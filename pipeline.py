@@ -4,6 +4,7 @@ generation -> citation verification into two calls: ingest() and ask().
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
+from pathlib import Path
 
 from openai import OpenAI
 
@@ -68,7 +69,14 @@ class RAGPipeline:
         raise ValueError(f"Unknown chunking strategy: {strategy}")
 
     def ingest_directory(self, path: str) -> dict:
-        docs = load_directory(path)
+        # Validate path to prevent path traversal
+        requested_path = Path(path).resolve()
+        allowed_root = Path(self.settings.allowed_ingest_root).resolve()
+
+        if not requested_path.is_relative_to(allowed_root):
+            raise ValueError(f"Ingest path {path} is outside the allowed directory {self.settings.allowed_ingest_root}")
+
+        docs = load_directory(requested_path)
         all_chunks: list[Chunk] = []
         for doc in docs:
             all_chunks.extend(self._chunk_document(doc))
@@ -139,7 +147,16 @@ class RAGPipeline:
                     if candidate_pool else
                     "I couldn't find any relevant information in the indexed documentation."
                 ),
-                sources=ranked,
+                sources=[
+                    {
+                        "block": i + 1,
+                        "source": c["payload"]["source"],
+                        "section_heading": c["payload"].get("section_heading"),
+                        "fused_score": c.get("fused_score"),
+                        "rerank_score": c.get("rerank_score"),
+                    }
+                    for i, c in enumerate(ranked)
+                ],
                 confidence={
                     "retrieval_confidence": retr_conf, "citation_coverage": None,
                     "completeness": None, "composite": retr_conf,

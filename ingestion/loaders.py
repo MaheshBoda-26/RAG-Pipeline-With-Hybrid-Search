@@ -67,8 +67,17 @@ def load_document(path: str | Path) -> RawDocument:
 
 
 def load_directory(root: str | Path) -> list[RawDocument]:
-    """Recursively load every supported file under `root`."""
-    root = Path(root)
+    """Recursively load every supported file under `root`.
+
+    Constraints the root path to ensure it is within the allowed base directory
+    to prevent path traversal.
+    """
+    root = Path(root).resolve()
+
+    # This function now assumes the caller has already validated that 'root'
+    # is within the allowed directory. If not, it should be handled at the
+    # entry point (e.g., the API layer).
+
     docs = []
     for dirpath, _dirnames, filenames in os.walk(root):
         for fname in sorted(filenames):

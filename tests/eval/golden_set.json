@@ -1,0 +1,272 @@
+[
+  {
+    "question": "What are the two authentication methods supported by the Aegis API?",
+    "expected_answer": "The Aegis API supports two authentication methods: OAuth2 and static API keys.",
+    "context": "The Aegis API supports two authentication methods: OAuth2 and static API keys. Choose OAuth2 for user-facing applications and API keys for server-to-server integrations."
+  },
+  {
+    "question": "How do you authenticate with an API key in the Aegis API?",
+    "expected_answer": "Include the API key in the Authorization header as 'Bearer aegis_live_xxxxxxxxxxxx'.",
+    "context": "To authenticate with an API key, include it in the Authorization header: Authorization: Bearer aegis_live_xxxxxxxxxxxx"
+  },
+  {
+    "question": "What happens when you make a request without a valid API key?",
+    "expected_answer": "Requests without a valid key return 401 Unauthorized.",
+    "context": "Requests without a valid key return 401 Unauthorized."
+  },
+  {
+    "question": "What happens when a read-only API key attempts a write operation?",
+    "expected_answer": "Requests with a valid but read-only key attempting a write operation return 403 Forbidden.",
+    "context": "Requests with a valid but read-only key attempting a write operation return 403 Forbidden."
+  },
+  {
+    "question": "What is the OAuth2 authorization endpoint for Aegis?",
+    "expected_answer": "The authorization endpoint is https://auth.aegis.example.com/oauth/authorize.",
+    "context": "The authorization endpoint is https://auth.aegis.example.com/oauth/authorize and the token endpoint is https://auth.aegis.example.com/oauth/token."
+  },
+  {
+    "question": "What is the OAuth2 token endpoint for Aegis?",
+    "expected_answer": "The token endpoint is https://auth.aegis.example.com/oauth/token.",
+    "context": "The authorization endpoint is https://auth.aegis.example.com/oauth/authorize and the token endpoint is https://auth.aegis.example.com/oauth/token."
+  },
+  {
+    "question": "How long do OAuth2 access tokens last before expiring?",
+    "expected_answer": "Access tokens expire after 1 hour.",
+    "context": "Access tokens expire after 1 hour. Use the returned refresh_token to obtain a new access token without requiring the user to log in again."
+  },
+  {
+    "question": "How do you get a new OAuth2 access token after it expires?",
+    "expected_answer": "Use the returned refresh_token to obtain a new access token without requiring the user to log in again.",
+    "context": "Access tokens expire after 1 hour. Use the returned refresh_token to obtain a new access token without requiring the user to log in again."
+  },
+  {
+    "question": "What is the rate limit for authenticated requests per API key?",
+    "expected_answer": "1000 requests per minute per API key.",
+    "context": "Authenticated requests are limited to 1000 requests per minute per API key, and 100 requests per minute per OAuth2 access token."
+  },
+  {
+    "question": "What is the rate limit for OAuth2 access tokens?",
+    "expected_answer": "100 requests per minute per OAuth2 access token.",
+    "context": "Authenticated requests are limited to 1000 requests per minute per API key, and 100 requests per minute per OAuth2 access token."
+  },
+  {
+    "question": "What headers indicate rate limit status?",
+    "expected_answer": "X-RateLimit-Limit and X-RateLimit-Remaining response headers.",
+    "context": "The current limit and remaining quota are returned in the X-RateLimit-Limit and X-RateLimit-Remaining response headers."
+  },
+  {
+    "question": "What happens when you exceed the rate limit?",
+    "expected_answer": "Exceeding the limit returns 429 Too Many Requests with a Retry-After header indicating how many seconds to wait.",
+    "context": "Exceeding the limit returns 429 Too Many Requests with a Retry-After header indicating how many seconds to wait."
+  },
+  {
+    "question": "What does the AUTH_INVALID_KEY error code mean?",
+    "expected_answer": "The provided API key does not exist or has been revoked (401).",
+    "context": "AUTH_INVALID_KEY (401): the provided API key does not exist or has been revoked."
+  },
+  {
+    "question": "What does the AUTH_EXPIRED_TOKEN error code mean?",
+    "expected_answer": "The OAuth2 access token has expired. Use the refresh token to obtain a new one (401).",
+    "context": "AUTH_EXPIRED_TOKEN (401): the OAuth2 access token has expired. Use the refresh token to obtain a new one."
+  },
+  {
+    "question": "What does the PERMISSION_DENIED error code mean?",
+    "expected_answer": "The authenticated principal does not have the required scope for this operation (403).",
+    "context": "PERMISSION_DENIED (403): the authenticated principal does not have the required scope for this operation."
+  },
+  {
+    "question": "What does the RATE_LIMITED error code mean and how should you handle it?",
+    "expected_answer": "Request quota exceeded. Safe to retry with exponential backoff using the Retry-After header (429).",
+    "context": "RATE_LIMITED (429): request quota exceeded. See the Retry-After header. RATE_LIMITED and INTERNAL_ERROR are safe to retry with exponential backoff."
+  },
+  {
+    "question": "What does the VALIDATION_ERROR error code mean?",
+    "expected_answer": "The request body failed schema validation. The details field lists each failing field and why (422).",
+    "context": "VALIDATION_ERROR (422): the request body failed schema validation. The details field lists each failing field and why."
+  },
+  {
+    "question": "What does the RESOURCE_NOT_FOUND error code mean?",
+    "expected_answer": "The requested resource ID does not exist in this workspace (404).",
+    "context": "RESOURCE_NOT_FOUND (404): the requested resource ID does not exist in this workspace."
+  },
+  {
+    "question": "What does the CONFLICT error code mean?",
+    "expected_answer": "The operation would violate a uniqueness constraint, e.g. creating a workspace with a name that's already taken (409).",
+    "context": "CONFLICT (409): the operation would violate a uniqueness constraint, e.g. creating a workspace with a name that's already taken."
+  },
+  {
+    "question": "What does the INTERNAL_ERROR error code mean?",
+    "expected_answer": "An unexpected server error. These are logged with a request_id -- include it when contacting support (500).",
+    "context": "INTERNAL_ERROR (500): an unexpected server error. These are logged with a request_id -- include it when contacting support."
+  },
+  {
+    "question": "Which error codes are safe to retry with exponential backoff?",
+    "expected_answer": "RATE_LIMITED and INTERNAL_ERROR are safe to retry with exponential backoff.",
+    "context": "RATE_LIMITED and INTERNAL_ERROR are safe to retry with exponential backoff. VALIDATION_ERROR, PERMISSION_DENIED, and CONFLICT will not succeed on retry without changing the request itself."
+  },
+  {
+    "question": "Which error codes will NOT succeed on retry without changing the request?",
+    "expected_answer": "VALIDATION_ERROR, PERMISSION_DENIED, and CONFLICT will not succeed on retry without changing the request itself.",
+    "context": "VALIDATION_ERROR, PERMISSION_DENIED, and CONFLICT will not succeed on retry without changing the request itself."
+  },
+  {
+    "question": "What are the supported deployment environments for Aegis?",
+    "expected_answer": "Aegis can be deployed on Kubernetes (recommended for production), Docker Compose (recommended for staging/local), or as a managed service via Aegis Cloud.",
+    "context": "Aegis can be deployed on Kubernetes (recommended for production), Docker Compose (recommended for staging/local), or as a managed service via Aegis Cloud."
+  },
+  {
+    "question": "Where is the Helm chart for Aegis Kubernetes deployment published?",
+    "expected_answer": "The Helm chart is published at charts.aegis.example.com/aegis-platform.",
+    "context": "The Helm chart is published at charts.aegis.example.com/aegis-platform."
+  },
+  {
+    "question": "What are the minimum Kubernetes and PostgreSQL versions for Aegis deployment?",
+    "context": "Minimum requirements are Kubernetes 1.27+ and a PostgreSQL 14+ instance reachable from the cluster.",
+    "expected_answer": "Kubernetes 1.27+ and PostgreSQL 14+."
+  },
+  {
+    "question": "What is the default replica count for API server pods in the Helm chart?",
+    "expected_answer": "Default is 3.",
+    "context": "replicaCount: number of API server pods. Default is 3."
+  },
+  {
+    "question": "What is the default memory request per pod in the Helm chart?",
+    "expected_answer": "Default is 512Mi per pod.",
+    "context": "resources.requests.memory: default is 512Mi per pod; increase to 1Gi+ for workspaces indexing more than 1M documents."
+  },
+  {
+    "question": "When should you increase the memory request per pod beyond the default?",
+    "expected_answer": "Increase to 1Gi+ for workspaces indexing more than 1M documents.",
+    "context": "resources.requests.memory: default is 512Mi per pod; increase to 1Gi+ for workspaces indexing more than 1M documents."
+  },
+  {
+    "question": "What is required if ingress is enabled in the Helm chart?",
+    "expected_answer": "ingress.tlsSecretName is required if ingress.enabled is true.",
+    "context": "ingress.tlsSecretName: required if ingress.enabled is true."
+  },
+  {
+    "question": "How do you deploy or update Aegis using Helm?",
+    "expected_answer": "Run helm upgrade --install aegis aegis/aegis-platform -f values.yaml.",
+    "context": "Run helm upgrade --install aegis aegis/aegis-platform -f values.yaml to deploy or update."
+  },
+  {
+    "question": "What services are included in the Docker Compose setup?",
+    "expected_answer": "The API server, worker, and a bundled PostgreSQL instance.",
+    "context": "For local or staging use, docker-compose.yml bundles the API server, worker, and a bundled PostgreSQL instance."
+  },
+  {
+    "question": "Why is Docker Compose not recommended for production?",
+    "expected_answer": "The bundled PostgreSQL has no automated backups.",
+    "context": "This configuration is not recommended for production because the bundled PostgreSQL has no automated backups."
+  },
+  {
+    "question": "What are the health check endpoints exposed by the API server?",
+    "expected_answer": "GET /healthz (liveness) and GET /readyz (readiness, checks database connectivity).",
+    "context": "The API server exposes GET /healthz (liveness) and GET /readyz (readiness, checks database connectivity)."
+  },
+  {
+    "question": "What does a 503 from /readyz indicate?",
+    "expected_answer": "The database connection pool is exhausted or unreachable.",
+    "context": "A 503 from /readyz indicates the database connection pool is exhausted or unreachable."
+  },
+  {
+    "question": "Does Aegis support zero-downtime upgrades?",
+    "expected_answer": "Aegis supports rolling upgrades between minor versions without downtime.",
+    "context": "Aegis supports rolling upgrades between minor versions without downtime."
+  },
+  {
+    "question": "What is required for major version upgrades?",
+    "expected_answer": "Running the migration tool (aegis-migrate) before deploying the new version, and may require brief read-only downtime.",
+    "context": "Major version upgrades require running the migration tool (aegis-migrate) before deploying the new version, and may require brief read-only downtime depending on the size of the schema change."
+  },
+  {
+    "question": "Where are API keys generated in the Aegis dashboard?",
+    "expected_answer": "Settings > API Keys.",
+    "context": "API keys are generated in the dashboard under Settings > API Keys."
+  },
+  {
+    "question": "What scopes can an API key have?",
+    "expected_answer": "Each key is scoped to a single workspace and can be restricted to read-only or read-write access.",
+    "context": "Each key is scoped to a single workspace and can be restricted to read-only or read-write access."
+  },
+  {
+    "question": "Do API keys expire automatically?",
+    "expected_answer": "Keys do not expire automatically, but can be revoked at any time from the dashboard.",
+    "context": "Keys do not expire automatically, but can be revoked at any time from the dashboard."
+  },
+  {
+    "question": "Where do you register an OAuth2 application in the Aegis dashboard?",
+    "expected_answer": "Settings > OAuth Apps.",
+    "context": "Register your application at Settings > OAuth Apps to receive a client_id and client_secret."
+  },
+  {
+    "question": "What information do you receive when registering an OAuth2 application?",
+    "expected_answer": "A client_id and client_secret.",
+    "context": "Register your application at Settings > OAuth Apps to receive a client_id and client_secret."
+  },
+  {
+    "question": "What HTTP status code does AUTH_INVALID_KEY return?",
+    "expected_answer": "401",
+    "context": "AUTH_INVALID_KEY (401): the provided API key does not exist or has been revoked."
+  },
+  {
+    "question": "What HTTP status code does PERMISSION_DENIED return?",
+    "expected_answer": "403",
+    "context": "PERMISSION_DENIED (403): the authenticated principal does not have the required scope for this operation."
+  },
+  {
+    "question": "What HTTP status code does VALIDATION_ERROR return?",
+    "expected_answer": "422",
+    "context": "VALIDATION_ERROR (422): the request body failed schema validation."
+  },
+  {
+    "question": "What HTTP status code does RATE_LIMITED return?",
+    "expected_answer": "429",
+    "context": "RATE_LIMITED (429): request quota exceeded."
+  },
+  {
+    "question": "What HTTP status code does RESOURCE_NOT_FOUND return?",
+    "expected_answer": "404",
+    "context": "RESOURCE_NOT_FOUND (404): the requested resource ID does not exist in this workspace."
+  },
+  {
+    "question": "What HTTP status code does CONFLICT return?",
+    "expected_answer": "409",
+    "context": "CONFLICT (409): the operation would violate a uniqueness constraint."
+  },
+  {
+    "question": "What HTTP status code does INTERNAL_ERROR return?",
+    "expected_answer": "500",
+    "context": "INTERNAL_ERROR (500): an unexpected server error."
+  },
+  {
+    "question": "What should you include when contacting support about an INTERNAL_ERROR?",
+    "expected_answer": "Include the request_id that is logged with the error.",
+    "context": "INTERNAL_ERROR (500): an unexpected server error. These are logged with a request_id -- include it when contacting support."
+  },
+  {
+    "question": "What is the Aegis Cloud deployment option?",
+    "expected_answer": "A managed service via Aegis Cloud.",
+    "context": "Aegis can be deployed on Kubernetes (recommended for production), Docker Compose (recommended for staging/local), or as a managed service via Aegis Cloud."
+  },
+  {
+    "question": "What error code is returned when creating a workspace with a name that already exists?",
+    "expected_answer": "CONFLICT (409)",
+    "context": "CONFLICT (409): the operation would violate a uniqueness constraint, e.g. creating a workspace with a name that's already taken."
+  },
+  {
+    "question": "What should you do if you get a VALIDATION_ERROR?",
+    "expected_answer": "Check the details field which lists each failing field and why. Fix the request before retrying.",
+    "context": "VALIDATION_ERROR (422): the request body failed schema validation. The details field lists each failing field and why. VALIDATION_ERROR, PERMISSION_DENIED, and CONFLICT will not succeed on retry without changing the request itself."
+  },
+  {
+    "question": "How do you know what your current rate limit quota is?",
+    "expected_answer": "The current limit and remaining quota are returned in the X-RateLimit-Limit and X-RateLimit-Remaining response headers.",
+    "context": "The current limit and remaining quota are returned in the X-RateLimit-Limit and X-RateLimit-Remaining response headers."
+  },
+  {
+    "question": "Can you use the same API key across multiple workspaces?",
+    "expected_answer": "No, each key is scoped to a single workspace.",
+    "context": "Each key is scoped to a single workspace and can be restricted to read-only or read-write access."
+  }
+]

@@ -44,6 +44,10 @@ class Settings:
     # --- Confidence / fallback ---
     min_retrieval_confidence: float = 0.35  # below this, refuse rather than hallucinate
 
+    # --- Auth ---
+    api_key: str = os.getenv("API_KEY", "dev-secret-key")
+    allowed_ingest_root: str = os.getenv("ALLOWED_INGEST_ROOT", "./sample_docs")
+
     def validate(self):
         if not self.openai_api_key:
             raise RuntimeError(
