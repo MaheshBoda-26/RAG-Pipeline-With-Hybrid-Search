@@ -7,7 +7,7 @@
     "avg_faithfulness": 0.9,
     "avg_citation_accuracy": 0.95,
     "avg_retrieval_relevance": 0.8,
-    "avg_latency_ms": 0.5544012776765697,
+    "avg_latency_ms": 1.00965970381771,
     "refusal_rate": 0.05555555555555555,
     "by_strategy": null
   },
@@ -60,7 +60,7 @@
           "rerank_score": 6.0
         }
       ],
-      "latency_ms": 1.0032919963123277,
+      "latency_ms": 0.9702909956104122,
       "correctness": 0.85,
       "faithfulness": 0.9,
       "citation_accuracy": 0.95,
@@ -114,7 +114,7 @@
           "rerank_score": 10.0
         }
       ],
-      "latency_ms": 0.6592499994440004,
+      "latency_ms": 0.6201669966685586,
       "correctness": 0.85,
       "faithfulness": 0.9,
       "citation_accuracy": 0.95,
@@ -126,10 +126,10 @@
       "actual_answer": "Based on the documentation, this is answered in the context [1].",
       "refused": false,
       "confidence": {
-        "retrieval_confidence": 0.94,
+        "retrieval_confidence": 0.86,
         "citation_coverage": 1.0,
         "completeness": 0.9,
-        "composite": 0.947
+        "composite": 0.92
       },
       "sources": [
         {
@@ -141,34 +141,34 @@
         },
         {
           "block": 2,
-          "source": "/Users/maheshboda/Projects/Rag Pipeline/sample_docs/error_codes.md",
-          "section_heading": "Overview",
-          "fused_score": 0.004285714285714285,
-          "rerank_score": 10.0
+          "source": "/Users/maheshboda/Projects/Rag Pipeline/sample_docs/deployment.md",
+          "section_heading": "Zero-Downtime Upgrades",
+          "fused_score": 0.01522144522144522,
+          "rerank_score": 9.0
         },
         {
           "block": 3,
-          "source": "/Users/maheshboda/Projects/Rag Pipeline/sample_docs/authentication.md",
-          "section_heading": "API Keys",
-          "fused_score": 0.015212150433944069,
+          "source": "/Users/maheshboda/Projects/Rag Pipeline/sample_docs/error_codes.md",
+          "section_heading": "Common Error Codes",
+          "fused_score": 0.014838709677419352,
           "rerank_score": 9.0
         },
         {
           "block": 4,
-          "source": "/Users/maheshboda/Projects/Rag Pipeline/sample_docs/deployment.md",
-          "section_heading": "Docker Compose",
-          "fused_score": 0.0109375,
+          "source": "/Users/maheshboda/Projects/Rag Pipeline/sample_docs/authentication.md",
+          "section_heading": "Overview",
+          "fused_score": 0.010144927536231883,
           "rerank_score": 9.0
         },
         {
           "block": 5,
-          "source": "/Users/maheshboda/Projects/Rag Pipeline/sample_docs/deployment.md",
-          "section_heading": "Supported Environments",
-          "fused_score": 0.01044776119402985,
-          "rerank_score": 9.0
+          "source": "/Users/maheshboda/Projects/Rag Pipeline/sample_docs/authentication.md",
+          "section_heading": "OAuth2",
+          "fused_score": 0.015767934520943667,
+          "rerank_score": 6.0
         }
       ],
-      "latency_ms": 0.6232089945115149,
+      "latency_ms": 0.5783329979749396,
       "correctness": 0.85,
       "faithfulness": 0.9,
       "citation_accuracy": 0.95,
@@ -217,12 +217,12 @@
         {
           "block": 5,
           "source": "/Users/maheshboda/Projects/Rag Pipeline/sample_docs/deployment.md",
-          "section_heading": "Kubernetes Deployment",
-          "fused_score": 0.015552884615384614,
+          "section_heading": "Docker Compose",
+          "fused_score": 0.015588723051409617,
           "rerank_score": 9.0
         }
       ],
-      "latency_ms": 0.6130830006441101,
+      "latency_ms": 0.5512919960892759,
       "correctness": 0.85,
       "faithfulness": 0.9,
       "citation_accuracy": 0.95,
@@ -276,7 +276,7 @@
           "rerank_score": 9.0
         }
       ],
-      "latency_ms": 0.549209005839657,
+      "latency_ms": 0.5131249999976717,
       "correctness": 0.85,
       "faithfulness": 0.9,
       "citation_accuracy": 0.95,
@@ -330,7 +330,7 @@
           "rerank_score": 9.0
         }
       ],
-      "latency_ms": 0.519667002663482,
+      "latency_ms": 0.5118749977555126,
       "correctness": 0.85,
       "faithfulness": 0.9,
       "citation_accuracy": 0.95,
@@ -384,7 +384,7 @@
           "rerank_score": 6.0
         }
       ],
-      "latency_ms": 0.5201249950914644,
+      "latency_ms": 0.5247500012046658,
       "correctness": 0.85,
       "faithfulness": 0.9,
       "citation_accuracy": 0.95,
@@ -438,7 +438,7 @@
           "rerank_score": 10.0
         }
       ],
-      "latency_ms": 0.5626669953926466,
+      "latency_ms": 0.545209004485514,
       "correctness": 0.85,
       "faithfulness": 0.9,
       "citation_accuracy": 0.95,
@@ -492,7 +492,7 @@
           "rerank_score": 10.0
         }
       ],
-      "latency_ms": 0.5387499986682087,
+      "latency_ms": 0.5394159961724654,
       "correctness": 0.85,
       "faithfulness": 0.9,
       "citation_accuracy": 0.95,
@@ -546,7 +546,7 @@
           "rerank_score": 10.0
         }
       ],
-      "latency_ms": 0.5095000014989637,
+      "latency_ms": 0.509375000547152,
       "correctness": 0.85,
       "faithfulness": 0.9,
       "citation_accuracy": 0.95,
@@ -600,7 +600,7 @@
           "rerank_score": 3.0
         }
       ],
-      "latency_ms": 0.46624999959021807,
+      "latency_ms": 0.46670799929415807,
       "correctness": 0.85,
       "faithfulness": 0.9,
       "citation_accuracy": 0.95,
@@ -629,7 +629,7 @@
           "block": 2,
           "source": "/Users/maheshboda/Projects/Rag Pipeline/sample_docs/error_codes.md",
           "section_heading": "Overview",
-          "fused_score": 0.015083672546359112,
+          "fused_score": 0.015017825311942958,
           "rerank_score": 9.0
         },
         {
@@ -654,7 +654,7 @@
           "rerank_score": 6.0
         }
       ],
-      "latency_ms": 0.49566700181458145,
+      "latency_ms": 0.505209005495999,
       "correctness": 0.85,
       "faithfulness": 0.9,
       "citation_accuracy": 0.95,
@@ -708,7 +708,7 @@
           "rerank_score": 6.0
         }
       ],
-      "latency_ms": 0.4935830002068542,
+      "latency_ms": 0.5205420020502061,
       "correctness": 0.85,
       "faithfulness": 0.9,
       "citation_accuracy": 0.95,
@@ -737,7 +737,7 @@
           "block": 2,
           "source": "/Users/maheshboda/Projects/Rag Pipeline/sample_docs/deployment.md",
           "section_heading": "Docker Compose",
-          "fused_score": 0.004477611940298507,
+          "fused_score": 0.004545454545454545,
           "rerank_score": 9.0
         },
         {
@@ -762,7 +762,7 @@
           "rerank_score": 3.0
         }
       ],
-      "latency_ms": 0.4850839977734722,
+      "latency_ms": 0.47783299669390544,
       "correctness": 0.85,
       "faithfulness": 0.9,
       "citation_accuracy": 0.95,
@@ -798,7 +798,7 @@
           "block": 3,
           "source": "/Users/maheshboda/Projects/Rag Pipeline/sample_docs/deployment.md",
           "section_heading": "Docker Compose",
-          "fused_score": 0.014705882352941176,
+          "fused_score": 0.01477172958735733,
           "rerank_score": 9.0
         },
         {
@@ -816,7 +816,7 @@
           "rerank_score": 6.0
         }
       ],
-      "latency_ms": 0.5070420011179522,
+      "latency_ms": 0.48508299369132146,
       "correctness": 0.85,
       "faithfulness": 0.9,
       "citation_accuracy": 0.95,
@@ -870,7 +870,7 @@
           "rerank_score": 9.0
         }
       ],
-      "latency_ms": 0.6983749990467913,
+      "latency_ms": 0.7033750007394701,
       "correctness": 0.85,
       "faithfulness": 0.9,
       "citation_accuracy": 0.95,
@@ -899,7 +899,7 @@
           "block": 2,
           "source": "/Users/maheshboda/Projects/Rag Pipeline/sample_docs/error_codes.md",
           "section_heading": "Overview",
-          "fused_score": 0.015953021776364082,
+          "fused_score": 0.015887174541947928,
           "rerank_score": 9.0
         },
         {
@@ -924,7 +924,7 @@
           "rerank_score": 3.0
         }
       ],
-      "latency_ms": 0.5119170018588193,
+      "latency_ms": 0.5164589965716004,
       "correctness": 0.85,
       "faithfulness": 0.9,
       "citation_accuracy": 0.95,
@@ -967,7 +967,7 @@
           "block": 4,
           "source": "/Users/maheshboda/Projects/Rag Pipeline/sample_docs/deployment.md",
           "section_heading": "Docker Compose",
-          "fused_score": 0.014925373134328356,
+          "fused_score": 0.014993215739484395,
           "rerank_score": 6.0
         },
         {
@@ -978,7 +978,7 @@
           "rerank_score": 3.0
         }
       ],
-      "latency_ms": 0.49783300346462056,
+      "latency_ms": 0.5099999980302528,
       "correctness": 0.85,
       "faithfulness": 0.9,
       "citation_accuracy": 0.95,
@@ -1014,7 +1014,7 @@
           "block": 3,
           "source": "/Users/maheshboda/Projects/Rag Pipeline/sample_docs/error_codes.md",
           "section_heading": "Overview",
-          "fused_score": 0.015953021776364082,
+          "fused_score": 0.015887174541947928,
           "rerank_score": 9.0
         },
         {
@@ -1032,7 +1032,7 @@
           "rerank_score": 3.0
         }
       ],
-      "latency_ms": 0.4858329994021915,
+      "latency_ms": 0.4828329983865842,
       "correctness": 0.85,
       "faithfulness": 0.9,
       "citation_accuracy": 0.95,
@@ -1068,7 +1068,7 @@
           "block": 3,
           "source": "/Users/maheshboda/Projects/Rag Pipeline/sample_docs/error_codes.md",
           "section_heading": "Overview",
-          "fused_score": 0.015887174541947928,
+          "fused_score": 0.015823235923022094,
           "rerank_score": 9.0
         },
         {
@@ -1086,7 +1086,7 @@
           "rerank_score": 6.0
         }
       ],
-      "latency_ms": 0.5858750009792857,
+      "latency_ms": 0.5765000023529865,
       "correctness": 0.85,
       "faithfulness": 0.9,
       "citation_accuracy": 0.95,
@@ -1140,7 +1140,7 @@
           "rerank_score": 9.0
         }
       ],
-      "latency_ms": 0.5283330028760247,
+      "latency_ms": 0.5138749984325841,
       "correctness": 0.85,
       "faithfulness": 0.9,
       "citation_accuracy": 0.95,
@@ -1194,7 +1194,7 @@
           "rerank_score": 9.0
         }
       ],
-      "latency_ms": 0.5352909938665107,
+      "latency_ms": 0.5281670019030571,
       "correctness": 0.85,
       "faithfulness": 0.9,
       "citation_accuracy": 0.95,
@@ -1248,7 +1248,7 @@
           "rerank_score": 6.0
         }
       ],
-      "latency_ms": 0.5167909985175356,
+      "latency_ms": 0.4932080046273768,
       "correctness": 0.85,
       "faithfulness": 0.9,
       "citation_accuracy": 0.95,
@@ -1302,7 +1302,7 @@
           "rerank_score": 10.0
         }
       ],
-      "latency_ms": 0.6116250006016344,
+      "latency_ms": 0.6078330043237656,
       "correctness": 0.85,
       "faithfulness": 0.9,
       "citation_accuracy": 0.95,
@@ -1356,7 +1356,7 @@
           "rerank_score": 9.0
         }
       ],
-      "latency_ms": 0.5292079949867912,
+      "latency_ms": 0.5209169976296835,
       "correctness": 0.85,
       "faithfulness": 0.9,
       "citation_accuracy": 0.95,
@@ -1410,7 +1410,7 @@
           "rerank_score": 10.0
         }
       ],
-      "latency_ms": 0.5554589952225797,
+      "latency_ms": 0.5572920053964481,
       "correctness": 0.85,
       "faithfulness": 0.9,
       "citation_accuracy": 0.95,
@@ -1464,7 +1464,7 @@
           "rerank_score": 9.0
         }
       ],
-      "latency_ms": 0.5430000019259751,
+      "latency_ms": 0.5261249971226789,
       "correctness": 0.85,
       "faithfulness": 0.9,
       "citation_accuracy": 0.95,
@@ -1518,7 +1518,7 @@
           "rerank_score": 9.0
         }
       ],
-      "latency_ms": 0.6586660019820556,
+      "latency_ms": 0.9224579989677295,
       "correctness": 0.85,
       "faithfulness": 0.9,
       "citation_accuracy": 0.95,
@@ -1572,7 +1572,7 @@
           "rerank_score": 10.0
         }
       ],
-      "latency_ms": 0.6522920011775568,
+      "latency_ms": 0.5390830046962947,
       "correctness": 0.85,
       "faithfulness": 0.9,
       "citation_accuracy": 0.95,
@@ -1592,9 +1592,9 @@
       "sources": [
         {
           "block": 1,
-          "source": "/Users/maheshboda/Projects/Rag Pipeline/sample_docs/deployment.md",
-          "section_heading": "Docker Compose",
-          "fused_score": 0.01545893719806763,
+          "source": "/Users/maheshboda/Projects/Rag Pipeline/sample_docs/authentication.md",
+          "section_heading": "Overview",
+          "fused_score": 0.015482954545454545,
           "rerank_score": 10.0
         },
         {
@@ -1620,13 +1620,13 @@
         },
         {
           "block": 5,
-          "source": "/Users/maheshboda/Projects/Rag Pipeline/sample_docs/authentication.md",
-          "section_heading": "Overview",
-          "fused_score": 0.015482954545454545,
+          "source": "/Users/maheshboda/Projects/Rag Pipeline/sample_docs/deployment.md",
+          "section_heading": "Docker Compose",
+          "fused_score": 0.015522875816993463,
           "rerank_score": 6.0
         }
       ],
-      "latency_ms": 0.5863339974894188,
+      "latency_ms": 0.5168749994481914,
       "correctness": 0.85,
       "faithfulness": 0.9,
       "citation_accuracy": 0.95,
@@ -1680,7 +1680,7 @@
           "rerank_score": 6.0
         }
       ],
-      "latency_ms": 0.5555000025196932,
+      "latency_ms": 0.5063339995103888,
       "correctness": 0.85,
       "faithfulness": 0.9,
       "citation_accuracy": 0.95,
@@ -1734,7 +1734,7 @@
           "rerank_score": 6.0
         }
       ],
-      "latency_ms": 0.6245830008992925,
+      "latency_ms": 26.011417001427617,
       "correctness": 0.85,
       "faithfulness": 0.9,
       "citation_accuracy": 0.95,
@@ -1788,7 +1788,7 @@
           "rerank_score": 6.0
         }
       ],
-      "latency_ms": 0.5744169975514524,
+      "latency_ms": 0.6782080017728731,
       "correctness": 0.85,
       "faithfulness": 0.9,
       "citation_accuracy": 0.95,
@@ -1817,7 +1817,7 @@
           "block": 2,
           "source": "/Users/maheshboda/Projects/Rag Pipeline/sample_docs/error_codes.md",
           "section_heading": "Overview",
-          "fused_score": 0.015180995475113122,
+          "fused_score": 0.015117056856187291,
           "rerank_score": 6.0
         },
         {
@@ -1842,7 +1842,7 @@
           "rerank_score": 3.0
         }
       ],
-      "latency_ms": 0.5214170014369301,
+      "latency_ms": 0.531457997567486,
       "correctness": 0.85,
       "faithfulness": 0.9,
       "citation_accuracy": 0.95,
@@ -1896,7 +1896,7 @@
           "rerank_score": 3.0
         }
       ],
-      "latency_ms": 0.49279200175078586,
+      "latency_ms": 0.5342500007827766,
       "correctness": 0.85,
       "faithfulness": 0.9,
       "citation_accuracy": 0.95,
@@ -1950,7 +1950,7 @@
           "rerank_score": 6.0
         }
       ],
-      "latency_ms": 0.60374999884516,
+      "latency_ms": 0.5020829994464293,
       "correctness": 0.85,
       "faithfulness": 0.9,
       "citation_accuracy": 0.95,
@@ -2004,7 +2004,7 @@
           "rerank_score": 9.0
         }
       ],
-      "latency_ms": 0.5267920059850439,
+      "latency_ms": 0.5143750022398308,
       "correctness": 0.85,
       "faithfulness": 0.9,
       "citation_accuracy": 0.95,
@@ -2054,11 +2054,11 @@
           "block": 5,
           "source": "/Users/maheshboda/Projects/Rag Pipeline/sample_docs/deployment.md",
           "section_heading": "Docker Compose",
-          "fused_score": 0.014430641821946168,
+          "fused_score": 0.014492753623188404,
           "rerank_score": 9.0
         }
       ],
-      "latency_ms": 0.5212500036577694,
+      "latency_ms": 0.48837500071385875,
       "correctness": 0.85,
       "faithfulness": 0.9,
       "citation_accuracy": 0.95,
@@ -2112,7 +2112,7 @@
           "rerank_score": 3.0
         }
       ],
-      "latency_ms": 0.49812500219559297,
+      "latency_ms": 0.5970830025034957,
       "correctness": 0.85,
       "faithfulness": 0.9,
       "citation_accuracy": 0.95,
@@ -2166,7 +2166,7 @@
           "rerank_score": 10.0
         }
       ],
-      "latency_ms": 0.8042499975999817,
+      "latency_ms": 0.5307079991325736,
       "correctness": 0.85,
       "faithfulness": 0.9,
       "citation_accuracy": 0.95,
@@ -2220,7 +2220,7 @@
           "rerank_score": 6.0
         }
       ],
-      "latency_ms": 0.5783329979749396,
+      "latency_ms": 0.5065419973107055,
       "correctness": 0.85,
       "faithfulness": 0.9,
       "citation_accuracy": 0.95,
@@ -2274,7 +2274,7 @@
           "rerank_score": 0.0
         }
       ],
-      "latency_ms": 0.5370830040192232,
+      "latency_ms": 0.4683330043917522,
       "correctness": 0.85,
       "faithfulness": 0.9,
       "citation_accuracy": 0.95,
@@ -2328,7 +2328,7 @@
           "rerank_score": 0.0
         }
       ],
-      "latency_ms": 0.4075839970028028,
+      "latency_ms": 0.4750840016640723,
       "correctness": null,
       "faithfulness": null,
       "citation_accuracy": null,
@@ -2382,7 +2382,7 @@
           "rerank_score": 0.0
         }
       ],
-      "latency_ms": 0.5068329992354847,
+      "latency_ms": 0.4755000045406632,
       "correctness": 0.85,
       "faithfulness": 0.9,
       "citation_accuracy": 0.95,
@@ -2436,7 +2436,7 @@
           "rerank_score": 0.0
         }
       ],
-      "latency_ms": 0.39449999894713983,
+      "latency_ms": 0.3843749946099706,
       "correctness": null,
       "faithfulness": null,
       "citation_accuracy": null,
@@ -2490,7 +2490,7 @@
           "rerank_score": 0.0
         }
       ],
-      "latency_ms": 0.4829579993383959,
+      "latency_ms": 0.3757090016733855,
       "correctness": null,
       "faithfulness": null,
       "citation_accuracy": null,
@@ -2544,7 +2544,7 @@
           "rerank_score": 0.0
         }
       ],
-      "latency_ms": 0.47887499385979027,
+      "latency_ms": 0.5002500038244762,
       "correctness": 0.85,
       "faithfulness": 0.9,
       "citation_accuracy": 0.95,
@@ -2598,7 +2598,7 @@
           "rerank_score": 0.0
         }
       ],
-      "latency_ms": 0.4859590044361539,
+      "latency_ms": 0.47087499842746183,
       "correctness": 0.85,
       "faithfulness": 0.9,
       "citation_accuracy": 0.95,
@@ -2652,7 +2652,7 @@
           "rerank_score": 6.0
         }
       ],
-      "latency_ms": 0.5243750056251884,
+      "latency_ms": 0.5217500001890585,
       "correctness": 0.85,
       "faithfulness": 0.9,
       "citation_accuracy": 0.95,
@@ -2706,7 +2706,7 @@
           "rerank_score": 6.0
         }
       ],
-      "latency_ms": 0.501457994687371,
+      "latency_ms": 0.4902500004391186,
       "correctness": 0.85,
       "faithfulness": 0.9,
       "citation_accuracy": 0.95,
@@ -2760,7 +2760,7 @@
           "rerank_score": 9.0
         }
       ],
-      "latency_ms": 0.5837080025230534,
+      "latency_ms": 0.5694999999832362,
       "correctness": 0.85,
       "faithfulness": 0.9,
       "citation_accuracy": 0.95,
@@ -2814,7 +2814,7 @@
           "rerank_score": 6.0
         }
       ],
-      "latency_ms": 0.5371669976739213,
+      "latency_ms": 0.5079580005258322,
       "correctness": 0.85,
       "faithfulness": 0.9,
       "citation_accuracy": 0.95,
@@ -2868,7 +2868,7 @@
           "rerank_score": 3.0
         }
       ],
-      "latency_ms": 0.5714590006391518,
+      "latency_ms": 0.5339159979484975,
       "correctness": 0.85,
       "faithfulness": 0.9,
       "citation_accuracy": 0.95,
@@ -2922,7 +2922,7 @@
           "rerank_score": 9.0
         }
       ],
-      "latency_ms": 0.5812910021631978,
+      "latency_ms": 0.5130830031703226,
       "correctness": 0.85,
       "faithfulness": 0.9,
       "citation_accuracy": 0.95,

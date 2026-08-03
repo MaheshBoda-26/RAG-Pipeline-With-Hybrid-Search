@@ -15,11 +15,23 @@ from pydantic import BaseModel
 from config import settings
 from pipeline import RAGPipeline
 
+
 app = FastAPI(title="RAG Pipeline API")
-pipeline = RAGPipeline(settings)
+
+# Lazy pipeline initialization
+_pipeline = None
+
+
+def get_pipeline() -> RAGPipeline:
+    global _pipeline
+    if _pipeline is None:
+        _pipeline = RAGPipeline(settings)
+    return _pipeline
+
 
 # --- Auth Middleware ---
 security = HTTPBearer()
+
 
 async def verify_api_key(auth: HTTPAuthorizationCredentials = Security(security)):
     """
@@ -44,12 +56,14 @@ class IngestRequest(BaseModel):
 
 @app.post("/v1/ask", dependencies=[Depends(verify_api_key)])
 def ask(req: AskRequest):
+    pipeline = get_pipeline()
     response = pipeline.ask(req.question)
     return response.__dict__
 
 
 @app.post("/v1/ingest", dependencies=[Depends(verify_api_key)])
 def ingest(req: IngestRequest):
+    pipeline = get_pipeline()
     try:
         return pipeline.ingest_directory(req.path)
     except ValueError as e:
@@ -58,6 +72,7 @@ def ingest(req: IngestRequest):
 
 @app.get("/v1/documents", dependencies=[Depends(verify_api_key)])
 def documents():
+    pipeline = get_pipeline()
     records = pipeline.vector_store.all_chunks()
     sources = sorted({r["payload"]["source"] for r in records})
     return {"documents": sources, "total_chunks": len(records)}

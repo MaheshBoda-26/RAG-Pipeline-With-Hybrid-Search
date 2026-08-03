@@ -1,0 +1,98 @@
+version: "3.8"
+
+services:
+  # Qdrant vector database
+  qdrant:
+    image: qdrant/qdrant:v1.10.0
+    container_name: rag-qdrant
+    ports:
+      - "6333:6333"   # HTTP API
+      - "6334:6334"   # gRPC
+    volumes:
+      - qdrant_data:/qdrant/storage
+    environment:
+      - QDRANT__SERVICE__HTTP_PORT=6333
+      - QDRANT__SERVICE__GRPC_PORT=6334
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6333/healthz"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - rag-network
+
+  # RAG Pipeline API
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: rag-api
+    ports:
+      - "8000:8000"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - CHAT_MODEL=${CHAT_MODEL:-gpt-4o}
+      - EMBEDDING_MODEL=${EMBEDDING_MODEL:-text-embedding-3-small}
+      - QDRANT_URL=http://qdrant:6333
+      - QDRANT_PATH=
+      - COLLECTION_NAME=docs
+      - EMBEDDING_DIM=1536
+      - CHUNK_STRATEGY=recursive
+      - FIXED_CHUNK_SIZE=800
+      - FIXED_CHUNK_OVERLAP=120
+      - SEMANTIC_SIMILARITY_THRESHOLD=0.28
+      - DEDUP_SIMILARITY_THRESHOLD=0.95
+      - DENSE_TOP_K=10
+      - SPARSE_TOP_K=10
+      - RRF_K=60
+      - DENSE_WEIGHT=0.7
+      - SPARSE_WEIGHT=0.3
+      - RERANK_CANDIDATE_POOL=20
+      - FINAL_TOP_K=5
+      - MIN_RETRIEVAL_CONFIDENCE=0.35
+      - API_KEY=${API_KEY:-dev-secret-key}
+      - ALLOWED_INGEST_ROOT=/app/sample_docs
+    volumes:
+      - ./sample_docs:/app/sample_docs:ro
+      - ./qdrant_data:/app/qdrant_data  # Only used if QDRANT_PATH is set
+    depends_on:
+      qdrant:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/v1/documents", "-H", "Authorization: Bearer ${API_KEY:-dev-secret-key}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
+    networks:
+      - rag-network
+    # Run with multiple workers (only works with external Qdrant)
+    command: ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]
+
+  # Optional: Streamlit Dashboard
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile.dashboard
+    container_name: rag-dashboard
+    ports:
+      - "8501:8501"
+    environment:
+      - API_URL=http://api:8000
+      - API_KEY=${API_KEY:-dev-secret-key}
+    depends_on:
+      - api
+    restart: unless-stopped
+    networks:
+      - rag-network
+
+volumes:
+  qdrant_data:
+    driver: local
+
+networks:
+  rag-network:
+    driver: bridge
