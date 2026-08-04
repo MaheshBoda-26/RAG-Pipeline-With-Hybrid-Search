@@ -32,6 +32,17 @@ class QdrantVectorStore:
                     size=self.embedding_dim, distance=qmodels.Distance.COSINE
                 ),
             )
+        else:
+            # Check existing collection dims match; recreate if mismatch
+            info = self.client.get_collection(self.collection_name)
+            if info.config.params.vectors.size != self.embedding_dim:
+                self.client.delete_collection(self.collection_name)
+                self.client.create_collection(
+                    collection_name=self.collection_name,
+                    vectors_config=qmodels.VectorParams(
+                        size=self.embedding_dim, distance=qmodels.Distance.COSINE
+                    ),
+                )
 
     def upsert(self, chunks: list[Chunk], embeddings: list[list[float]]) -> None:
         if not chunks:

@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="RAG Pipeline - Hybrid Search Over Internal Docs. A production-grade retrieval-augmented generation system with dense + sparse search, RRF fusion, LLM reranking, and grounded generation with citations.">
+    <title>RAG Pipeline | Hybrid Search Over Internal Docs</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Anime.js -->
+    <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Canvas Background -->
+    <canvas id="bg-canvas" aria-hidden="true"></canvas>
+
+    <!-- Navigation -->
+    <nav class="nav" role="navigation" aria-label="Main navigation">
+        <div class="nav-container">
+            <a href="#" class="nav-logo" aria-label="RAG Pipeline Home">
+                <svg class="logo-icon" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+                    <rect x="2" y="2" width="28" height="28" rx="6" class="logo-bg"/>
+                    <path d="M8 12h16M8 16h12M8 20h8" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" class="logo-lines"/>
+                    <circle cx="24" cy="20" r="3" class="logo-dot"/>
+                </svg>
+                <span class="logo-text">RAG Pipeline</span>
+            </a>
+
+            <div class="nav-links" role="menubar">
+                <a href="#features" class="nav-link" role="menuitem">Features</a>
+                <a href="#architecture" class="nav-link" role="menuitem">Architecture</a>
+                <a href="#demo" class="nav-link" role="menuitem">Live Demo</a>
+                <a href="#docs" class="nav-link" role="menuitem">Docs</a>
+                <a href="https://github.com" class="nav-link nav-github" target="_blank" rel="noopener noreferrer" role="menuitem" aria-label="View on GitHub">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+                    </svg>
+                </a>
+            </div>
+
+            <button class="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation">
+                <span class="hamburger"></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero" role="banner">
+        <div class="hero-container">
+            <div class="hero-content">
+                <div class="hero-badge" aria-label="New release">
+                    <span class="badge-dot" aria-hidden="true"></span>
+                    <span>v2.0 — Hybrid Search + LLM Reranking</span>
+                </div>
+
+                <h1 class="hero-title">
+                    <span class="title-line">Hybrid Search</span>
+                    <span class="title-line title-accent">Over Internal Docs</span>
+                </h1>
+
+                <p class="hero-description">
+                    Production-grade RAG pipeline with dense vector search, BM25 sparse retrieval,
+                    reciprocal rank fusion, LLM-as-judge reranking, and grounded generation
+                    with verified inline citations.
+                </p>
+
+                <div class="hero-cta">
+                    <a href="#demo" class="btn btn-primary" role="button">
+                        <span>Try Live Demo</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                    <a href="#architecture" class="btn btn-secondary" role="button">
+                        <span>View Architecture</span>
+                    </a>
+                </div>
+
+                <div class="hero-stats" role="list" aria-label="Key metrics">
+                    <div class="stat" role="listitem">
+                        <span class="stat-value" data-count="95">0</span>
+                        <span class="stat-label">Retrieval Accuracy</span>
+                    </div>
+                    <div class="stat" role="listitem">
+                        <span class="stat-value" data-count="50">0</span>
+                        <span class="stat-label">ms Latency</span>
+                    </div>
+                    <div class="stat" role="listitem">
+                        <span class="stat-value" data-count="3">0</span>
+                        <span class="stat-label">Search Modes</span>
+                    </div>
+                    <div class="stat" role="listitem">
+                        <span class="stat-value" data-count="99">0</span>
+                        <span class="stat-label">Uptime SLA</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hero-visual" aria-hidden="true">
+                <div class="visual-container">
+                    <div class="code-window">
+                        <div class="window-header">
+                            <div class="window-controls">
+                                <span class="control close"></span>
+                                <span class="control minimize"></span>
+                                <span class="control maximize"></span>
+                            </div>
+                            <div class="window-title">pipeline.ask()</div>
+                        </div>
+                        <div class="code-content">
+                            <pre><code><span class="kw">const</span> pipeline = <span class="fn">new</span> <span class="class">RAGPipeline</span>(settings);
+
+<span class="kw">await</span> pipeline.<span class="fn">ingest_directory</span>(<span class="str">"./docs"</span>);
+
+<span class="kw">const</span> response = <span class="kw">await</span> pipeline.<span class="fn">ask</span>(<span class="str">"How do I authenticate?"</span>);
+
+<span class="cm">// Response with citations & confidence</span>
+<span class="kw">console</span>.<span class="fn">log</span>(response.<span class="prop">answer</span>);
+<span class="kw">console</span>.<span class="fn">log</span>(response.<span class="prop">confidence</span>);
+<span class="kw">console</span>.<span class="fn">log</span>(response.<span class="prop">sources</span>);</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="flow-diagram">
+                        <div class="flow-step" data-step="1">
+                            <span class="step-num">01</span>
+                            <span class="step-label">Ingest</span>
+                            <span class="step-desc">Load & Chunk</span>
+                        </div>
+                        <div class="flow-arrow"></div>
+                        <div class="flow-step" data-step="2">
+                            <span class="step-num">02</span>
+                            <span class="step-label">Embed</span>
+                            <span class="step-desc">Dense + Sparse</span>
+                        </div>
+                        <div class="flow-arrow"></div>
+                        <div class="flow-step" data-step="3">
+                            <span class="step-num">03</span>
+                            <span class="step-label">Fuse</span>
+                            <span class="step-desc">RRF Merge</span>
+                        </div>
+                        <div class="flow-arrow"></div>
+                        <div class="flow-step" data-step="4">
+                            <span class="step-num">04</span>
+                            <span class="step-label">Rerank</span>
+                            <span class="step-desc">LLM Judge</span>
+                        </div>
+                        <div class="flow-arrow"></div>
+                        <div class="flow-step" data-step="5">
+                            <span class="step-num">05</span>
+                            <span class="step-label">Generate</span>
+                            <span class="step-desc">Grounded Answer</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="hero-scroll" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M12 5v14M19 12l-7 7-7-7"/>
+            </svg>
+        </div>
+    </header>
+
+    <!-- Features Section -->
+    <section id="features" class="features" aria-labelledby="features-title">
+        <div class="container">
+            <header class="section-header">
+                <span class="section-tag">Core Capabilities</span>
+                <h2 id="features-title" class="section-title">Built for Production RAG</h2>
+                <p class="section-description">
+                    Every component designed for reliability, observability, and scale.
+                    No vendor lock-in — runs on your infrastructure.
+                </p>
+            </header>
+
+            <div class="features-grid">
+                <article class="feature-card" data-feature="hybrid">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                            <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+                            <line x1="12" y1="22.08" x2="12" y2="12"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Hybrid Search</h3>
+                    <p class="feature-description">
+                        Dense vector embeddings (Qdrant) + sparse BM25 keyword search combined via Reciprocal Rank Fusion.
+                        Configurable weights for dense/sparse balance per query.
+                    </p>
+                    <ul class="feature-details">
+                        <li>Qdrant embedded or remote</li>
+                        <li>BM25 with rank_bm25</li>
+                        <li>RRF k=60 default</li>
+                        <li>Per-query weight override</li>
+                    </ul>
+                </article>
+
+                <article class="feature-card" data-feature="rerank">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                            <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/>
+                            <polyline points="12 22 12 15.5 22 15.5 12 8.5 2 8.5 12 2"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">LLM Reranking</h3>
+                    <p class="feature-description">
+                        Batched LLM-as-judge scores top 20 fused candidates in a single call.
+                        Falls back to fusion order on parse failure. Costs ~1 call per query.
+                    </p>
+                    <ul class="feature-details">
+                        <li>Single batched API call</li>
+                        <li>JSON array output</li>
+                        <li>Graceful fallback</li>
+                        <li>Top-N configurable</li>
+                    </ul>
+                </article>
+
+                <article class="feature-card" data-feature="citations">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                            <line x1="16" y1="13" x2="8" y2="13"/>
+                            <line x1="16" y1="17" x2="8" y2="17"/>
+                            <polyline points="10 9 9 9 8 9"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Verified Citations</h3>
+                    <p class="feature-description">
+                        Extract claims → verify against sources → compute composite confidence
+                        (retrieval × citation coverage × completeness). Refuses below threshold.
+                    </p>
+                    <ul class="feature-details">
+                        <li>Batched verification</li>
+                        <li>Composite confidence score</li>
+                        <li>Refusal on low confidence</li>
+                        <li>Inline citation markers</li>
+                    </ul>
+                </article>
+
+                <article class="feature-card" data-feature="chunking">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                            <rect x="3" y="3" width="7" height="7" rx="1"/>
+                            <rect x="14" y="3" width="7" height="7" rx="1"/>
+                            <rect x="3" y="14" width="7" height="7" rx="1"/>
+                            <rect x="14" y="14" width="7" height="7" rx="1"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Smart Chunking</h3>
+                    <p class="feature-description">
+                        Three strategies: fixed sliding window, recursive markdown-aware,
+                        semantic embedding-drift. Switchable via config — no code changes.
+                    </p>
+                    <ul class="feature-details">
+                        <li>Fixed / Recursive / Semantic</li>
+                        <li>Markdown heading aware</li>
+                        <li>Cosine dedup (0.95)</li>
+                        <li>Corpus-aware index</li>
+                    </ul>
+                </article>
+
+                <article class="feature-card" data-feature="api">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                            <path d="M8 21h8M12 17v4"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">REST API + CLI</h3>
+                    <p class="feature-description">
+                        FastAPI service with Bearer auth. Two endpoints: /v1/ask and /v1/ingest.
+                        CLI for local development. OpenAPI docs at /docs.
+                    </p>
+                    <ul class="feature-details">
+                        <li>FastAPI + Uvicorn</li>
+                        <li>Bearer token auth</li>
+                        <li>CLI ingest/ask</li>
+                        <li>Auto OpenAPI spec</li>
+                    </ul>
+                </article>
+
+                <article class="feature-card" data-feature="eval">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                            <line x1="18" y1="20" x2="18" y2="10"/>
+                            <line x1="12" y1="20" x2="12" y2="4"/>
+                            <line x1="6" y1="20" x2="6" y2="14"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Eval Ready</h3>
+                    <p class="feature-description">
+                        Smoke tests with mocked LLM. Golden Q&A dataset structure defined.
+                        Chunking strategy comparison via config sweep. Phase 4 extensible.
+                    </p>
+                    <ul class="feature-details">
+                        <li>Mocked LLM tests</li>
+                        <li>Deterministic embeddings</li>
+                        <li>Config sweep ready</li>
+                        <li>Golden dataset schema</li>
+                    </ul>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- Architecture Section -->
+    <section id="architecture" class="architecture" aria-labelledby="arch-title">
+        <div class="container">
+            <header class="section-header">
+                <span class="section-tag">System Design</span>
+                <h2 id="arch-title" class="section-title">Architecture Overview</h2>
+                <p class="section-description">
+                    Modular pipeline with clear stage boundaries. Each component swappable
+                    via config — no hard dependencies between stages.
+                </p>
+            </header>
+
+            <div class="arch-diagram">
+                <div class="arch-stage" data-stage="ingestion">
+                    <div class="stage-header">
+                        <span class="stage-num">1</span>
+                        <h3 class="stage-title">Ingestion</h3>
+                    </div>
+                    <div class="stage-components">
+                        <div class="component">
+                            <span class="comp-name">loaders.py</span>
+                            <span class="comp-desc">Multi-format → text</span>
+                        </div>
+                        <div class="component">
+                            <span class="comp-name">chunking.py</span>
+                            <span class="comp-desc">Fixed / Recursive / Semantic</span>
+                        </div>
+                        <div class="component">
+                            <span class="comp-name">dedup.py</span>
+                            <span class="comp-desc">Cosine > 0.95 skip</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="arch-connector">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <path d="M12 5v14M19 12l-7 7-7-7"/>
+                    </svg>
+                </div>
+
+                <div class="arch-stage" data-stage="retrieval">
+                    <div class="stage-header">
+                        <span class="stage-num">2</span>
+                        <h3 class="stage-title">Retrieval</h3>
+                    </div>
+                    <div class="stage-components">
+                        <div class="component dual">
+                            <span class="comp-name">embeddings.py</span>
+                            <span class="comp-desc">text-embedding-3-small (1536-dim)</span>
+                        </div>
+                        <div class="component dual">
+                            <span class="comp-name">vector_store.py</span>
+                            <span class="comp-desc">Qdrant dense top-10</span>
+                        </div>
+                        <div class="component dual">
+                            <span class="comp-name">sparse.py</span>
+                            <span class="comp-desc">BM25 top-10</span>
+                        </div>
+                        <div class="component dual">
+                            <span class="comp-name">fusion.py</span>
+                            <span class="comp-desc">RRF k=60</span>
+                        </div>
+                        <div class="component dual">
+                            <span class="comp-name">reranker.py</span>
+                            <span class="comp-desc">LLM judge top-20 → top-5</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="arch-connector">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <path d="M12 5v14M19 12l-7 7-7-7"/>
+                    </svg>
+                </div>
+
+                <div class="arch-stage" data-stage="generation">
+                    <div class="stage-header">
+                        <span class="stage-num">3</span>
+                        <h3 class="stage-title">Generation</h3>
+                    </div>
+                    <div class="stage-components">
+                        <div class="component">
+                            <span class="comp-name">generate.py</span>
+                            <span class="comp-desc">Grounded answer + context</span>
+                        </div>
+                        <div class="component">
+                            <span class="comp-name">citations.py</span>
+                            <span class="comp-desc">Extract → Verify → Score</span>
+                        </div>
+                        <div class="component">
+                            <span class="comp-name">prompts.py</span>
+                            <span class="comp-desc">System prompts & templates</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="arch-code">
+                <h3>Pipeline Orchestration</h3>
+                <pre><code><span class="kw">class</span> <span class="class">RAGPipeline</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="kw">self</span>, settings: <span class="class">Settings</span>):
+        <span class="kw">self</span>.vector_store = <span class="class">QdrantVectorStore</span>(settings)
+        <span class="kw">self</span>.sparse_store = <span class="class">BM25Store</span>(settings)
+        <span class="kw">self</span>.fusion = <span class="class">RRFusion</span>(settings.rrf_k)
+        <span class="kw">self</span>.reranker = <span class="class">LLMReranker</span>(settings)
+        <span class="kw">self</span>.generator = <span class="class">GroundedGenerator</span>(settings)
+        <span class="kw">self</span>.citations = <span class="class">CitationVerifier</span>(settings)
+
+    <span class="kw">async def</span> <span class="fn">ask</span>(<span class="kw">self</span>, question: <span class="class">str</span>) -> <span class="class">Answer</span>:
+        dense_hits = <span class="kw">await</span> <span class="kw">self</span>.vector_store.search(question)
+        sparse_hits = <span class="kw">await</span> <span class="kw">self</span>.sparse_store.search(question)
+        fused = <span class="kw">self</span>.fusion.combine(dense_hits, sparse_hits)
+        reranked = <span class="kw">await</span> <span class="kw">self</span>.reranker.score(fused)
+        answer = <span class="kw">await</span> <span class="kw">self</span>.generator.generate(question, reranked)
+        verified = <span class="kw">await</span> <span class="kw">self</span>.citations.verify(answer)
+        <span class="kw">return</span> verified</code></pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- Live Demo Section -->
+    <section id="demo" class="demo" aria-labelledby="demo-title">
+        <div class="container">
+            <header class="section-header">
+                <span class="section-tag">Interactive</span>
+                <h2 id="demo-title" class="section-title">Live Query Demo</h2>
+                <p class="section-description">
+                    Ask questions against the sample documentation. The API must be running
+                    at <code>localhost:8000</code> with documents ingested.
+                </p>
+            </header>
+
+            <div class="demo-interface">
+                <div class="demo-sidebar">
+                    <div class="demo-config">
+                        <h4>Configuration</h4>
+                        <div class="config-group">
+                            <label for="api-url">API Endpoint</label>
+                            <input type="text" id="api-url" value="http://localhost:8000" readonly>
+                        </div>
+                        <div class="config-group">
+                            <label for="dense-weight">Dense Weight</label>
+                            <input type="range" id="dense-weight" min="0" max="1" step="0.1" value="0.7">
+                            <span class="weight-value" id="dense-value">0.7</span>
+                        </div>
+                        <div class="config-group">
+                            <label for="sparse-weight">Sparse Weight</label>
+                            <input type="range" id="sparse-weight" min="0" max="1" step="0.1" value="0.3">
+                            <span class="weight-value" id="sparse-value">0.3</span>
+                        </div>
+                        <button class="btn btn-sm btn-secondary" id="ingest-btn">Ingest Sample Docs</button>
+                    </div>
+
+                    <div class="sample-questions">
+                        <h4>Sample Questions</h4>
+                        <ul class="question-list">
+                            <li data-q="How do I authenticate with the API?">How do I authenticate with the API?</li>
+                            <li data-q="What happens when I hit the rate limit?">What happens when I hit the rate limit?</li>
+                            <li data-q="How do I deploy on Kubernetes?">How do I deploy on Kubernetes?</li>
+                            <li data-q="What are the common error codes?">What are the common error codes?</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="demo-main">
+                    <div class="query-input">
+                        <label for="query" class="visually-hidden">Your question</label>
+                        <input type="text" id="query" placeholder="Ask a question about the documentation..." autocomplete="off">
+                        <button class="btn btn-primary" id="ask-btn" aria-label="Submit question">
+                            <span class="btn-text">Ask</span>
+                            <span class="btn-loader" aria-hidden="true"></span>
+                        </button>
+                    </div>
+
+                    <div class="response-area" id="response-area" aria-live="polite">
+                        <div class="response-placeholder">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                                <circle cx="12" cy="12" r="10"/>
+                                <path d="M12 16v-4M12 8h.01"/>
+                            </svg>
+                            <p>Submit a question to see the grounded answer with citations</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Docs/Quickstart Section -->
+    <section id="docs" class="docs" aria-labelledby="docs-title">
+        <div class="container">
+            <header class="section-header">
+                <span class="section-tag">Get Started</span>
+                <h2 id="docs-title" class="section-title">Quickstart</h2>
+                <p class="section-description">
+                    From zero to running RAG pipeline in three commands.
+                </p>
+            </header>
+
+            <div class="docs-steps">
+                <article class="step-card">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Install Dependencies</h3>
+                        <pre><code>pip install -r requirements.txt
+cp .env.example .env
+# Edit .env with your OPENAI_API_KEY</code></pre>
+                    </div>
+                </article>
+
+                <article class="step-card">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Ingest Documents</h3>
+                        <pre><code># CLI
+python cli.py ingest ./sample_docs
+
+# Or via API
+curl -X POST localhost:8000/v1/ingest \
+  -H "Authorization: Bearer dev-secret-key" \
+  -H "Content-Type: application/json" \
+  -d '{"path": "./sample_docs"}'</code></pre>
+                    </div>
+                </article>
+
+                <article class="step-card">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Ask Questions</h3>
+                        <pre><code># CLI
+python cli.py ask "How do I authenticate?"
+
+# Or via API
+curl -X POST localhost:8000/v1/ask \
+  -H "Authorization: Bearer dev-secret-key" \
+  -H "Content-Type: application/json" \
+  -d '{"question": "How do I authenticate?"}'</code></pre>
+                    </div>
+                </article>
+            </div>
+
+            <div class="config-reference">
+                <h3>Key Configuration</h3>
+                <div class="config-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Variable</th>
+                                <th>Default</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>CHUNK_STRATEGY</td><td>recursive</td><td>fixed | recursive | semantic</td></tr>
+                            <tr><td>DENSE_WEIGHT</td><td>0.7</td><td>Vector search weight</td></tr>
+                            <tr><td>SPARSE_WEIGHT</td><td>0.3</td><td>BM25 search weight</td></tr>
+                            <tr><td>RRF_K</td><td>60</td><td>Reciprocal rank fusion constant</td></tr>
+                            <tr><td>RERANK_CANDIDATE_POOL</td><td>20</td><td>Candidates sent to LLM judge</td></tr>
+                            <tr><td>FINAL_TOP_K</td><td>5</td><td>Final chunks for generation</td></tr>
+                            <tr><td>MIN_RETRIEVAL_CONFIDENCE</td><td>0.35</td><td>Refusal threshold</td></tr>
+                            <tr><td>DEDUP_SIMILARITY_THRESHOLD</td><td>0.95</td><td>Cosine similarity for dedup</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer" role="contentinfo">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="#" class="footer-logo">
+                        <svg class="logo-icon" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+                            <rect x="2" y="2" width="28" height="28" rx="6" class="logo-bg"/>
+                            <path d="M8 12h16M8 16h12M8 20h8" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" class="logo-lines"/>
+                            <circle cx="24" cy="20" r="3" class="logo-dot"/>
+                        </svg>
+                        <span>RAG Pipeline</span>
+                    </a>
+                    <p>Production-grade retrieval-augmented generation with hybrid search, LLM reranking, and verified citations.</p>
+                </div>
+
+                <nav class="footer-nav" aria-label="Footer navigation">
+                    <div class="footer-col">
+                        <h4>Resources</h4>
+                        <ul>
+                            <li><a href="#architecture">Architecture</a></li>
+                            <li><a href="#docs">Quickstart</a></li>
+                            <li><a href="#demo">Live Demo</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-col">
+                        <h4>Components</h4>
+                        <ul>
+                            <li><a href="#features">Hybrid Search</a></li>
+                            <li><a href="#features">LLM Reranking</a></li>
+                            <li><a href="#features">Citations</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-col">
+                        <h4>Config</h4>
+                        <ul>
+                            <li><a href="#docs">Chunking Strategies</a></li>
+                            <tr><td>Search Weights</td></tr>
+                            <li><a href="#docs">Confidence Thresholds</a></li>
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+
+            <div class="footer-bottom">
+                <p>Built with FastAPI, Qdrant, OpenAI, and anime.js</p>
+                <p class="footer-links">
+                    <a href="https://github.com" target="_blank" rel="noopener">GitHub</a>
+                    <span aria-hidden="true">·</span>
+                    <a href="#">Issues</a>
+                    <span aria-hidden="true">·</span>
+                    <a href="#">Changelog</a>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="app.js"></script>
+</body>
+</html>
