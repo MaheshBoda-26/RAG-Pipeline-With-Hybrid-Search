@@ -135,7 +135,12 @@ def retrieval_confidence(ranked_chunks: list[dict]) -> float:
     if not ranked_chunks:
         return 0.0
     scores = [c.get("rerank_score", 0.0) for c in ranked_chunks]
-    return max(0.0, min(1.0, (sum(scores) / len(scores)) / 10.0))
+    # Use top-3 non-zero scores to avoid penalizing for irrelevant chunks in the pool
+    nonzero = [s for s in scores if s > 0]
+    if not nonzero:
+        return 0.0
+    top_scores = sorted(nonzero, reverse=True)[:3]
+    return max(0.0, min(1.0, (sum(top_scores) / len(top_scores)) / 10.0))
 
 
 def composite_confidence(retrieval_conf: float, coverage: float, completeness: float) -> float:

@@ -14,7 +14,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import numpy as np
 
-EMBED_DIM = 1536
+EMBED_DIM = 1024
 
 
 def fake_embedding(text: str) -> list[float]:
@@ -40,7 +40,7 @@ def fake_embedding(text: str) -> list[float]:
 
 
 class FakeEmbeddingsAPI:
-    def create(self, model, input):
+    def create(self, model, input, extra_body=None):
         data = [mock.Mock(embedding=fake_embedding(t)) for t in input]
         return mock.Mock(data=data)
 
@@ -81,7 +81,7 @@ class FakeChatAPI:
 
 
 class FakeOpenAI:
-    def __init__(self, api_key=None):
+    def __init__(self, api_key=None, base_url=None):
         self.embeddings = FakeEmbeddingsAPI()
         self.chat = mock.Mock(completions=FakeChatAPI())
 
@@ -91,7 +91,7 @@ def run():
     qdrant_tmp = tempfile.mkdtemp(prefix="qdrant_test_")
     os.environ["QDRANT_PATH"] = qdrant_tmp
 
-    with mock.patch("pipeline.OpenAI", FakeOpenAI), mock.patch("retrieval.reranker.OpenAI", FakeOpenAI):
+    with mock.patch("pipeline.OpenAI", FakeOpenAI), mock.patch("retrieval.reranker.OpenAI", FakeOpenAI), mock.patch("retrieval.embeddings.OpenAI", FakeOpenAI):
         from config import Settings
         from pipeline import RAGPipeline
 

@@ -14,6 +14,7 @@ load_dotenv()
 class Settings:
     # --- Providers ---
     openai_api_key: str = field(default_factory=lambda: os.getenv("OPENAI_API_KEY", ""))
+    openai_base_url: str = field(default_factory=lambda: os.getenv("OPENAI_BASE_URL", ""))
     embedding_model: str = os.getenv("EMBEDDING_MODEL", "text-embedding-3-small")
     chat_model: str = os.getenv("CHAT_MODEL", "gpt-4o")
 

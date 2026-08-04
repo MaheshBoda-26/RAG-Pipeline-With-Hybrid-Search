@@ -5,6 +5,7 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass
 from pathlib import Path
+import os
 
 from openai import OpenAI
 
@@ -22,7 +23,7 @@ from generation.prompts import build_context_block
 from ingestion.chunking import Chunk, chunk_fixed, chunk_recursive, chunk_semantic
 from ingestion.dedup import DuplicateIndex
 from ingestion.loaders import load_directory
-from retrieval.embeddings import Embedder
+from retrieval.embeddings import Embedder, create_openai_client
 from retrieval.fusion import reciprocal_rank_fusion
 from retrieval.reranker import rerank
 from retrieval.sparse import BM25Index
@@ -44,7 +45,10 @@ class RAGPipeline:
         self.settings = settings or Settings()
         self.settings.validate()
 
-        self.client = OpenAI(api_key=self.settings.openai_api_key)
+        self.client = create_openai_client(
+            api_key=self.settings.openai_api_key,
+            base_url=self.settings.openai_base_url,
+        )
         self.embedder = Embedder(self.client, self.settings.embedding_model)
         self.vector_store = QdrantVectorStore(
             path=self.settings.qdrant_path,
