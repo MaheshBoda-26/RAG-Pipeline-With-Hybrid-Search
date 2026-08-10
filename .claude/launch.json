@@ -1,0 +1,24 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "rag-api",
+      "runtimeExecutable": "/Users/maheshboda/Projects/Rag Pipeline/venv/bin/python",
+      "runtimeArgs": ["-m", "uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8000"],
+      "port": 8000
+    },
+    {
+      "name": "rag-website",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 3000,
+      "cwd": "/Users/maheshboda/Projects/Rag Pipeline/website"
+    },
+    {
+      "name": "rag-dashboard",
+      "runtimeExecutable": "/Users/maheshboda/Projects/Rag Pipeline/venv/bin/python",
+      "runtimeArgs": ["-m", "streamlit", "run", "dashboard/app.py", "--server.port", "8501", "--server.address", "0.0.0.0"],
+      "port": 8501
+    }
+  ]
+}

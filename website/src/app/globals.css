@@ -1,93 +1,106 @@
 @import "tailwindcss";
 
 @theme {
-  /* Primary — Aegis Blue */
-  --color-primary-50: #EEF3FD;
-  --color-primary-100: #D6E4FA;
-  --color-primary-200: #ADCAF5;
-  --color-primary-300: #7AB3EE;
-  --color-primary-400: #5194E8;
-  --color-primary-500: #3B6FE0;
-  --color-primary-600: #2554C7;
-  --color-primary-700: #1D42A0;
-  --color-primary-800: #1A367D;
-  --color-primary-900: #132A66;
-  --color-primary-950: #0A1A44;
+  /* ─── Brand & Accent ─────────────────────────────── */
+  --color-coral: #cc785c;              /* Primary CTA, wordmark, callout
+    cards */
+  --color-coral-active: #a9583e;       /* Press / active state */
+  --color-accent-teal: #5db8a6;        /* Terminal status, secondary surfaces
+    */
+  --color-accent-amber: #e8a55a;       /* Category badges, inline highlights */
 
-  /* Secondary — Slate */
-  --color-secondary-50: #F8F9FB;
-  --color-secondary-100: #E7EAF0;
-  --color-secondary-200: #CFD5DD;
-  --color-secondary-300: #A8B3C5;
-  --color-secondary-400: #7E8CA8;
-  --color-secondary-500: #5B6B85;
-  --color-secondary-600: #475570;
-  --color-secondary-700: #33405B;
-  --color-secondary-800: #273249;
-  --color-secondary-900: #1B2436;
-  --color-secondary-950: #111720;
+  /* ─── Surface — Cream Family ─────────────────────── */
+  --color-canvas: #faf9f5;             /* Default page floor (NOT pure white)
+    */
+  --color-surface-soft: #f5f0e8;       /* Section dividers, soft bands */
+  --color-surface-card: #efe9de;       /* Feature / content cards */
+  --color-surface-cream-strong: #e8e0d2; /* Selected tabs, emphasized bands */
 
-  /* Accent — Violet */
-  --color-accent-50: #F5F0FF;
-  --color-accent-100: #EDE6FB;
-  --color-accent-200: #DCCCF7;
-  --color-accent-300: #C0A8F0;
-  --color-accent-400: #9E7EE7;
-  --color-accent-500: #7C3AED;
-  --color-accent-600: #6A2FDB;
-  --color-accent-700: #5B21B6;
-  --color-accent-800: #4C1D95;
-  --color-accent-900: #3E1A7A;
-  --color-accent-950: #2A0E52;
+  /* ─── Surface — Dark Family ──────────────────────── */
+  --color-surface-dark: #181715;       /* Code mockups, footer, dark cards */
+  --color-surface-dark-elevated: #252320; /* Elevated cards inside dark bands */
+  --color-surface-dark-soft: #1f1e1b;  /* Code block backgrounds */
 
-  /* Semantic */
-  --color-success-500: #15803D;
-  --color-warning-500: #B45309;
-  --color-error-500: #B91C1C;
-  --color-info-500: #2563EB;
+  /* ─── Borders ────────────────────────────────────── */
+  --color-hairline: #e6dfd8;           /* 1px border on cream surfaces */
+  --color-hairline-soft: #ebe6df;      /* Barely-visible divider */
 
-  /* Semantic aliases (light/dark overridden in base layer) */
-  --color-primary: var(--primary);
-  --color-primary-hover: var(--primary-hover);
-  --color-primary-light: var(--primary-light);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-hover: var(--secondary-hover);
-  --color-secondary-light: var(--secondary-light);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-accent: var(--accent);
-  --color-accent-hover: var(--accent-hover);
-  --color-accent-light: var(--accent-light);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-surface: var(--surface);
-  --color-surface-elevated: var(--surface-elevated);
-  --color-border: var(--border);
-  --color-border-strong: var(--border-strong);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-ring: var(--ring);
+  /* ─── Text ───────────────────────────────────────── */
+  --color-ink: #141413;                /* Headlines, primary text */
+  --color-body-strong: #252523;        /* Emphasized paragraphs, lead text */
+  --color-body: #3d3d3a;               /* Default running text */
+  --color-muted: #8e8b82;              /* Soft captions / fills */
+  --color-muted-soft: #8e8b82;         /* Captions, fine-print */
+  --color-on-primary: #ffffff;         /* Text on coral buttons */
+  --color-on-dark: #faf9f5;            /* Cream-tinted white on dark */
+  --color-on-dark-soft: #a09d96;       /* Footer body text */
 
-  /* Neutrals */
-  --color-neutral-0: #FFFFFF;
-  --color-neutral-50: #F8F9FB;
-  --color-neutral-100: #F1F3F6;
-  --color-neutral-200: #DDE1E7;
-  --color-neutral-300: #C4CAD3;
-  --color-neutral-400: #9AA3B2;
-  --color-neutral-500: #7A8494;
-  --color-neutral-600: #5B6472;
-  --color-neutral-700: #434B59;
-  --color-neutral-800: #2A303C;
-  --color-neutral-900: #1E232D;
-  --color-neutral-950: #12151B;
+  /* ─── Semantic (re-pointed to Anthropic palette) ─── */
+  --color-primary: #cc785c;            /* coral */
+  --color-primary-hover: #a9583e;
+  --color-primary-light: #f5f0e8;
+  --color-primary-foreground: #ffffff;
+  /* coral scale (legacy `-NNN` utility compat) */
+  --color-primary-50: #faf4f1;
+  --color-primary-100: #f3e4dc;
+  --color-primary-200: #e9cbb9;
+  --color-primary-300: #dcab91;
+  --color-primary-400: #d28e70;
+  --color-primary-500: #cc785c;
+  --color-primary-600: #bd6649;
+  --color-primary-700: #a9583e;
+  --color-primary-800: #8a442f;
+  --color-primary-900: #6b3424;
+  --color-primary-950: #452117;
+  --color-secondary: #e8a55a;          /* amber — sparse / secondary accent */
+  --color-secondary-500: #e8a55a;
+  --color-secondary-600: #d48f3f;
+  --color-secondary-foreground: #141413;
+  --color-accent: #5db8a6;             /* teal — sparse / reranked accent */
+  --color-accent-500: #5db8a6;
+  --color-accent-hover: #4aa38f;
+  --color-accent-600: #4aa38f;
+  --color-accent-light: #eaf5f2;
+  --color-accent-foreground: #ffffff;
+  --color-success: #5db872;
+  --color-success-500: #5db872;
+  --color-warning: #d4a017;
+  --color-warning-500: #d4a017;
+  --color-error-500: #c64545;
+  --color-info-500: #5db8a6;
 
-  /* Fonts */
-  --font-sans: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  /* ─── Surface aliases ────────────────────────────── */
+  --color-background: var(--color-canvas);
+  --color-foreground: var(--color-ink);
+  --color-surface: var(--color-surface-card);
+  --color-surface-elevated: var(--color-canvas);
+  --color-border: var(--color-hairline);
+  --color-border-strong: #d9d0c0;
+  --color-muted-foreground: var(--color-body);
+  --color-ring: var(--color-coral);
+
+  /* ─── Neutrals (code blocks / dark chrome) ───────── */
+  --color-neutral-0: #ffffff;
+  --color-neutral-50: #f8f7f3;
+  --color-neutral-100: #efede6;
+  --color-neutral-200: #e2ded3;
+  --color-neutral-300: #c9c3b5;
+  --color-neutral-400: #a39c8d;
+  --color-neutral-500: #817a6b;
+  --color-neutral-600: #5f594e;
+  --color-neutral-700: #47423a;
+  --color-neutral-800: #2e2b25;
+  --color-neutral-900: #211f1b;
+  --color-neutral-950: #181715;
+
+  /* ─── Fonts ──────────────────────────────────────── */
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-
+    serif;
+  --font-display: var(--font-display), "Cormorant Garamond", Georgia, "Times
+    New Roman", serif;
   --font-mono: "JetBrains Mono", "SF Mono", "Consolas", monospace;
 
-  /* Spacing scale (4px base) */
+  /* ─── Spacing scale (4px base) ───────────────────── */
   --spacing-1: 4px;
   --spacing-2: 8px;
   --spacing-3: 12px;
@@ -101,14 +114,14 @@
   --spacing-20: 80px;
   --spacing-24: 96px;
 
-  /* Border radius */
+  /* ─── Border radius ──────────────────────────────── */
   --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
-  --radius-xl: 12px;
-  --radius-2xl: 16px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
 
-  /* Motion tokens */
+  /* ─── Motion tokens ──────────────────────────────── */
   --duration-micro: 120ms;
   --duration-standard: 200ms;
   --duration-page: 240ms;
@@ -122,60 +135,79 @@
 
 @layer base {
   :root {
-    --background: var(--color-neutral-0);
-    --foreground: var(--color-neutral-950);
-    --surface: var(--color-neutral-50);
-    --surface-elevated: var(--color-neutral-0);
-    --border: var(--color-neutral-200);
-    --border-strong: var(--color-neutral-300);
-    --muted: var(--color-neutral-400);
-    --muted-foreground: var(--color-neutral-600);
+    --background: #faf9f5;             /* cream canvas */
+    --foreground: #141413;             /* warm ink */
+    --surface: #efe9de;                /* surface-card */
+    --surface-elevated: #faf9f5;
+    --border: #e6dfd8;                 /* hairline */
+    --border-strong: #d9d0c0;
+    --muted: #8e8b82;
+    --muted-foreground: #3d3d3a;
 
-    --primary: var(--color-primary-600);
-    --primary-hover: var(--color-primary-700);
-    --primary-light: var(--color-primary-50);
-    --primary-foreground: var(--color-neutral-0);
+    --primary: #cc785c;
+    --primary-hover: #a9583e;
+    --primary-light: #f5f0e8;
+    --primary-foreground: #ffffff;
 
-    --secondary: var(--color-secondary-700);
-    --secondary-hover: var(--color-secondary-800);
-    --secondary-light: var(--color-secondary-100);
-    --secondary-foreground: var(--color-neutral-0);
+    --secondary: #e8a55a;
+    --secondary-foreground: #141413;
 
-    --accent: var(--color-accent-500);
-    --accent-hover: var(--color-accent-600);
-    --accent-light: var(--color-accent-100);
-    --accent-foreground: var(--color-neutral-0);
+    --accent: #5db8a6;
+    --accent-hover: #4aa38f;
+    --accent-light: #eaf5f2;
+    --accent-foreground: #ffffff;
 
-    --ring: var(--color-primary-600);
-    --radius: var(--radius-md);
+    --ring: #cc785c;
   }
 
   .dark {
-    --background: var(--color-neutral-950);
-    --foreground: var(--color-neutral-50);
-    --surface: var(--color-neutral-900);
-    --surface-elevated: var(--color-neutral-800);
-    --border: var(--color-neutral-800);
-    --border-strong: var(--color-neutral-700);
-    --muted: var(--color-neutral-500);
-    --muted-foreground: var(--color-neutral-400);
+    --background: #181715;             /* dark canvas — flips to dark navy */
+    --foreground: #faf9f5;             /* on-dark cream text */
+    --surface: #211f1b;                /* dark-soft surface */
+    --surface-elevated: #252320;       /* surface-dark-elevated */
+    --border: #2e2b25;                 /* dark hairline */
+    --border-strong: #47423a;
+    --muted: #5f594e;
+    --muted-foreground: #a09d96;
 
-    --primary: var(--color-primary-500);
-    --primary-hover: var(--color-primary-400);
-    --primary-light: var(--color-primary-900);
-    --primary-foreground: var(--color-neutral-950);
+    --primary: #cc785c;
+    --primary-hover: #a9583e;
+    --primary-light: #3a2a22;
+    --primary-foreground: #ffffff;
 
-    --secondary: var(--color-secondary-300);
-    --secondary-hover: var(--color-secondary-200);
-    --secondary-light: var(--color-secondary-800);
-    --secondary-foreground: var(--color-neutral-950);
+    --secondary: #e8a55a;
+    --secondary-foreground: #141413;
 
-    --accent: var(--color-accent-500);
-    --accent-hover: var(--color-accent-400);
-    --accent-light: var(--color-accent-900);
-    --accent-foreground: var(--color-neutral-0);
+    --accent: #5db8a6;
+    --accent-hover: #4aa38f;
+    --accent-light: #18302b;
+    --accent-foreground: #141413;
 
-    --ring: var(--color-primary-500);
+    --ring: #cc785c;
+
+    /* Anthropic color tokens — flip the cream family to a warm dark family
+       so bg-canvas / text-ink / bg-surface-card / border-hairline switch in
+       dark mode. Coral + dark surfaces + on-* stay fixed. */
+    --color-canvas: #171613;
+    --color-surface-soft: #211f1c;
+    --color-surface-card: #2b2822;
+    --color-surface-cream-strong: #34302a;
+    --color-ink: #f2efe7;
+    --color-body: #c9c3b5;
+    --color-muted: #8f897c;
+    --color-muted-soft: #7a7468;
+    --color-hairline: #38342c;
+    --color-hairline-soft: #2e2b26;
+    --color-coral: #cc785c;
+    --color-coral-active: #a9583e;
+    --color-accent-teal: #5db8a6;
+    --color-accent-amber: #e8a55a;
+    --color-surface-dark: #181715;
+    --color-surface-dark-elevated: #252320;
+    --color-surface-dark-soft: #1f1e1b;
+    --color-on-primary: #ffffff;
+    --color-on-dark: #faf9f5;
+    --color-on-dark-soft: #a09d96;
   }
 }
 
@@ -186,6 +218,17 @@
 
   html {
     scroll-behavior: smooth;
+  }
+
+  /* Editorial display voice: slab/didone serif on headlines */
+  h1, h2, h3 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+    font-weight: 500;
+  }
+
+  h1 {
+    letter-spacing: -0.03em;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -223,6 +266,18 @@
 
   .text-pretty {
     text-wrap: pretty;
+  }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
   }
 
   .animate-in {

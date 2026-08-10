@@ -117,24 +117,20 @@ export function Docs() {
               transition={{ delay: index * 0.1, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
               className="relative group"
             >
-              <div className="grid lg:grid-cols-[80px_1fr] gap-6 lg:gap-8 items-start">
-                <div className="lg:order-1 lg:text-right lg:pr-8">
-                  <div className="flex items-center justify-end lg:justify-end gap-3 mb-6">
+              <div className="grid lg:grid-cols-[1fr_1fr] gap-8 lg:gap-12 items-start">
+                <div className="lg:order-1 lg:text-right">
+                  <div className="flex items-center justify-end gap-3 mb-4">
                     <span className="text-4xl font-mono font-bold text-muted-foreground/20">
                       {step.number}
                     </span>
-                    <div className="text-right">
-                      <div
-                        className={cn(
-                          "inline-flex items-center justify-center w-14 h-14 rounded-xl mb-3",
-                          colorStyles[step.color as keyof typeof colorStyles]
-                        )}
-                      >
-                        <step.icon className="w-7 h-7" aria-hidden="true" />
-                      </div>
-                      <h3 className="text-2xl font-semibold">{step.title}</h3>
+                    <div className={cn(
+                      "inline-flex items-center justify-center w-14 h-14 rounded-xl",
+                      colorStyles[step.color as keyof typeof colorStyles]
+                    )}>
+                      <step.icon className="w-7 h-7" aria-hidden="true" />
                     </div>
                   </div>
+                  <h3 className="text-2xl font-semibold mb-3">{step.title}</h3>
                   <p className="text-muted-foreground leading-relaxed">{step.description}</p>
                 </div>
 

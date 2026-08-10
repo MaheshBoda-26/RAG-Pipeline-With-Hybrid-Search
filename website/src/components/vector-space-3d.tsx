@@ -35,11 +35,11 @@ interface VectorSpace3DProps {
 }
 
 const NODE_COLORS = {
-  unretrieved: { color: "#9AA3B2", size: 0.04, opacity: 0.3 },
-  dense: { color: "#2554C7", size: 0.08, opacity: 1 },
-  sparse: { color: "#5B6B85", size: 0.08, opacity: 1 },
-  reranked: { color: "#7C3AED", size: 0.12, opacity: 1 },
-  query: { color: "#15803D", size: 0.15, opacity: 1 },
+  unretrieved: { color: "#a39c8d", size: 0.04, opacity: 0.3 },
+  dense: { color: "#cc785c", size: 0.08, opacity: 1 },
+  sparse: { color: "#e8a55a", size: 0.08, opacity: 1 },
+  reranked: { color: "#5db8a6", size: 0.12, opacity: 1 },
+  query: { color: "#5db872", size: 0.15, opacity: 1 },
 };
 
 function PointsCloud({ chunks, queryNode }: { chunks: ChunkData[]; queryNode: ChunkData | null }) {
@@ -279,7 +279,7 @@ function VectorSpaceScene({
 
   return (
     <>
-      <fog attach="fog" args={["#FFFFFF", 8, 40]} />
+      <fog attach="fog" args={["#faf9f5", 8, 40]} />
       <ambientLight intensity={0.6} />
       <directionalLight position={[10, 10, 5]} intensity={0.8} />
       <directionalLight position={[-10, -5, -5]} intensity={0.4} />

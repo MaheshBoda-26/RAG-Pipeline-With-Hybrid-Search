@@ -24,34 +24,51 @@ const footerLinks = {
   ],
 };
 
-export function Footer() {
+/* Anthropic-style radial-spike brand mark: a 4-spoke asterisk glyph. */
+function SpikeMark({ className }: { className?: string }) {
   return (
-    <footer className="bg-surface border-t border-border" role="contentinfo">
+    <svg
+      className={cn("w-6 h-6", className)}
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+    >
+      <path d="M12 3v18M4 6l16 12M20 6L4 18" />
+    </svg>
+  );
+}
+
+export function Footer() {
+  const [email, setEmail] = React.useState("");
+
+  return (
+    <footer className="bg-surface-dark text-on-dark-soft" role="contentinfo">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 lg:py-20">
-        <div className="grid lg:grid-cols-[1fr_repeat(3,auto)] gap-8 lg:gap-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-12">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.2 }}
-            className="lg:col-span-1 max-w-xs"
+            className="sm:col-span-2 lg:col-span-2 max-w-xs"
           >
-            <a href="#" className="flex items-center gap-2 text-xl font-semibold text-foreground mb-4" aria-label="RAG Pipeline Home">
-              <svg className="w-8 h-8 text-primary" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-                <rect x="2" y="2" width="28" height="28" rx="6" className="logo-bg" stroke="currentColor" strokeWidth="2" />
-                <path d="M8 12h16M8 16h12M8 20h8" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="logo-lines" />
-                <circle cx="24" cy="20" r="3" fill="currentColor" className="logo-dot" />
-              </svg>
-              <span>RAG Pipeline</span>
+            <a href="#" className="flex items-center gap-2 text-lg text-on-dark font-medium mb-4" aria-label="RAG Pipeline Home">
+              <SpikeMark />
+              <span className="tracking-tight">RAG Pipeline</span>
             </a>
-            <p className="text-muted-foreground text-sm leading-relaxed mb-6">
-              Production-grade retrieval-augmented generation with hybrid search, LLM reranking, and verified citations.
+            <p className="text-sm leading-relaxed mb-6">
+              Production-grade retrieval-augmented generation with hybrid search,
+              LLM reranking, and verified citations. No vendor lock-in — runs on
+              your infrastructure.
             </p>
             <div className="flex items-center gap-4">
               <motion.a
                 href="https://github.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-foreground transition-colors"
+                className="hover:text-on-dark transition-colors"
                 whileHover={{ scale: 1.1 }}
                 aria-label="GitHub"
               >
@@ -59,15 +76,13 @@ export function Footer() {
               </motion.a>
               <motion.a
                 href="#"
-                className="text-muted-foreground hover:text-foreground transition-colors"
-                whileHover={{ scale: 1.1 }}
+                className="hover:text-on-dark transition-colors"
               >
                 Issues
               </motion.a>
               <motion.a
                 href="#"
-                className="text-muted-foreground hover:text-foreground transition-colors"
-                whileHover={{ scale: 1.1 }}
+                className="hover:text-on-dark transition-colors"
               >
                 Changelog
               </motion.a>
@@ -83,13 +98,13 @@ export function Footer() {
               transition={{ delay: index * 0.05 + 0.1 }}
               aria-label={`${title} navigation`}
             >
-              <h4 className="font-semibold mb-4">{title}</h4>
+              <h4 className="text-on-dark font-medium mb-4">{title}</h4>
               <ul className="space-y-3" role="list">
-                {links.map((link, i) => (
+                {links.map((link) => (
                   <li key={link.label}>
                     <motion.a
                       href={link.href}
-                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                      className="text-sm hover:text-on-dark transition-colors"
                       whileHover={{ x: 4 }}
                     >
                       {link.label}
@@ -107,18 +122,28 @@ export function Footer() {
             transition={{ delay: 0.3 }}
             className="lg:col-span-1"
           >
-            <h4 className="font-semibold mb-4">Stay Updated</h4>
-            <p className="text-sm text-muted-foreground mb-4">
+            <h4 className="text-on-dark font-medium mb-4">Stay Updated</h4>
+            <p className="text-sm mb-4">
               Get notified about new releases, features, and improvements.
             </p>
-            <form className="flex gap-2">
+            <form
+              className="flex gap-2"
+              onSubmit={(e) => e.preventDefault()}
+            >
               <input
                 type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
-                className="flex-1 px-3 py-2 bg-muted/30 border border-border rounded-lg text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                className="flex-1 px-3 py-2 bg-surface-dark-elevated border border-white/10 rounded-lg text-sm text-on-dark placeholder:text-on-dark-soft focus:outline-none focus:ring-2 focus:ring-coral"
                 aria-label="Email address"
+                suppressHydrationWarning
               />
-              <Button size="sm" variant="default">
+              <Button
+                type="submit"
+                size="sm"
+                className="bg-coral text-on-primary hover:bg-coral-active"
+              >
                 <ArrowRight className="w-4 h-4" />
               </Button>
             </form>
@@ -130,14 +155,14 @@ export function Footer() {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true, amount: 0.1 }}
           transition={{ delay: 0.4 }}
-          className="mt-12 lg:mt-16 pt-8 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4"
+          className="mt-12 lg:mt-16 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4"
         >
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm">
             Built with FastAPI, Qdrant, OpenAI, Next.js, and Framer Motion
           </p>
-          <div className="flex items-center gap-4 text-sm text-muted-foreground">
+          <div className="flex items-center gap-4 text-sm">
             <span className="flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-primary" />
+              <Sparkles className="w-3.5 h-3.5 text-accent-teal" />
               <span>v2.0</span>
             </span>
             <span className="hidden sm:inline">·</span>

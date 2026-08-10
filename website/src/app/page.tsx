@@ -4,6 +4,7 @@ import { Hero } from "@/components/hero";
 import { Features } from "@/components/features";
 import { Architecture } from "@/components/architecture";
 import { Demo } from "@/components/demo";
+import { CalloutCoral } from "@/components/CalloutCoral";
 import { Docs } from "@/components/docs";
 import { Footer } from "@/components/footer";
 
@@ -28,6 +29,7 @@ export default function HomePage() {
         <Features />
         <Architecture />
         <Demo />
+        <CalloutCoral />
         <Docs />
       </main>
       <Footer />
