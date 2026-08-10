@@ -1,17 +1,15 @@
 "use client";
 
 import * as React from "react";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
 import {
   OrbitControls,
   Html,
   Points,
   Text,
   Sphere,
-  Lines,
-  mergeGeometries,
 } from "@react-three/drei";
-import { BufferGeometry, Float32BufferAttribute, PointsMaterial, Color, Fog } from "three";
+import { BufferGeometry, Float32BufferAttribute, PointsMaterial, Color } from "three";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -32,8 +30,8 @@ interface VectorSpace3DProps {
   isLoading?: boolean;
   className?: string;
   interactive?: boolean;
-  width?: number;
-  height?: number;
+  width?: number | string;
+  height?: number | string;
 }
 
 const NODE_COLORS = {
@@ -108,14 +106,14 @@ function Edges({ chunks, queryNode }: { chunks: ChunkData[]; queryNode: ChunkDat
   geometry.setAttribute("position", new Float32BufferAttribute(positions, 3));
 
   return (
-    <Lines
-      geometry={geometry}
-      color="#5B6B85"
-      opacity={0.15}
-      lineWidth={1}
-      transparent
-      depthWrite={false}
-    />
+    <lineSegments geometry={geometry}>
+      <lineBasicMaterial
+        color="#5B6B85"
+        transparent
+        opacity={0.15}
+        depthWrite={false}
+      />
+    </lineSegments>
   );
 }
 
@@ -139,7 +137,6 @@ function NodeTooltip({
       fullscreen
       distanceFactor={10}
       zIndexRange={[100, 100]}
-      occlusion={false}
     >
       <motion.div
         initial={{ opacity: 0, scale: 0.95, y: 10 }}
@@ -270,7 +267,7 @@ function VectorSpaceScene({
   const activeQuery = !!query;
   const [hoveredChunk, setHoveredChunk] = React.useState<ChunkData | null>(null);
 
-  const handlePointerOver = (event: React.PointerEvent, chunk: ChunkData) => {
+  const handlePointerOver = (event: ThreeEvent<PointerEvent>, chunk: ChunkData) => {
     if (!interactive) return;
     event.stopPropagation();
     setHoveredChunk(chunk);
@@ -282,12 +279,7 @@ function VectorSpaceScene({
 
   return (
     <>
-      <Fog
-        attach="fog"
-        color="#FFFFFF"
-        near={8}
-        far={40}
-      />
+      <fog attach="fog" args={["#FFFFFF", 8, 40]} />
       <ambientLight intensity={0.6} />
       <directionalLight position={[10, 10, 5]} intensity={0.8} />
       <directionalLight position={[-10, -5, -5]} intensity={0.4} />
