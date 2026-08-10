@@ -75,7 +75,7 @@ export function DashboardClient() {
                   />
                 </div>
                 <p id="query-hint" className="mt-2 text-sm text-muted-foreground">
-                  Try: "How does reciprocal rank fusion work?" or "What is the chunking strategy?"
+                  Try: &quot;How does reciprocal rank fusion work?&quot; or &quot;What is the chunking strategy?&quot;
                 </p>
               </div>
 

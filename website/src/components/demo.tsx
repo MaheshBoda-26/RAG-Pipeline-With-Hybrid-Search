@@ -277,7 +277,7 @@ export function Demo() {
                         <div className="text-3xl font-bold text-accent">{response.retrieval.reranked}</div>
                         <div className="text-sm text-muted-foreground">Reranked Finalists</div>
                       </div>
-                      <div className="bg-success-500/10 rounded-lg p-4 text-center">
+                      <div className="bg-success/10 rounded-lg p-4 text-center">
                         <div className="text-3xl font-bold text-success-500">{response.sources.length}</div>
                         <div className="text-sm text-muted-foreground">Verified Citations</div>
                       </div>
@@ -334,7 +334,7 @@ export function Demo() {
                           <div className="text-2xl font-bold text-accent">{response.retrieval.fused}</div>
                           <div className="text-xs text-muted-foreground">After RRF Fusion</div>
                         </div>
-                        <div className="p-3 bg-success-500/10 rounded-lg">
+                        <div className="p-3 bg-success/10 rounded-lg">
                           <div className="text-2xl font-bold text-success-500">{response.retrieval.reranked}</div>
                           <div className="text-xs text-muted-foreground">After LLM Rerank</div>
                         </div>
