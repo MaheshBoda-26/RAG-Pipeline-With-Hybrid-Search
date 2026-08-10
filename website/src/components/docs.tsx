@@ -162,7 +162,7 @@ export function Docs() {
     {i < step.commands.length - 1 ? "\n" : ""}
   </span>
 ))}
-                    </pre>
+                    </code></pre>
                     <div className="px-4 pb-3">
                       <Button
                         variant="ghost"

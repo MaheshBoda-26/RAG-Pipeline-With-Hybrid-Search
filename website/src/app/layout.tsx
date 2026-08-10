@@ -17,6 +17,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://rag-pipeline.dev"),
   title: {
     default: "RAG Pipeline | Hybrid Search Over Internal Docs",
     template: "%s | RAG Pipeline",
@@ -56,7 +57,7 @@ export const metadata: Metadata = {
       "Production-grade RAG pipeline with dense vector search, BM25 sparse retrieval, reciprocal rank fusion, LLM-as-judge reranking, and grounded generation with verified inline citations.",
     images: [
       {
-        url: "/og-image.png",
+        url: "/og-image.svg",
         width: 1200,
         height: 630,
         alt: "RAG Pipeline - Hybrid Search Over Internal Docs",
@@ -70,7 +71,7 @@ export const metadata: Metadata = {
     title: "RAG Pipeline | Hybrid Search Over Internal Docs",
     description:
       "Production-grade RAG pipeline with hybrid search, LLM reranking, and verified citations.",
-    images: ["/og-image.png"],
+    images: ["/og-image.svg"],
   },
   verification: {
     google: "google-site-verification-token",

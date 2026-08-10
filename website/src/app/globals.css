@@ -46,6 +46,29 @@
   --color-error-500: #B91C1C;
   --color-info-500: #2563EB;
 
+  /* Semantic aliases (light/dark overridden in base layer) */
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-light: var(--primary-light);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-hover: var(--secondary-hover);
+  --color-secondary-light: var(--secondary-light);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-light: var(--accent-light);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-ring: var(--ring);
+
   /* Neutrals */
   --color-neutral-0: #FFFFFF;
   --color-neutral-50: #F8F9FB;
@@ -111,13 +134,17 @@
     --primary: var(--color-primary-600);
     --primary-hover: var(--color-primary-700);
     --primary-light: var(--color-primary-50);
+    --primary-foreground: var(--color-neutral-0);
 
     --secondary: var(--color-secondary-700);
     --secondary-hover: var(--color-secondary-800);
     --secondary-light: var(--color-secondary-100);
+    --secondary-foreground: var(--color-neutral-0);
 
     --accent: var(--color-accent-500);
+    --accent-hover: var(--color-accent-600);
     --accent-light: var(--color-accent-100);
+    --accent-foreground: var(--color-neutral-0);
 
     --ring: var(--color-primary-600);
     --radius: var(--radius-md);
@@ -136,13 +163,17 @@
     --primary: var(--color-primary-500);
     --primary-hover: var(--color-primary-400);
     --primary-light: var(--color-primary-900);
+    --primary-foreground: var(--color-neutral-950);
 
     --secondary: var(--color-secondary-300);
     --secondary-hover: var(--color-secondary-200);
     --secondary-light: var(--color-secondary-800);
+    --secondary-foreground: var(--color-neutral-950);
 
     --accent: var(--color-accent-500);
+    --accent-hover: var(--color-accent-400);
     --accent-light: var(--color-accent-900);
+    --accent-foreground: var(--color-neutral-0);
 
     --ring: var(--color-primary-500);
   }

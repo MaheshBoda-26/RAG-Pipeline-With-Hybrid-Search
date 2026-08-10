@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     title: "RAG Pipeline | Hybrid Search Over Internal Docs",
     description:
       "Production-grade RAG pipeline with dense vector search, BM25 sparse retrieval, reciprocal rank fusion, LLM-as-judge reranking, and grounded generation with verified inline citations.",
-    images: ["/og-image.png"],
+    images: ["/og-image.svg"],
   },
 };
 

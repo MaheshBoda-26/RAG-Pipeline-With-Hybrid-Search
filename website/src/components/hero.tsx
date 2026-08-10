@@ -1,11 +1,23 @@
 "use client";
 
 import * as React from "react";
+import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
 import { ArrowRight, Github, Zap, Shield, CheckCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { VectorSpace3D } from "@/components/vector-space-3d";
+
+const VectorSpace3D = dynamic(() => import("@/components/vector-space-3d").then((m) => m.VectorSpace3D), {
+  ssr: false,
+  loading: () => (
+    <div className="aspect-square max-w-md mx-auto rounded-lg bg-surface/50 border border-border flex items-center justify-center" role="status" aria-label="Loading visualization">
+      <div className="text-center text-muted-foreground">
+        <div className="w-8 h-8 border-2 border-primary-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+        <p className="text-sm font-medium">Loading vector space...</p>
+      </div>
+    </div>
+  ),
+});
 
 const sampleChunks = [
   { id: "1", x: -2.1, y: 0.5, z: -1.2, source: "authentication.md", strategy: "recursive", text: "API authentication uses Bearer tokens with JWT validation...", role: "dense" as const },
