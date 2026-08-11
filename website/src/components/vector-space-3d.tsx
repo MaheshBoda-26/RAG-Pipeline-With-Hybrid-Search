@@ -367,7 +367,7 @@ export function VectorSpace3D({
       aria-label={query ? "Interactive vector space visualization with query results" : "Vector space visualization of indexed documents"}
     >
       <Canvas
-        camera={{ position: [0, 3, 15], fov: 45 }}
+        camera={{ position: [0, 3, 15], fov: 42 }}
         style={{ width: "100%", height: "100%" }}
         gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
       >
@@ -375,9 +375,9 @@ export function VectorSpace3D({
       </Canvas>
 
       {!interactive && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="text-center text-neutral-400 dark:text-neutral-600 px-4">
-            <p className="text-sm font-medium mb-1">Live Corpus Visualization</p>
+        <div className="absolute inset-x-6 bottom-6 pointer-events-none sm:inset-x-8 sm:bottom-8">
+          <div className="max-w-xs text-on-dark-soft">
+            <p className="text-sm font-medium text-on-dark/75 mb-1">Live Corpus Visualization</p>
             <p className="text-xs">Visit the dashboard to explore</p>
           </div>
         </div>
@@ -387,30 +387,30 @@ export function VectorSpace3D({
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="absolute bottom-4 left-4 right-4 md:left-auto md:right-4 md:bottom-auto md:top-4 md:w-72"
+          className="absolute left-4 right-4 top-4 sm:left-6 sm:right-auto sm:top-6 sm:w-64"
         >
-          <div className="bg-neutral-950/95 dark:bg-neutral-50/95 backdrop-blur-sm rounded-md border border-neutral-200 dark:border-neutral-800 p-3 text-xs">
-            <div className="flex items-center gap-2 mb-2 text-neutral-400 dark:text-neutral-600">
+          <div className="bg-canvas/95 backdrop-blur-sm rounded-lg border border-hairline p-3 text-xs shadow-[0_18px_40px_-24px_rgba(20,20,19,0.45)]">
+            <div className="flex items-center gap-2 mb-2 text-body">
               <span className="w-2 h-2 rounded-full bg-accent-500" />
-              <span className="font-medium text-neutral-100 dark:text-neutral-900">Reranked Finalists</span>
+              <span className="font-medium text-ink">Reranked Finalists</span>
             </div>
-            <div className="flex items-center gap-2 mb-1 text-neutral-400 dark:text-neutral-600">
+            <div className="flex items-center gap-2 mb-1 text-body">
               <span className="w-2 h-2 rounded-full bg-primary-600" />
-              <span className="font-medium text-neutral-100 dark:text-neutral-900">Dense Matches</span>
+              <span className="font-medium text-ink">Dense Matches</span>
             </div>
-            <div className="flex items-center gap-2 mb-1 text-neutral-400 dark:text-neutral-600">
+            <div className="flex items-center gap-2 mb-1 text-body">
               <span
                 className="w-2 h-2 rounded-full border border-secondary-500 bg-transparent"
               />
-              <span className="font-medium text-neutral-100 dark:text-neutral-900">Sparse Matches</span>
+              <span className="font-medium text-ink">Sparse Matches</span>
             </div>
-            <div className="flex items-center gap-2 mb-1 text-neutral-400 dark:text-neutral-600">
+            <div className="flex items-center gap-2 mb-1 text-body">
               <span className="w-2 h-2 rounded-full bg-neutral-400 opacity-30" />
-              <span className="font-medium text-neutral-100 dark:text-neutral-900">Unretrieved</span>
+              <span className="font-medium text-ink">Unretrieved</span>
             </div>
-            <div className="flex items-center gap-2 text-neutral-400 dark:text-neutral-600">
+            <div className="flex items-center gap-2 text-body">
               <span className="w-2 h-2 rounded-full bg-success-500" />
-              <span className="font-medium text-neutral-100 dark:text-neutral-900">Query Vector</span>
+              <span className="font-medium text-ink">Query Vector</span>
             </div>
           </div>
         </motion.div>

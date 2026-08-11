@@ -123,14 +123,14 @@ export function Hero() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.3, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="flex flex-col gap-6"
+            className="flex flex-col gap-6 lg:-ml-4"
           >
-            <div className="bg-surface-dark rounded-2xl p-4 sm:p-6">
+            <div className="relative overflow-hidden rounded-2xl border border-white/5 bg-surface-dark shadow-[0_32px_90px_-56px_rgba(20,20,19,0.9)]">
               <VectorSpace3D
                 chunks={sampleChunks}
                 query="How do I authenticate?"
                 interactive={false}
-                className="aspect-square w-full"
+                className="min-h-[360px] h-[clamp(360px,42vw,560px)] w-full"
               />
             </div>
 
