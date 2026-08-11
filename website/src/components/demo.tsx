@@ -92,7 +92,7 @@ export function Demo() {
             transition={{ delay: 0.2, duration: 0.5 }}
             className="space-y-6"
           >
-            <div className="bg-surface border border-border rounded-xl p-6 sticky top-24">
+            <div className="bg-surface border border-border rounded-xl p-6">
               <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                 <Info className="w-5 h-5 text-primary" />
                 Configuration
