@@ -18,8 +18,31 @@ from pipeline import RAGPipeline
 
 app = FastAPI(title="RAG Pipeline API")
 
+
+@app.get("/")
+def root():
+    return {
+        "status": "online",
+        "service": "RAG Pipeline API",
+        "documentation": "/docs",
+        "endpoints": {
+            "ask": "POST /v1/ask",
+            "ingest": "POST /v1/ingest",
+            "documents": "GET /v1/documents",
+            "docs": "GET /docs",
+            "openapi": "GET /openapi.json"
+        }
+    }
+
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
+
 # Lazy pipeline initialization
 _pipeline = None
+
 
 
 def get_pipeline() -> RAGPipeline:
