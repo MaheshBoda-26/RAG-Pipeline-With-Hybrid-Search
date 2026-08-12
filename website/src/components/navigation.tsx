@@ -116,7 +116,7 @@ export function Navigation() {
               {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             </Button>
             <motion.a
-              href="https://github.com"
+              href="https://github.com/MaheshBoda-26/RAG-Pipeline-With-Hybrid-Search"
               target="_blank"
               rel="noopener noreferrer"
               className="text-muted-foreground hover:text-ink transition-colors duration-200"
@@ -179,11 +179,12 @@ export function Navigation() {
                   {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
                 </Button>
                 <motion.a
-                  href="https://github.com"
+                  href="https://github.com/MaheshBoda-26/RAG-Pipeline-With-Hybrid-Search"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-muted-foreground hover:text-ink"
                   whileHover={{ scale: 1.1 }}
+                  aria-label="View on GitHub"
                 >
                   <Github className="w-5 h-5" />
                 </motion.a>
