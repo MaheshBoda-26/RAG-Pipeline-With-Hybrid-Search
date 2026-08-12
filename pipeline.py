@@ -156,6 +156,7 @@ class RAGPipeline:
                         "block": i + 1,
                         "source": c["payload"]["source"],
                         "section_heading": c["payload"].get("section_heading"),
+                        "text": c["payload"].get("text", ""),
                         "fused_score": c.get("fused_score"),
                         "rerank_score": c.get("rerank_score"),
                     }
@@ -188,6 +189,7 @@ class RAGPipeline:
                     "block": i + 1,
                     "source": c["payload"]["source"],
                     "section_heading": c["payload"].get("section_heading"),
+                    "text": c["payload"].get("text", ""),
                     "fused_score": c.get("fused_score"),
                     "rerank_score": c.get("rerank_score"),
                 }
