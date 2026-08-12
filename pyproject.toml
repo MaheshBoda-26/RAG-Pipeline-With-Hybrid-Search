@@ -22,5 +22,16 @@ dependencies = [
     "mdurl==0.1.2",
 ]
 
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["ingestion*", "retrieval*", "generation*", "dashboard*"]
+exclude = ["website*", "sample_docs*", "qdrant_data*", "tests*", "tasks*"]
+
+[tool.setuptools]
+py-modules = ["api", "config", "pipeline", "cli"]
+
+[tool.uv]
+package = false
+
 [tool.vercel]
 entrypoint = "api:app"
