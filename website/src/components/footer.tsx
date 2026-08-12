@@ -65,7 +65,7 @@ export function Footer() {
             </p>
             <div className="flex items-center gap-4">
               <motion.a
-                href="https://github.com"
+                href="https://github.com/MaheshBoda-26/RAG-Pipeline-With-Hybrid-Search"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-on-dark transition-colors"
