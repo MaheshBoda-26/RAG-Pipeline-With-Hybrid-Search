@@ -17,7 +17,7 @@
     "clsx": "2.1.1",
     "framer-motion": "11.11.0",
     "lucide-react": "0.453.0",
-    "next": "15.0.0",
+    "next": "^15.1.7",
     "react": "^19.0.0-rc-66855b96-20241106",
     "react-dom": "^19.0.0-rc-66855b96-20241106",
     "tailwind-merge": "2.5.4",
@@ -30,7 +30,8 @@
     "@types/react-dom": "^19.0.0",
     "@types/three": "0.169.0",
     "eslint": "8.57.1",
-    "eslint-config-next": "15.0.0",
+    "eslint-config-next": "^15.1.7",
+
     "postcss": "8.4.47",
     "tailwindcss": "4.0.0-alpha.25",
     "typescript": "5.6.3"
