@@ -683,9 +683,14 @@
       const snippet = q || "the question";
       return {
         answer:
-          "To authenticate, supply an API key in the Authorization header [1] or use OAuth2 [2]. " +
-          "Rate limits are enforced at 1000 req/min; exceeding them returns 429 with a Retry-After header [3]. " +
-          "For " + snippet + ", refer to the specific endpoint documentation in the indexed set [4].",
+          "The Aegis API supports two authentication methods: OAuth2 and static API keys [1]. " +
+          "For API keys, include them in the Authorization header as a Bearer token [2]. " +
+          "OAuth2 uses the standard authorization code flow with tokens expiring after 1 hour [2]. " +
+          "Rate limits: 1000 req/min per API key, 100 req/min per OAuth2 token; exceeding returns 429 with Retry-After [1]. " +
+          "For deployment, Kubernetes (Helm chart) is recommended for production, Docker Compose for staging [3]. " +
+          "Health checks: GET /healthz (liveness), GET /readyz (readiness) [3]. " +
+          "Error codes include AUTH_INVALID_KEY (401), RATE_LIMITED (429), VALIDATION_ERROR (422), INTERNAL_ERROR (500) [4]. " +
+          "For " + snippet + ", refer to the indexed documentation.",
         confidence: {
           retrieval_confidence: 0.87,
           citation_coverage: 1.0,
@@ -693,10 +698,10 @@
           composite: 0.93,
         },
         sources: [
-          { source: "sample_docs/authentication.md", section: "API Keys" },
-          { source: "sample_docs/authentication.md", section: "OAuth2" },
-          { source: "sample_docs/rate_limits.md", section: "Rate Limits" },
-          { source: "sample_docs/endpoints.md", section: "Endpoints" },
+          { source: "sample_docs/authentication.md", section: "Overview / Rate Limits" },
+          { source: "sample_docs/authentication.md", section: "API Keys / OAuth2" },
+          { source: "sample_docs/deployment.md", section: "Supported Environments / Health Checks" },
+          { source: "sample_docs/error_codes.md", section: "Common Error Codes" },
         ],
       };
     }
