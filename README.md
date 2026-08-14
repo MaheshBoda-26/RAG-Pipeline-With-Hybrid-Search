@@ -164,4 +164,4 @@ python tests/test_pipeline_smoke.py
   service and a real Qdrant server (swap `QDRANT_PATH` for `QDRANT_URL` in
   the compose env) — not included here since embedded mode was the chosen
   setup for this pass.
-# RAG-Pipeline-With-Hybrid-Search
+
