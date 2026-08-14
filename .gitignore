@@ -4,3 +4,25 @@
 # Ignore all markdown files except README.md
 *.md
 !README.md
+
+# Secrets
+.env
+!.env.example
+
+# Local IDE / AI config
+.claude/
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Local database / runtime data
+qdrant_data/
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Test artifacts
+tests/eval/results*.json
