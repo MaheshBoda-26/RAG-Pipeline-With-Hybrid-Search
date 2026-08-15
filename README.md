@@ -8,7 +8,7 @@ composite confidence score.
 This covers Phases 1–3 of the full spec (ingestion/chunking, hybrid
 retrieval, grounded generation + citation verification) as a working,
 runnable system. Phases 4–6 (eval framework, dashboard, Docker packaging)
-are not built yet — see "Extending this" below for where they'd plug in.
+are not built yet — see "Extending this" below for where they would plug in.
 
 ## Architecture
 
@@ -150,17 +150,17 @@ python tests/test_pipeline_smoke.py
 
 ## Extending this to the full spec
 
-- **Phase 4 (eval framework)**: the golden Q&A dataset would live in
+- ** Phase 4 (eval framework)**: the golden Q&A dataset would live in
   `tests/eval/`, running `RAGPipeline.ask()` against each question and
   scoring with the same `generation/citations.py` primitives
   (`citation_coverage`, `score_completeness`) plus a new answer-correctness
   judge. The chunking-strategy comparison report is just that eval suite
   run three times with `CHUNK_STRATEGY` swapped.
-- **Phase 5 (dashboard)**: `api.py` already exposes `/v1/ask`, `/v1/ingest`,
+- ** Phase 5 (dashboard)**: `api.py` already exposes `/v1/ask`, `/v1/ingest`,
   `/v1/documents` — a Streamlit or React frontend is a thin client over
   those three endpoints. The "hybrid vs dense-only" toggle just means
   calling `ask()` with `sparse_weight=0` for comparison.
-- **Phase 6 (Docker)**: `Dockerfile` + `docker-compose.yml` bundling the API
+- ** Phase 6 (Docker)**: `Dockerfile` + `docker-compose.yml` bundling the API
   service and a real Qdrant server (swap `QDRANT_PATH` for `QDRANT_URL` in
   the compose env) — not included here since embedded mode was the chosen
   setup for this pass.
