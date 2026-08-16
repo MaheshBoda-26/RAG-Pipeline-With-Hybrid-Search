@@ -4,7 +4,6 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const BACKEND_URL = process.env.RAG_API_URL || "http://localhost:8000";
-const API_KEY = process.env.RAG_API_KEY || "your-secure-api-key-here";
 
 export async function DELETE(
   req: NextRequest,
@@ -16,11 +15,16 @@ export async function DELETE(
       return NextResponse.json({ error: "source is required" }, { status: 400 });
     }
 
+    // Forward cookies for session management
+    const cookieHeader = req.headers.get("cookie");
+    const headers: Record<string, string> = {};
+    if (cookieHeader) {
+      headers["Cookie"] = cookieHeader;
+    }
+
     const upstream = await fetch(`${BACKEND_URL}/v1/documents/${source}`, {
       method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${API_KEY}`,
-      },
+      headers,
       cache: "no-store",
     });
 

@@ -4,22 +4,18 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const BACKEND_URL = process.env.RAG_API_URL || "http://localhost:8000";
-const API_KEY = process.env.RAG_API_KEY || "your-secure-api-key-here";
 
-export async function GET(req: NextRequest) {
+export async function POST(req: NextRequest) {
   try {
     // Forward cookies for session management
     const cookieHeader = req.headers.get("cookie");
     const headers: Record<string, string> = {};
     if (cookieHeader) {
       headers["Cookie"] = cookieHeader;
-    } else {
-      // Fallback to API key for backward compatibility
-      headers["Authorization"] = `Bearer ${API_KEY}`;
     }
 
-    const upstream = await fetch(`${BACKEND_URL}/v1/documents`, {
-      method: "GET",
+    const upstream = await fetch(`${BACKEND_URL}/v1/auth/refresh`, {
+      method: "POST",
       headers,
       cache: "no-store",
     });
@@ -28,14 +24,22 @@ export async function GET(req: NextRequest) {
 
     if (!upstream.ok) {
       return NextResponse.json(
-        { error: data.detail || data.error || "Upstream pipeline error" },
+        { error: data.detail || data.error || "Token refresh failed" },
         { status: upstream.status }
       );
     }
 
-    return NextResponse.json(data);
+    // Forward the Set-Cookie headers from backend
+    const response = NextResponse.json(data);
+
+    const setCookieHeaders = upstream.headers.getSetCookie();
+    for (const cookie of setCookieHeaders) {
+      response.headers.append("Set-Cookie", cookie);
+    }
+
+    return response;
   } catch (err) {
-    console.error("RAG API documents proxy error:", err);
+    console.error("RAG API refresh proxy error:", err);
     return NextResponse.json(
       { error: "Backend RAG API unreachable" },
       { status: 502 }

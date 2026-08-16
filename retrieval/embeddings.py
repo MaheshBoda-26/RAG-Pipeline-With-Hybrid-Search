@@ -12,7 +12,7 @@ class Embedder:
         self.client = client
         self.model = model
         # NVIDIA asymmetric embedding models require input_type
-        self.is_nvidia_asymmetric = "nvidia/nv-embedqa" in model
+        self.is_nvidia_asymmetric = "nvidia/nv-embedqa" in model or "nvidia/llama-nemotron-embed" in model
 
     def embed(self, texts: list[str]) -> list[list[float]]:
         if not texts:

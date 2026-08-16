@@ -4,23 +4,34 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const BACKEND_URL = process.env.RAG_API_URL || "http://localhost:8000";
-const API_KEY = process.env.RAG_API_KEY || "your-secure-api-key-here";
 
-export async function GET(req: NextRequest) {
+export async function POST(req: NextRequest) {
+  let body: unknown;
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+  }
+
+  const { question } = body as { question?: string };
+  if (!question || typeof question !== "string" || question.trim() === "") {
+    return NextResponse.json({ error: "question is required" }, { status: 400 });
+  }
+
   try {
     // Forward cookies for session management
     const cookieHeader = req.headers.get("cookie");
-    const headers: Record<string, string> = {};
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
     if (cookieHeader) {
       headers["Cookie"] = cookieHeader;
-    } else {
-      // Fallback to API key for backward compatibility
-      headers["Authorization"] = `Bearer ${API_KEY}`;
     }
 
-    const upstream = await fetch(`${BACKEND_URL}/v1/documents`, {
-      method: "GET",
+    const upstream = await fetch(`${BACKEND_URL}/v1/demo/ask`, {
+      method: "POST",
       headers,
+      body: JSON.stringify({ question }),
       cache: "no-store",
     });
 
@@ -35,7 +46,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(data);
   } catch (err) {
-    console.error("RAG API documents proxy error:", err);
+    console.error("RAG API demo proxy error:", err);
     return NextResponse.json(
       { error: "Backend RAG API unreachable" },
       { status: 502 }

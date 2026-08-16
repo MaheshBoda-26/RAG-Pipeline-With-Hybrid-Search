@@ -15,15 +15,23 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "file is required" }, { status: 400 });
     }
 
-    // Forward to backend
+    // Forward to backend with cookies for authenticated users
     const upstreamFormData = new FormData();
     upstreamFormData.append("file", file, file.name);
 
+    // Forward cookies for session management
+    const cookieHeader = req.headers.get("cookie");
+    const headers: Record<string, string> = {};
+    if (cookieHeader) {
+      headers["Cookie"] = cookieHeader;
+    } else {
+      // Fallback to API key for backward compatibility
+      headers["Authorization"] = `Bearer ${API_KEY}`;
+    }
+
     const upstream = await fetch(`${BACKEND_URL}/v1/upload`, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${API_KEY}`,
-      },
+      headers,
       body: upstreamFormData,
       cache: "no-store",
     });

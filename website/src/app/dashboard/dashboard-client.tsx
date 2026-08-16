@@ -1,9 +1,13 @@
 "use client";
 
 import * as React from "react";
-import { Search, Sparkles, Zap, CheckCircle } from "lucide-react";
+import { Search, Sparkles, Zap, CheckCircle, Users, Globe, LogOut, Upload, Settings } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
+import { Button } from "@/components/ui/button";
+import { DocumentUploader } from "@/components/DocumentUploader";
 
 export function DashboardClient() {
+  const { user, isLoading, isAuthenticated, mode, setMode, logout, refreshUser } = useAuth();
   const [query, setQuery] = React.useState("");
   const [loading, setLoading] = React.useState(false);
   const [answer, setAnswer] = React.useState("");
@@ -18,11 +22,13 @@ export function DashboardClient() {
     setCitations([]);
 
     try {
-      const res = await fetch("/api/ask", {
+      const endpoint = mode === "demo" ? "/api/demo/ask" : "/api/ask";
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify({ question: query }),
       });
 
@@ -36,16 +42,102 @@ export function DashboardClient() {
     }
   };
 
+  if (isLoading) {
+    return (
+      <section className="py-24 sm:py-32 lg:py-40 bg-surface/30">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
+          <div className="flex items-center justify-center gap-2 text-muted-foreground">
+            <Zap className="w-5 h-5 animate-spin" />
+            <span>Loading...</span>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section id="dashboard" className="py-24 sm:py-32 lg:py-40 bg-surface/30">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div
-          className="text-center max-w-3xl mx-auto mb-16 animate-in"
-        >
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
-            <Sparkles className="w-4 h-4" />
-            <span>Live Dashboard</span>
-          </span>
+        {/* Mode Toggle & User Info */}
+        <div className="mb-8 animate-in">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium">
+                <Sparkles className="w-4 h-4" />
+                <span>Live Dashboard</span>
+              </span>
+              <div className="flex items-center gap-2 border border-border rounded-lg p-1 bg-surface">
+                <Button
+                  variant={mode === "demo" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setMode("demo")}
+                  className="rounded-md"
+                >
+                  <Globe className="w-4 h-4 mr-1" />
+                  Demo
+                </Button>
+                <Button
+                  variant={mode === "user" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setMode("user")}
+                  className="rounded-md"
+                  disabled={!isAuthenticated}
+                >
+                  <Users className="w-4 h-4 mr-1" />
+                  My Documents
+                </Button>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              {isAuthenticated && user && (
+                <div className="flex items-center gap-3 text-sm">
+                  <span className="text-muted-foreground">Logged in as</span>
+                  <span className="font-medium">{user.email}</span>
+                  <Button variant="ghost" size="sm" onClick={logout} className="gap-1">
+                    <LogOut className="w-4 h-4" />
+                    Logout
+                  </Button>
+                </div>
+              )}
+              {!isAuthenticated && mode === "user" && (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <span>Sign in to use My Documents mode</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Upload Section - Only for authenticated users in user mode */}
+        {isAuthenticated && mode === "user" && (
+          <div className="mb-8 animate-in">
+            <DocumentUploader />
+          </div>
+        )}
+
+        {/* Demo mode notice */}
+        {mode === "demo" && (
+          <div className="mb-8 animate-in">
+            <div className="bg-primary/5 border border-primary/20 rounded-xl p-4">
+              <div className="flex items-center gap-3">
+                <Globe className="w-5 h-5 text-primary" />
+                <div>
+                  <p className="font-medium text-primary">Demo Mode</p>
+                  <p className="text-sm text-muted-foreground">
+                    Querying pre-loaded demo documents.{" "}
+                    {isAuthenticated ? (
+                      <span>Switch to &ldquo;My Documents&rdquo; to query your own uploads.</span>
+                    ) : (
+                      <span>Sign in to upload and query your own documents.</span>
+                    )}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className="text-center max-w-3xl mx-auto mb-16 animate-in">
           <h2 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-balance mb-6">
             Query the Pipeline
           </h2>
@@ -68,20 +160,24 @@ export function DashboardClient() {
                     type="text"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    placeholder="What does the RAG pipeline do? How does hybrid search work? ..."
+                    placeholder={mode === "demo"
+                      ? "What does the RAG pipeline do? How does hybrid search work? ..."
+                      : "What's in my documents? Summarize my uploaded files..."}
                     className="w-full pl-12 pr-4 py-4 bg-surface border border-border rounded-xl text-lg placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                    disabled={loading}
+                    disabled={loading || (mode === "user" && !isAuthenticated)}
                     aria-describedby="query-hint"
                   />
                 </div>
                 <p id="query-hint" className="mt-2 text-sm text-muted-foreground">
-                  Try: &quot;How does reciprocal rank fusion work?&quot; or &quot;What is the chunking strategy?&quot;
+                  {mode === "demo"
+                    ? 'Try: "How does reciprocal rank fusion work?" or "What is the chunking strategy?"'
+                    : 'Try: "Summarize my documents" or "What are the key topics in my files?"'}
                 </p>
               </div>
 
               <button
                 type="submit"
-                disabled={loading || !query.trim()}
+                disabled={loading || !query.trim() || (mode === "user" && !isAuthenticated)}
                 className="w-full sm:w-auto px-8 py-4 bg-primary text-primary-foreground rounded-xl font-medium text-lg hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none transition-all active:scale-[0.98] flex items-center gap-2 justify-center"
               >
                 {loading ? (
@@ -96,12 +192,15 @@ export function DashboardClient() {
                   </>
                 )}
               </button>
+              {(mode === "user" && !isAuthenticated) && (
+                <p className="text-sm text-muted-foreground text-center">
+                  Please sign in to query your documents
+                </p>
+              )}
             </form>
 
             {answer && (
-              <div
-                className="bg-surface border border-border rounded-xl p-6 space-y-4 animate-in"
-              >
+              <div className="bg-surface border border-border rounded-xl p-6 space-y-4 animate-in">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <CheckCircle className="w-4 h-4 text-success-500" />
                   <span>Grounded answer with {citations.length} citation{citations.length !== 1 ? "s" : ""}</span>

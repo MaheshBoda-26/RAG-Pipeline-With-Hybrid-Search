@@ -8,6 +8,10 @@ POST /v1/upload           multipart/form-data file upload
 GET  /v1/documents        list user's documents
 DELETE /v1/documents/{source}  delete a document
 POST /v1/users            create a new user (admin)
+POST /v1/auth/register    register new user
+POST /v1/auth/login       login user (returns JWT cookies)
+POST /v1/auth/refresh     refresh access token
+POST /v1/auth/logout      logout user
 """
 from __future__ import annotations
 
@@ -15,20 +19,34 @@ import os
 import shutil
 from pathlib import Path
 from typing import Optional
+from datetime import timedelta
 
 from fastapi import (
-    FastAPI, HTTPException, Security, Depends, UploadFile, File, Form
+    FastAPI, HTTPException, Security, Depends, UploadFile, File, Form,
+    Response, Request, Cookie
 )
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from config import (
-    settings, get_user_by_api_key, create_user, load_user_registry, save_user_registry
+    settings, get_user_by_api_key, create_user, load_user_registry, save_user_registry,
+    verify_user_password, get_user_by_email, create_access_token, create_refresh_token,
+    get_user_id_from_token
 )
 from pipeline import RAGPipeline
 
 
 app = FastAPI(title="RAG Pipeline API")
+
+# CORS middleware for frontend
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/")
@@ -101,6 +119,59 @@ async def verify_api_key(auth: HTTPAuthorizationCredentials = Security(security)
     return user_id
 
 
+async def verify_jwt_token(
+    request: Request,
+    access_token: str | None = Cookie(default=None, alias="access_token")
+) -> str:
+    """
+    Verify JWT token from HttpOnly cookie and return user_id.
+    Supports both cookie and Authorization header (for backward compatibility).
+    """
+    token = access_token
+
+    # Fallback to Authorization header if no cookie
+    if not token:
+        auth_header = request.headers.get("Authorization")
+        if auth_header and auth_header.startswith("Bearer "):
+            token = auth_header[7:]
+
+    if not token:
+        raise HTTPException(
+            status_code=401,
+            detail="Not authenticated. Please login."
+        )
+
+    user_id = get_user_id_from_token(token)
+    if not user_id:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid or expired token. Please login again."
+        )
+
+    return user_id
+
+
+async def get_optional_user_id(
+    request: Request,
+    access_token: str | None = Cookie(default=None, alias="access_token")
+) -> str | None:
+    """
+    Get user_id if authenticated, otherwise return None (for demo mode).
+    """
+    token = access_token
+
+    if not token:
+        auth_header = request.headers.get("Authorization")
+        if auth_header and auth_header.startswith("Bearer "):
+            token = auth_header[7:]
+
+    if not token:
+        return None
+
+    user_id = get_user_id_from_token(token)
+    return user_id
+
+
 class AskRequest(BaseModel):
     question: str
 
@@ -114,14 +185,14 @@ class CreateUserRequest(BaseModel):
 
 
 @app.post("/v1/ask")
-def ask(req: AskRequest, user_id: str = Depends(verify_api_key)):
+async def ask(req: AskRequest, user_id: str = Depends(verify_jwt_token)):
     pipeline = get_pipeline(user_id)
     response = pipeline.ask(req.question)
     return response.__dict__
 
 
 @app.post("/v1/ingest")
-def ingest(req: IngestRequest, user_id: str = Depends(verify_api_key)):
+async def ingest(req: IngestRequest, user_id: str = Depends(verify_jwt_token)):
     pipeline = get_pipeline(user_id)
     try:
         return pipeline.ingest_directory(req.path)
@@ -132,7 +203,7 @@ def ingest(req: IngestRequest, user_id: str = Depends(verify_api_key)):
 @app.post("/v1/upload")
 async def upload(
     file: UploadFile = File(...),
-    user_id: str = Depends(verify_api_key)
+    user_id: str = Depends(verify_jwt_token)
 ):
     """Upload a document file and ingest it."""
     # Validate file size
@@ -174,7 +245,7 @@ async def upload(
 
 
 @app.get("/v1/documents")
-def documents(user_id: str = Depends(verify_api_key)):
+async def documents(user_id: str = Depends(verify_jwt_token)):
     pipeline = get_pipeline(user_id)
     docs = pipeline.list_documents()
     total_chunks = sum(d.get("chunk_count", 0) for d in docs)
@@ -182,7 +253,7 @@ def documents(user_id: str = Depends(verify_api_key)):
 
 
 @app.delete("/v1/documents/{source:path}")
-def delete_document(source: str, user_id: str = Depends(verify_api_key)):
+async def delete_document(source: str, user_id: str = Depends(verify_jwt_token)):
     pipeline = get_pipeline(user_id)
     deleted = pipeline.delete_document(source)
     if deleted == 0:
@@ -251,3 +322,160 @@ async def admin_list_users(auth: HTTPAuthorizationCredentials = Security(securit
             for uid, info in registry.items()
         ]
     }
+
+
+# --- JWT Auth Endpoints ---
+class RegisterRequest(BaseModel):
+    email: str
+    password: str
+    name: str | None = None
+
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+
+class TokenResponse(BaseModel):
+    access_token: str
+    refresh_token: str
+    token_type: str = "bearer"
+
+
+def set_auth_cookies(response: Response, access_token: str, refresh_token: str):
+    """Set HttpOnly cookies for auth tokens."""
+    response.set_cookie(
+        key="access_token",
+        value=access_token,
+        httponly=True,
+        secure=False,  # Set to True in production with HTTPS
+        samesite="lax",
+        max_age=settings.access_token_expire_minutes * 60,
+        path="/",
+    )
+    response.set_cookie(
+        key="refresh_token",
+        value=refresh_token,
+        httponly=True,
+        secure=False,
+        samesite="lax",
+        max_age=settings.refresh_token_expire_days * 24 * 60 * 60,
+        path="/",
+    )
+
+
+def clear_auth_cookies(response: Response):
+    """Clear auth cookies."""
+    response.delete_cookie(key="access_token", path="/")
+    response.delete_cookie(key="refresh_token", path="/")
+
+
+@app.post("/v1/auth/register", response_model=TokenResponse)
+async def register(req: RegisterRequest, response: Response):
+    """Register a new user and return JWT tokens in HttpOnly cookies."""
+    # Check if user already exists
+    existing_user_id = get_user_by_email(req.email)
+    if existing_user_id:
+        raise HTTPException(status_code=400, detail="User already exists")
+
+    # Create user with password
+    user_id, api_key = create_user(req.name or req.email, req.email, req.password)
+
+    # Generate tokens
+    access_token = create_access_token(user_id)
+    refresh_token = create_refresh_token(user_id)
+
+    # Set HttpOnly cookies
+    set_auth_cookies(response, access_token, refresh_token)
+
+    return TokenResponse(access_token=access_token, refresh_token=refresh_token)
+
+
+@app.post("/v1/auth/login", response_model=TokenResponse)
+async def login(req: LoginRequest, response: Response):
+    """Login user and return JWT tokens in HttpOnly cookies."""
+    user_id = get_user_by_email(req.email)
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+
+    if not verify_user_password(user_id, req.password):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+
+    # Generate tokens
+    access_token = create_access_token(user_id)
+    refresh_token = create_refresh_token(user_id)
+
+    # Set HttpOnly cookies
+    set_auth_cookies(response, access_token, refresh_token)
+
+    return TokenResponse(access_token=access_token, refresh_token=refresh_token)
+
+
+@app.post("/v1/auth/refresh", response_model=TokenResponse)
+async def refresh_token(
+    response: Response,
+    refresh_token: str | None = Cookie(default=None, alias="refresh_token")
+):
+    """Refresh access token using refresh token."""
+    if not refresh_token:
+        raise HTTPException(status_code=401, detail="Refresh token not found")
+
+    payload = decode_token(refresh_token)
+    if not payload or payload.get("type") != "refresh":
+        raise HTTPException(status_code=401, detail="Invalid refresh token")
+
+    user_id = payload.get("sub")
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Invalid refresh token")
+
+    # Generate new tokens
+    new_access_token = create_access_token(user_id)
+    new_refresh_token = create_refresh_token(user_id)
+
+    # Set new cookies
+    set_auth_cookies(response, new_access_token, new_refresh_token)
+
+    return TokenResponse(access_token=new_access_token, refresh_token=new_refresh_token)
+
+
+@app.post("/v1/auth/logout")
+async def logout(response: Response):
+    """Logout user by clearing cookies."""
+    clear_auth_cookies(response)
+    return {"message": "Logged out successfully"}
+
+
+@app.get("/v1/auth/me")
+async def get_current_user(user_id: str = Depends(verify_jwt_token)):
+    """Get current authenticated user info."""
+    registry = load_user_registry()
+    user = registry.get(user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return {
+        "user_id": user_id,
+        "email": user.get("name", ""),
+        "name": user.get("name", ""),
+    }
+
+
+# --- Demo mode endpoint (uses global 'docs' collection) ---
+@app.post("/v1/demo/ask")
+async def demo_ask(req: AskRequest):
+    """Ask question using demo/global collection (no auth required)."""
+    pipeline = get_pipeline(settings.default_user_id)
+    response = pipeline.ask(req.question)
+    return response.__dict__
+
+
+@app.get("/v1/demo/documents")
+async def demo_documents():
+    """List demo documents (no auth required)."""
+    pipeline = get_pipeline(settings.default_user_id)
+    docs = pipeline.list_documents()
+    total_chunks = sum(d.get("chunk_count", 0) for d in docs)
+    return {"documents": docs, "total_documents": len(docs), "total_chunks": total_chunks}
+
+
+# Import decode_token for refresh endpoint
+from config import decode_token

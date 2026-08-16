@@ -8,12 +8,19 @@ import json
 import secrets
 from dataclasses import dataclass, field
 from pathlib import Path
+from datetime import datetime, timedelta
 from dotenv import load_dotenv
 
 load_dotenv()
 
 # User registry file for persistence
 USER_REGISTRY_PATH = Path("./user_registry.json")
+
+# JWT settings
+JWT_SECRET = os.getenv("JWT_SECRET", secrets.token_urlsafe(64))
+JWT_ALGORITHM = "HS256"
+JWT_ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("JWT_ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
+JWT_REFRESH_TOKEN_EXPIRE_DAYS = int(os.getenv("JWT_REFRESH_TOKEN_EXPIRE_DAYS", "7"))
 
 
 def load_user_registry() -> dict:
@@ -35,23 +42,89 @@ def get_user_by_api_key(api_key: str) -> str | None:
     return None
 
 
-def create_user(name: str) -> tuple[str, str]:
+def create_user(name: str, email: str | None = None, password: str | None = None) -> tuple[str, str]:
     """Create a new user. Returns (user_id, api_key)."""
     user_id = f"user_{secrets.token_urlsafe(8)}"
     api_key = f"sk_{secrets.token_urlsafe(32)}"
     registry = load_user_registry()
-    registry[user_id] = {"name": name, "api_key": api_key, "created": __import__("datetime").datetime.now().isoformat()}
+    user_data = {
+        "name": name,
+        "email": email or name,
+        "api_key": api_key,
+        "created": datetime.now().isoformat(),
+    }
+    if password:
+        import hashlib
+        user_data["password_hash"] = hashlib.sha256(password.encode()).hexdigest()
+    registry[user_id] = user_data
     save_user_registry(registry)
     return user_id, api_key
+
+
+def verify_user_password(user_id: str, password: str) -> bool:
+    """Verify user password."""
+    import hashlib
+    registry = load_user_registry()
+    user = registry.get(user_id)
+    if not user or "password_hash" not in user:
+        return False
+    return user["password_hash"] == hashlib.sha256(password.encode()).hexdigest()
+
+
+def get_user_by_email(email: str) -> str | None:
+    """Look up user_id by email (stored as email field or name for backward compat)."""
+    registry = load_user_registry()
+    for uid, info in registry.items():
+        if info.get("email") == email or info.get("name") == email:
+            return uid
+    return None
+
+
+# JWT token functions
+def create_access_token(user_id: str, expires_delta: timedelta | None = None) -> str:
+    """Create JWT access token."""
+    import jwt
+    if expires_delta:
+        expire = datetime.utcnow() + expires_delta
+    else:
+        expire = datetime.utcnow() + timedelta(minutes=JWT_ACCESS_TOKEN_EXPIRE_MINUTES)
+    to_encode = {"sub": user_id, "exp": expire, "type": "access"}
+    return jwt.encode(to_encode, JWT_SECRET, algorithm=JWT_ALGORITHM)
+
+
+def create_refresh_token(user_id: str) -> str:
+    """Create JWT refresh token."""
+    import jwt
+    expire = datetime.utcnow() + timedelta(days=JWT_REFRESH_TOKEN_EXPIRE_DAYS)
+    to_encode = {"sub": user_id, "exp": expire, "type": "refresh"}
+    return jwt.encode(to_encode, JWT_SECRET, algorithm=JWT_ALGORITHM)
+
+
+def decode_token(token: str) -> dict | None:
+    """Decode and validate JWT token."""
+    import jwt
+    try:
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        return payload
+    except jwt.PyJWTError:
+        return None
+
+
+def get_user_id_from_token(token: str) -> str | None:
+    """Extract user_id from JWT token."""
+    payload = decode_token(token)
+    if payload and payload.get("type") == "access":
+        return payload.get("sub")
+    return None
 
 
 @dataclass
 class Settings:
     # --- Providers ---
-    openai_api_key: str = field(default_factory=lambda: os.getenv("OPENAI_API_KEY", ""))
-    openai_base_url: str = field(default_factory=lambda: os.getenv("OPENAI_BASE_URL", ""))
-    embedding_model: str = os.getenv("EMBEDDING_MODEL", "text-embedding-3-small")
-    chat_model: str = os.getenv("CHAT_MODEL", "gpt-4o")
+    nvidia_api_key: str = field(default_factory=lambda: os.getenv("NVIDIA_API_KEY", ""))
+    nvidia_base_url: str = field(default_factory=lambda: os.getenv("NVIDIA_BASE_URL", "https://integrate.api.nvidia.com/v1"))
+    embedding_model: str = os.getenv("EMBEDDING_MODEL", "nvidia/nv-embedqa-e5-v5")
+    chat_model: str = os.getenv("CHAT_MODEL", "meta/llama-3.1-70b-instruct")
 
     # --- Storage ---
     qdrant_path: str = os.getenv("QDRANT_PATH", "./qdrant_data")
@@ -88,14 +161,18 @@ class Settings:
     # --- Auth ---
     api_key: str = os.getenv("API_KEY", "dev-secret-key")
     allowed_ingest_root: str = os.getenv("ALLOWED_INGEST_ROOT", "./sample_docs")
+    jwt_secret: str = JWT_SECRET
+    jwt_algorithm: str = JWT_ALGORITHM
+    access_token_expire_minutes: int = JWT_ACCESS_TOKEN_EXPIRE_MINUTES
+    refresh_token_expire_days: int = JWT_REFRESH_TOKEN_EXPIRE_DAYS
 
     # --- Upload limits ---
     max_file_size_mb: int = int(os.getenv("MAX_FILE_SIZE_MB", "10"))
 
     def validate(self):
-        if not self.openai_api_key:
+        if not self.nvidia_api_key:
             raise RuntimeError(
-                "OPENAI_API_KEY is not set. Copy .env.example to .env and fill it in."
+                "NVIDIA_API_KEY is not set. Copy .env.example to .env and fill it in."
             )
 
     def get_collection_name(self, user_id: str | None = None) -> str:

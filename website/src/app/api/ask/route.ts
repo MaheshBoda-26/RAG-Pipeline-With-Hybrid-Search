@@ -20,12 +20,21 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    // Forward cookies for session management
+    const cookieHeader = req.headers.get("cookie");
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
+    if (cookieHeader) {
+      headers["Cookie"] = cookieHeader;
+    } else {
+      // Fallback to API key for backward compatibility
+      headers["Authorization"] = `Bearer ${API_KEY}`;
+    }
+
     const upstream = await fetch(`${BACKEND_URL}/v1/ask`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${API_KEY}`,
-      },
+      headers,
       body: JSON.stringify({ question }),
       cache: "no-store",
     });
