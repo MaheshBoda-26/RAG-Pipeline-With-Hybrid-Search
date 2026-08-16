@@ -41,22 +41,28 @@ class AskResponse:
 
 
 class RAGPipeline:
-    def __init__(self, settings: Settings | None = None):
+    def __init__(self, settings: Settings | None = None, user_id: str | None = None):
         self.settings = settings or Settings()
         self.settings.validate()
+        self.user_id = user_id or self.settings.default_user_id
 
         self.client = create_openai_client(
             api_key=self.settings.openai_api_key,
             base_url=self.settings.openai_base_url,
         )
         self.embedder = Embedder(self.client, self.settings.embedding_model)
+
+        # Get user-specific collection name
+        collection_name = self.settings.get_collection_name(self.user_id)
+
         self.vector_store = QdrantVectorStore(
             path=self.settings.qdrant_path,
             url=self.settings.qdrant_url,
-            collection_name=self.settings.collection_name,
+            collection_name=collection_name,
             embedding_dim=self.settings.embedding_dim,
+            user_id=self.user_id,
         )
-        self.bm25 = BM25Index()
+        self.bm25 = BM25Index(user_id=self.user_id)
         self._rebuild_sparse_index()  # picks up anything already in Qdrant from a prior run
 
     # ------------------------------------------------------------------
@@ -111,6 +117,50 @@ class RAGPipeline:
             "chunks_indexed": len(kept_chunks),
             "duplicates_skipped": len(dup_idx),
             "strategy": self.settings.chunking_strategy,
+        }
+
+    def ingest_file(self, file_path: str, user_id: str | None = None) -> dict:
+        """Ingest a single uploaded file. Returns stats dict."""
+        from ingestion.loaders import load_file
+        from pathlib import Path
+
+        # Validate path
+        requested_path = Path(file_path).resolve()
+        upload_dir = self.settings.get_user_upload_dir(user_id or self.user_id)
+        allowed_root = Path(upload_dir).resolve()
+
+        if not requested_path.is_relative_to(allowed_root):
+            raise ValueError(f"File {file_path} is outside the allowed upload directory")
+
+        doc = load_file(requested_path)
+        if not doc:
+            return {"documents": 0, "chunks_created": 0, "chunks_indexed": 0, "duplicates_skipped": 0}
+
+        chunks = self._chunk_document(doc)
+        if not chunks:
+            return {"documents": 1, "chunks_created": 0, "chunks_indexed": 0, "duplicates_skipped": 0}
+
+        embeddings = self.embedder.embed([c.text for c in chunks])
+
+        dedup = DuplicateIndex(self.settings.dedup_similarity_threshold)
+        for existing in self.vector_store.all_chunks(with_vectors=True):
+            if existing["vector"] is not None:
+                dedup.add(existing["vector"])
+        keep_idx, dup_idx = dedup.filter_new(embeddings)
+
+        kept_chunks = [chunks[i] for i in keep_idx]
+        kept_embeddings = [embeddings[i] for i in keep_idx]
+
+        self.vector_store.upsert(kept_chunks, kept_embeddings)
+        self._rebuild_sparse_index()
+
+        return {
+            "documents": 1,
+            "chunks_created": len(chunks),
+            "chunks_indexed": len(kept_chunks),
+            "duplicates_skipped": len(dup_idx),
+            "strategy": self.settings.chunking_strategy,
+            "source": str(requested_path),
         }
 
     def _rebuild_sparse_index(self):
@@ -202,3 +252,22 @@ class RAGPipeline:
                 "composite": composite,
             },
         )
+
+    def delete_document(self, source: str) -> int:
+        """Delete all chunks for a given source document. Returns count deleted."""
+        deleted = self.vector_store.delete_by_source(source)
+        if deleted:
+            self._rebuild_sparse_index()
+        return deleted
+
+    def list_documents(self) -> list[dict]:
+        """List all unique source documents in the index."""
+        records = self.vector_store.all_chunks()
+        sources = {}
+        for r in records:
+            src = r["payload"].get("source", "unknown")
+            if src not in sources:
+                sources[src] = {"source": src, "chunk_count": 0, "total_chars": 0}
+            sources[src]["chunk_count"] += 1
+            sources[src]["total_chars"] += r["payload"].get("char_count", 0)
+        return list(sources.values())

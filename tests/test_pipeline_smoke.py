@@ -14,7 +14,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import numpy as np
 
-EMBED_DIM = 1024
+EMBED_DIM = 1536
 
 
 def fake_embedding(text: str) -> list[float]:
@@ -104,7 +104,7 @@ def run():
         sample_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "sample_docs")
         ingest_result = pipe.ingest_directory(sample_dir)
         print("Ingest result:", json.dumps(ingest_result, indent=2))
-        assert ingest_result["documents"] == 3, f"expected 3 sample docs, got {ingest_result['documents']}"
+        assert ingest_result["documents"] == 5, f"expected 5 sample docs, got {ingest_result['documents']}"
         assert ingest_result["chunks_indexed"] > 0, "expected at least one chunk indexed"
 
         # Re-ingesting the same directory should be caught almost entirely by dedup.
