@@ -14,9 +14,10 @@ from ingestion.chunking import Chunk
 
 
 class QdrantVectorStore:
-    def __init__(self, path: str, url: str, collection_name: str, embedding_dim: int):
+    def __init__(self, path: str, url: str, collection_name: str, embedding_dim: int, user_id: str | None = None):
         self.collection_name = collection_name
         self.embedding_dim = embedding_dim
+        self.user_id = user_id
         if url:
             self.client = QdrantClient(url=url)
         else:
@@ -93,3 +94,20 @@ class QdrantVectorStore:
             {"id": p.id, "payload": p.payload, "vector": (p.vector if with_vectors else None)}
             for p in points
         ]
+
+    def delete_by_source(self, source: str) -> int:
+        """Delete all points with matching source. Returns count deleted."""
+        points, _ = self.client.scroll(
+            collection_name=self.collection_name,
+            scroll_filter=qmodels.Filter(
+                must=[qmodels.FieldCondition(key="source", match=qmodels.MatchValue(value=source))]
+            ),
+            limit=10000,
+            with_payload=False,
+            with_vectors=False,
+        )
+        if not points:
+            return 0
+        point_ids = [p.id for p in points]
+        self.client.delete(collection_name=self.collection_name, points_selector=qmodels.PointIdsList(points=point_ids))
+        return len(point_ids)

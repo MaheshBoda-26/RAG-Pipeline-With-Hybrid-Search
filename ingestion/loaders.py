@@ -1,4 +1,4 @@
-"""Load markdown, plaintext, HTML, and PDF files into normalized RawDocument
+"""Load markdown, plaintext, HTML, PDF, and DOCX files into normalized RawDocument
 objects: clean plaintext plus metadata (source file, section headings where
 known, page numbers for PDFs).
 """
@@ -11,7 +11,7 @@ from pathlib import Path
 from bs4 import BeautifulSoup
 from pypdf import PdfReader
 
-SUPPORTED_EXTENSIONS = {".md", ".markdown", ".txt", ".html", ".htm", ".pdf"}
+SUPPORTED_EXTENSIONS = {".md", ".markdown", ".txt", ".html", ".htm", ".pdf", ".docx", ".doc"}
 
 
 @dataclass
@@ -52,6 +52,18 @@ def _load_pdf(path: Path) -> RawDocument:
     )
 
 
+def _load_docx(path: Path) -> RawDocument:
+    try:
+        from docx import Document
+    except ImportError:
+        raise ValueError("DOCX support requires 'python-docx' package. Install with: pip install python-docx")
+
+    doc = Document(str(path))
+    paragraphs = [p.text for p in doc.paragraphs if p.text.strip()]
+    full_text = "\n\n".join(paragraphs)
+    return RawDocument(source=str(path), text=full_text, doc_type="docx")
+
+
 def load_document(path: str | Path) -> RawDocument:
     path = Path(path)
     ext = path.suffix.lower()
@@ -63,6 +75,8 @@ def load_document(path: str | Path) -> RawDocument:
         return _load_html(path)
     if ext == ".pdf":
         return _load_pdf(path)
+    if ext in (".docx", ".doc"):
+        return _load_docx(path)
     raise ValueError(f"Unsupported file type: {ext} ({path})")
 
 
@@ -88,3 +102,14 @@ def load_directory(root: str | Path) -> list[RawDocument]:
                 except Exception as e:
                     print(f"[loader] skipping {fpath}: {e}")
     return docs
+
+
+def load_file(path: str | Path) -> RawDocument | None:
+    """Load a single file. Returns None if file doesn't exist or is unsupported."""
+    path = Path(path)
+    if not path.exists():
+        return None
+    try:
+        return load_document(path)
+    except ValueError:
+        return None
