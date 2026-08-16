@@ -47,8 +47,8 @@ class RAGPipeline:
         self.user_id = user_id or self.settings.default_user_id
 
         self.client = create_openai_client(
-            api_key=self.settings.openai_api_key,
-            base_url=self.settings.openai_base_url,
+            api_key=self.settings.nvidia_api_key,
+            base_url=self.settings.nvidia_base_url,
         )
         self.embedder = Embedder(self.client, self.settings.embedding_model)
 

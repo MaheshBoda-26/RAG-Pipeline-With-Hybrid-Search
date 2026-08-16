@@ -4,6 +4,9 @@ Uses Qdrant's embedded mode (a local on-disk path, no server process) by
 default so the project runs with zero extra infrastructure. Set QDRANT_URL
 in .env to point at a real Qdrant server instead for a multi-process/
 production deployment -- the interface is identical either way.
+
+For embedded mode with multiple pipelines, we use a singleton client to
+avoid file locking conflicts.
 """
 from __future__ import annotations
 
@@ -11,6 +14,18 @@ from qdrant_client import QdrantClient
 from qdrant_client.http import models as qmodels
 
 from ingestion.chunking import Chunk
+
+
+# Singleton client for embedded mode to avoid concurrent access conflicts
+_embedded_client: QdrantClient | None = None
+
+
+def _get_embedded_client(path: str) -> QdrantClient:
+    """Get or create singleton embedded Qdrant client."""
+    global _embedded_client
+    if _embedded_client is None:
+        _embedded_client = QdrantClient(path=path, force_disable_check_same_thread=True)
+    return _embedded_client
 
 
 class QdrantVectorStore:
@@ -21,7 +36,7 @@ class QdrantVectorStore:
         if url:
             self.client = QdrantClient(url=url)
         else:
-            self.client = QdrantClient(path=path)
+            self.client = _get_embedded_client(path)
         self._ensure_collection()
 
     def _ensure_collection(self):
@@ -29,20 +44,35 @@ class QdrantVectorStore:
         if self.collection_name not in existing:
             self.client.create_collection(
                 collection_name=self.collection_name,
-                vectors_config=qmodels.VectorParams(
-                    size=self.embedding_dim, distance=qmodels.Distance.COSINE
-                ),
+                vectors_config={
+                    "default": qmodels.VectorParams(
+                        size=self.embedding_dim, distance=qmodels.Distance.COSINE
+                    )
+                },
             )
         else:
             # Check existing collection dims match; recreate if mismatch
             info = self.client.get_collection(self.collection_name)
-            if info.config.params.vectors.size != self.embedding_dim:
+            vectors_config = info.config.params.vectors
+            # Handle both dict (named vectors) and single VectorParams
+            size = None
+            if isinstance(vectors_config, dict):
+                # Named vectors - get the 'default' vector
+                default_vec = vectors_config.get("default")
+                if default_vec and hasattr(default_vec, "size"):
+                    size = default_vec.size
+            elif vectors_config and hasattr(vectors_config, "size"):
+                # Single unnamed vector
+                size = vectors_config.size
+            if size != self.embedding_dim:
                 self.client.delete_collection(self.collection_name)
                 self.client.create_collection(
                     collection_name=self.collection_name,
-                    vectors_config=qmodels.VectorParams(
-                        size=self.embedding_dim, distance=qmodels.Distance.COSINE
-                    ),
+                    vectors_config={
+                        "default": qmodels.VectorParams(
+                            size=self.embedding_dim, distance=qmodels.Distance.COSINE
+                        )
+                    },
                 )
 
     def upsert(self, chunks: list[Chunk], embeddings: list[list[float]]) -> None:
@@ -51,7 +81,7 @@ class QdrantVectorStore:
         points = [
             qmodels.PointStruct(
                 id=chunk.id,
-                vector=embedding,
+                vector={"default": embedding},
                 payload={
                     "text": chunk.text,
                     "source": chunk.source,
@@ -70,6 +100,7 @@ class QdrantVectorStore:
         results = self.client.query_points(
             collection_name=self.collection_name,
             query=query_embedding,
+            using="default",
             limit=top_k,
             with_payload=True,
         ).points
@@ -90,10 +121,17 @@ class QdrantVectorStore:
             with_payload=True,
             with_vectors=with_vectors,
         )
-        return [
-            {"id": p.id, "payload": p.payload, "vector": (p.vector if with_vectors else None)}
-            for p in points
-        ]
+        result = []
+        for p in points:
+            vec = None
+            if with_vectors and p.vector:
+                # Handle named vectors (dict with 'default' key) or single vector
+                if isinstance(p.vector, dict):
+                    vec = p.vector.get("default")
+                else:
+                    vec = p.vector
+            result.append({"id": p.id, "payload": p.payload, "vector": vec})
+        return result
 
     def delete_by_source(self, source: str) -> int:
         """Delete all points with matching source. Returns count deleted."""

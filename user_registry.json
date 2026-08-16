@@ -23,5 +23,57 @@
     "name": "User B",
     "api_key": "sk_user_b_test_key_67890",
     "created": "2026-08-16T17:04:51.306316"
+  },
+  "user_oKJnBKxpgSg": {
+    "name": "Test User",
+    "api_key": "sk_zNbreNcXzXytQeZ_Gl1RNqoytE4viKAW67eYSr7Dq0k",
+    "created": "2026-08-16T18:36:57.688363",
+    "password_hash": "7e6e0c3079a08c5cc6036789b57e951f65f82383913ba1a49ae992544f1b4b6e"
+  },
+  "user_P3IpAw1eRTY": {
+    "name": "Test User",
+    "api_key": "sk_Ln88MTwwFtqBp40Oh89H2a4t8M-yrnHQ58wjE4-8dA8",
+    "created": "2026-08-16T18:37:12.821483",
+    "password_hash": "7e6e0c3079a08c5cc6036789b57e951f65f82383913ba1a49ae992544f1b4b6e"
+  },
+  "user_vauj-ZI2Oqg": {
+    "name": "Test User",
+    "api_key": "sk_FJHeyWlO2OXr16YW27s9z6EG98jcaA_L1iytjOKrXO0",
+    "created": "2026-08-16T18:37:24.573704",
+    "password_hash": "7e6e0c3079a08c5cc6036789b57e951f65f82383913ba1a49ae992544f1b4b6e"
+  },
+  "user_QwbCPtFaz2c": {
+    "name": "Test User",
+    "api_key": "sk_RhrheHC_LMJwkqF5hpUZkGnyHAxhW-TdA90YBLCXkfA",
+    "created": "2026-08-16T18:37:33.692719",
+    "password_hash": "7e6e0c3079a08c5cc6036789b57e951f65f82383913ba1a49ae992544f1b4b6e"
+  },
+  "user_vy7UKbeb6rY": {
+    "name": "Test User 2",
+    "email": "test2@example.com",
+    "api_key": "sk_JkyFVDKXQGx35gUpGN3Tl9aBm4bIiIm6SCks0FKyrtU",
+    "created": "2026-08-16T18:39:06.574217",
+    "password_hash": "7e6e0c3079a08c5cc6036789b57e951f65f82383913ba1a49ae992544f1b4b6e"
+  },
+  "user_vqAgPyxxWmw": {
+    "name": "Test User",
+    "email": "test@example.com",
+    "api_key": "sk_ZhtqxOHO4OsYoOTDRlhTFJ0p9Bio-xiWUequqOVzE9M",
+    "created": "2026-08-16T18:49:19.614099",
+    "password_hash": "ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f"
+  },
+  "user_KV0RVY_1noo": {
+    "name": "Test User 3",
+    "email": "test3@example.com",
+    "api_key": "sk_8K8mtERS33wnRdyYJsARekeWm7CIZPJQ8q6m_PqX4Ic",
+    "created": "2026-08-16T19:19:32.181933",
+    "password_hash": "ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f"
+  },
+  "user_fVwOcFM0s2o": {
+    "name": "newuser",
+    "email": "newuser@example.com",
+    "api_key": "sk_maaRY9ExItPJZiF_SI3tE2pG6v9CycNjmNji8_mYDSY",
+    "created": "2026-08-16T19:34:17.535233",
+    "password_hash": "7e6e0c3079a08c5cc6036789b57e951f65f82383913ba1a49ae992544f1b4b6e"
   }
 }
