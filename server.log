@@ -1,12 +1,36 @@
-INFO:     Started server process [35113]
+INFO:     Will watch for changes in these directories: ['/Users/maheshboda/Projects/Rag Pipeline']
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [67326] using StatReload
+INFO:     Started server process [67385]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
-INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
-INFO:     127.0.0.1:56172 - "POST /v1/auth/login HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56180 - "POST /v1/ingest HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56185 - "POST /v1/ask HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56204 - "POST /v1/ask HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56220 - "POST /v1/ask HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56226 - "POST /v1/demo/ask HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56236 - "POST /v1/demo/ingest HTTP/1.1" 404 Not Found
-INFO:     127.0.0.1:56254 - "POST /v1/ask HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:61839 - "POST /v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61843 - "POST /v1/ask HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61937 - "POST /v1/demo/ask HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62125 - "POST /v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62132 - "POST /v1/ask HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62149 - "POST /v1/demo/ask HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62172 - "GET /v1/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62176 - "POST /v1/upload HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62195 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62221 - "POST /v1/ask HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62237 - "POST /v1/ask HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62255 - "POST /v1/demo/ask HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62269 - "POST /v1/auth/register HTTP/1.1" 400 Bad Request
+INFO:     127.0.0.1:62276 - "POST /v1/auth/register HTTP/1.1" 400 Bad Request
+INFO:     127.0.0.1:62320 - "POST /v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62323 - "POST /v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62327 - "POST /v1/ask HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62357 - "POST /v1/demo/ask HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62371 - "GET /v1/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62427 - "POST /v1/demo/ask HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62456 - "POST /v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62465 - "POST /v1/ask HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62483 - "POST /v1/ask HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55143 - "GET /v1/auth/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55153 - "GET /v1/auth/me HTTP/1.1" 401 Unauthorized
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [67385]
+INFO:     Stopping reloader process [67326]
