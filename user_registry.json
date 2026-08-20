@@ -82,5 +82,33 @@
     "api_key": "sk_ixRBmVxJeb0-2j3d4ukO1aCmurEwo4uTZoh0NXRljFY",
     "created": "2026-08-20T23:27:49.799653",
     "password_hash": "89e01536ac207279409d4de1e5253e01f4a1769e696db0d6062ca9b8f56767c8"
+  },
+  "user_20GWUua0O-Q": {
+    "name": "testuser",
+    "email": "test@example.com",
+    "api_key": "sk_Ao_euJsCBhgN7_ksbM0FBaqHeeOdRXeZYlerFrjLxkM",
+    "created": "2026-08-21T00:23:46.934719",
+    "password_hash": "$2b$12$S3tEufFCP0IyGAYkJGXHEOSVMlOUd3YYUUB2PHED5i1U5.Pgtw8mu"
+  },
+  "user_Tgbdbc6af3I": {
+    "name": "testuser2",
+    "email": "test2@example.com",
+    "api_key": "sk_0gKEzAGu2SMFDNBGgKEz84RCuZgNGHFbQak4TUFkAb4",
+    "created": "2026-08-21T00:23:56.507678",
+    "password_hash": "$2b$12$1CyI1Ygl7kvUuFmCH4NfyOK/ABbb/vXdJlcf2Ao3UlVZWTxce/3na"
+  },
+  "user_we2vCOV3tto": {
+    "name": "testuser3",
+    "email": "test3@example.com",
+    "api_key": "sk_WBpIeHviMw5HOyayT2pC3kjrYwpiQNc8LzRONaZLO2I",
+    "created": "2026-08-21T00:24:29.880261",
+    "password_hash": "$2b$12$vnHxliL.liI6pp4DGDTtAOdrVMKHcYsUyNI9CBV5rq20z2JYdU366"
+  },
+  "user_ZEqvdetqhpA": {
+    "name": "API Test User",
+    "email": "apitest@example.com",
+    "api_key": "sk_uSVXJZPZyGwuoU9pRtO6-o2Cmgb8ylxtRSdTv5LELtk",
+    "created": "2026-08-21T00:25:02.708071",
+    "password_hash": "$2b$12$M.qOycyUBKTDdB95biH3A..St7UGGD0Oqm689S/ylXGizNzwLTmB."
   }
 }
