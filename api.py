@@ -206,6 +206,13 @@ async def upload(
     user_id: str = Depends(verify_jwt_token)
 ):
     """Upload a document file and ingest it."""
+    # Check if API key is configured before accepting uploads
+    if not settings.nvidia_api_key or settings.nvidia_api_key in ("", "your-nvidia-key", "test-key"):
+        raise HTTPException(
+            status_code=503,
+            detail="Embedding service not configured. Set NVIDIA_API_KEY in .env file."
+        )
+
     # Validate file size
     max_size = settings.max_file_size_mb * 1024 * 1024
     content = await file.read()
@@ -221,27 +228,60 @@ async def upload(
     if ext not in allowed_exts:
         raise HTTPException(
             status_code=400,
-            detail=f"Unsupported file type: {ext}. Allowed: {', '.join(allowed_exts)}"
+            detail=f"Unsupported file type: {ext}. Allowed: {', '.join(sorted(allowed_exts))}"
+        )
+
+    # Validate filename (no path traversal)
+    safe_filename = Path(file.filename).name
+    if not safe_filename or safe_filename.startswith("."):
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid filename"
         )
 
     # Save to user's upload directory
     upload_dir = settings.get_user_upload_dir(user_id)
     upload_dir.mkdir(parents=True, exist_ok=True)
-    file_path = upload_dir / file.filename
 
-    with open(file_path, "wb") as f:
-        f.write(content)
+    # Add UUID prefix to avoid filename collisions
+    import uuid
+    unique_filename = f"{uuid.uuid4().hex[:8]}_{safe_filename}"
+    file_path = upload_dir / unique_filename
 
-    # Ingest the file
-    pipeline = get_pipeline(user_id)
     try:
+        with open(file_path, "wb") as f:
+            f.write(content)
+
+        # Ingest the file
+        pipeline = get_pipeline(user_id)
         result = pipeline.ingest_file(str(file_path), user_id)
-        return {"message": "File uploaded and indexed", "file": file.filename, **result}
+        return {
+            "message": "File uploaded and indexed",
+            "file": safe_filename,
+            "stored_as": unique_filename,
+            **result
+        }
+    except HTTPException:
+        # Clean up on failure
+        if file_path.exists():
+            file_path.unlink()
+        raise
     except Exception as e:
         # Clean up on failure
         if file_path.exists():
             file_path.unlink()
-        raise HTTPException(status_code=500, detail=f"Failed to process file: {str(e)}")
+        error_msg = str(e)
+        if "401" in error_msg or "Authentication" in error_msg:
+            raise HTTPException(
+                status_code=503,
+                detail=f"Embedding API authentication failed. Check NVIDIA_API_KEY in .env"
+            )
+        if "404" in error_msg and "model" in error_msg.lower():
+            raise HTTPException(
+                status_code=503,
+                detail=f"Embedding model not found. Check EMBEDDING_MODEL in .env"
+            )
+        raise HTTPException(status_code=500, detail=f"Failed to process file: {error_msg}")
 
 
 @app.get("/v1/documents")
