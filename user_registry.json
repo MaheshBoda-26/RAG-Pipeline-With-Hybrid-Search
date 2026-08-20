@@ -117,5 +117,61 @@
     "api_key": "sk_D7tLppah2k7sAs1L4g602Zcg1-orwQD85WQ3PHkIS4U",
     "created": "2026-08-21T00:38:12.374559",
     "password_hash": "$2b$12$RXN9Fxi1YApSFUG0LwLVCeOr7lzKf1dB1UrXZ2YtRaA/84QRnO4Lu"
+  },
+  "user_U8Qb804pUso": {
+    "name": "testupload@example.com",
+    "email": "testupload@example.com",
+    "api_key": "sk_1B9iK4_YK4Zn0krW3IS39TLS22_Y6uc7tiyrWp4cgmY",
+    "created": "2026-08-21T00:44:29.390934",
+    "password_hash": "$2b$12$LFzS3LybqniIS9r9o.nEdOtJ7kv8yuyFWbnLFys4CBBG10pVEcB2C"
+  },
+  "user_V8jr9VmNGWU": {
+    "name": "testupload2@example.com",
+    "email": "testupload2@example.com",
+    "api_key": "sk_gTGLeFdarA6nmMXR8UKHTuiAglwBoxbaeqydhoTPQfE",
+    "created": "2026-08-21T00:44:44.170740",
+    "password_hash": "$2b$12$6NIGMdr0pmLgCoOpQPZPS.bLla8n79SC0lB0lt.Y53JjkWjCzfOSi"
+  },
+  "user_odjUBUPN92I": {
+    "name": "testupload3@example.com",
+    "email": "testupload3@example.com",
+    "api_key": "sk_Gwbhh5euw47Z8qQlEtuHj_2ZORZbrM_HSM1BePl_7BQ",
+    "created": "2026-08-21T00:45:01.306513",
+    "password_hash": "$2b$12$IGhogfayQ5YwI9kp0QiNyuYp2dhLccuMgmQuD/i5JKoEbn81lBYOu"
+  },
+  "user_h29hF2MXAPU": {
+    "name": "testupload4@example.com",
+    "email": "testupload4@example.com",
+    "api_key": "sk_CJfMIYuuTFH7k2TVObWvkVakX99taQ_MXGLs4MzFsX8",
+    "created": "2026-08-21T00:45:21.337605",
+    "password_hash": "$2b$12$TsTGFI6upeLCxo20LZ3okOUWm1UzlfA.UcCOVjJzxSIr9g8pBT1S2"
+  },
+  "user_uMyba_MzvY0": {
+    "name": "pytest@example.com",
+    "email": "pytest@example.com",
+    "api_key": "sk_HO-SzK0jOl-EQZB0S_KCGBVG8kkrx3758DWFOaNCeqM",
+    "created": "2026-08-21T00:46:11.382640",
+    "password_hash": "$2b$12$/nHAOL53kpwQOzZW1BfjJ.Jc8BsAY35wMr7/jo2tq/DNBiVdzr2/K"
+  },
+  "user_REj7vEGZmVk": {
+    "name": "pytest2@example.com",
+    "email": "pytest2@example.com",
+    "api_key": "sk_EJ2wKwhJ_QmcyAdA7C33nCZnA9Fw0TrweWLBHKyWQ18",
+    "created": "2026-08-21T00:46:36.148336",
+    "password_hash": "$2b$12$T8z3MV0SVh.0tdVvU8x8YeI04sUQmczMKStZAvvNEhHPEWPTON9Ey"
+  },
+  "user_1RWjRdrrtnA": {
+    "name": "pytest3@example.com",
+    "email": "pytest3@example.com",
+    "api_key": "sk_2P1Ga_UvNYBv0R8wsQqGZ7KkwCBuYje4joqmybaI3A4",
+    "created": "2026-08-21T00:47:19.896686",
+    "password_hash": "$2b$12$JLzbB1avp4.NywbjA01sMuygZ4tiwwKBJWNFNUf0jKE69fQSL7W.u"
+  },
+  "user_yzhbhorhLPQ": {
+    "name": "pytest4@example.com",
+    "email": "pytest4@example.com",
+    "api_key": "sk_clFJeHd9ZFuc3Wr-N66S32e0lw-F9dKK9s5KS6TarBA",
+    "created": "2026-08-21T00:50:17.834684",
+    "password_hash": "$2b$12$CON.VyFcesfJ0YH33dFAnOOJvW1p2SOvwlBj5q/UNrhJEiG/VGqjG"
   }
 }
