@@ -54,21 +54,21 @@ def create_user(name: str, email: str | None = None, password: str | None = None
         "created": datetime.now().isoformat(),
     }
     if password:
-        import hashlib
-        user_data["password_hash"] = hashlib.sha256(password.encode()).hexdigest()
+        import bcrypt
+        user_data["password_hash"] = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
     registry[user_id] = user_data
     save_user_registry(registry)
     return user_id, api_key
 
 
 def verify_user_password(user_id: str, password: str) -> bool:
-    """Verify user password."""
-    import hashlib
+    """Verify user password using bcrypt."""
+    import bcrypt
     registry = load_user_registry()
     user = registry.get(user_id)
     if not user or "password_hash" not in user:
         return False
-    return user["password_hash"] == hashlib.sha256(password.encode()).hexdigest()
+    return bcrypt.checkpw(password.encode(), user["password_hash"].encode())
 
 
 def get_user_by_email(email: str) -> str | None:
@@ -83,7 +83,7 @@ def get_user_by_email(email: str) -> str | None:
 # JWT token functions
 def create_access_token(user_id: str, expires_delta: timedelta | None = None) -> str:
     """Create JWT access token."""
-    import jwt
+    from jose import jwt
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
     else:
@@ -94,7 +94,7 @@ def create_access_token(user_id: str, expires_delta: timedelta | None = None) ->
 
 def create_refresh_token(user_id: str) -> str:
     """Create JWT refresh token."""
-    import jwt
+    from jose import jwt
     expire = datetime.utcnow() + timedelta(days=JWT_REFRESH_TOKEN_EXPIRE_DAYS)
     to_encode = {"sub": user_id, "exp": expire, "type": "refresh"}
     return jwt.encode(to_encode, JWT_SECRET, algorithm=JWT_ALGORITHM)
@@ -102,7 +102,7 @@ def create_refresh_token(user_id: str) -> str:
 
 def decode_token(token: str) -> dict | None:
     """Decode and validate JWT token."""
-    import jwt
+    from jose import jwt
     try:
         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
         return payload

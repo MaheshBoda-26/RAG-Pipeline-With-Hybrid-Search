@@ -1,6 +1,7 @@
 # Pinned dependencies (from requirements.lock.txt)
 anyio==4.14.2
 beautifulsoup4==4.12.0
+bcrypt==4.2.1
 certifi==2026.7.22
 click==8.4.2
 distro==1.9.0
@@ -12,7 +13,7 @@ idna==3.18
 jiter==0.16.0
 markdown-it-py==4.2.0
 mdurl==0.1.2
-numpy==2.5.1
+numpy==1.26.4
 openai==2.52.1
 orjson==3.11.9
 portalocker==2.10.1
@@ -22,6 +23,8 @@ pydantic_core==2.46.4
 pypdf==4.2.0
 python-docx==1.1.2
 python-dotenv==1.0.0
+python-jose[cryptography]==3.3.0
+python-multipart==0.0.20
 qdrant-client==1.10.0
 rank_bm25==0.2.2
 rich==13.9.4
