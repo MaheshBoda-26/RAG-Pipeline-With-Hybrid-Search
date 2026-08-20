@@ -75,5 +75,12 @@
     "api_key": "sk_maaRY9ExItPJZiF_SI3tE2pG6v9CycNjmNji8_mYDSY",
     "created": "2026-08-16T19:34:17.535233",
     "password_hash": "7e6e0c3079a08c5cc6036789b57e951f65f82383913ba1a49ae992544f1b4b6e"
+  },
+  "user_esDzUEQCnPQ": {
+    "name": "My Test User",
+    "email": "mytest@example.com",
+    "api_key": "sk_ixRBmVxJeb0-2j3d4ukO1aCmurEwo4uTZoh0NXRljFY",
+    "created": "2026-08-20T23:27:49.799653",
+    "password_hash": "89e01536ac207279409d4de1e5253e01f4a1769e696db0d6062ca9b8f56767c8"
   }
 }
