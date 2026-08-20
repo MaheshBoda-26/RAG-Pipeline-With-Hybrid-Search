@@ -110,5 +110,12 @@
     "api_key": "sk_uSVXJZPZyGwuoU9pRtO6-o2Cmgb8ylxtRSdTv5LELtk",
     "created": "2026-08-21T00:25:02.708071",
     "password_hash": "$2b$12$M.qOycyUBKTDdB95biH3A..St7UGGD0Oqm689S/ylXGizNzwLTmB."
+  },
+  "user_y2PUXpl9Puo": {
+    "name": "rowdy",
+    "email": "rowdy@gmail.com",
+    "api_key": "sk_D7tLppah2k7sAs1L4g602Zcg1-orwQD85WQ3PHkIS4U",
+    "created": "2026-08-21T00:38:12.374559",
+    "password_hash": "$2b$12$RXN9Fxi1YApSFUG0LwLVCeOr7lzKf1dB1UrXZ2YtRaA/84QRnO4Lu"
   }
 }
