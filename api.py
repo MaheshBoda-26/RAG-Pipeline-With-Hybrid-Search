@@ -252,9 +252,9 @@ async def upload(
         with open(file_path, "wb") as f:
             f.write(content)
 
-        # Ingest the file
+        # Ingest the file - pass original filename for better source tracking
         pipeline = get_pipeline(user_id)
-        result = pipeline.ingest_file(str(file_path), user_id)
+        result = pipeline.ingest_file(str(file_path), original_filename=safe_filename, user_id=user_id)
         return {
             "message": "File uploaded and indexed",
             "file": safe_filename,
@@ -266,12 +266,10 @@ async def upload(
         if file_path.exists():
             file_path.unlink()
         raise
-    except Exception as e:
-        # Clean up on failure
-        if file_path.exists():
-            file_path.unlink()
+    except RuntimeError as e:
+        # Embedding/indexing service errors - keep file for retry
         error_msg = str(e)
-        if "401" in error_msg or "Authentication" in error_msg:
+        if "AuthenticationError" in error_msg or "401" in error_msg:
             raise HTTPException(
                 status_code=503,
                 detail=f"Embedding API authentication failed. Check NVIDIA_API_KEY in .env"
@@ -281,7 +279,15 @@ async def upload(
                 status_code=503,
                 detail=f"Embedding model not found. Check EMBEDDING_MODEL in .env"
             )
-        raise HTTPException(status_code=500, detail=f"Failed to process file: {error_msg}")
+        raise HTTPException(status_code=502, detail=f"Indexing service unavailable: {error_msg}")
+    except ValueError as e:
+        # Path validation / file format errors - clean up file
+        if file_path.exists():
+            file_path.unlink()
+        raise HTTPException(status_code=400, detail=f"Invalid file: {error_msg}")
+    except Exception as e:
+        # Unknown errors - keep file for debugging
+        raise HTTPException(status_code=500, detail=f"Failed to process file: {str(e)}")
 
 
 @app.get("/v1/documents")

@@ -119,7 +119,7 @@ class RAGPipeline:
             "strategy": self.settings.chunking_strategy,
         }
 
-    def ingest_file(self, file_path: str, user_id: str | None = None) -> dict:
+    def ingest_file(self, file_path: str, original_filename: str | None = None, user_id: str | None = None) -> dict:
         """Ingest a single uploaded file. Returns stats dict."""
         from ingestion.loaders import load_file
         from pathlib import Path
@@ -140,7 +140,11 @@ class RAGPipeline:
         if not chunks:
             return {"documents": 1, "chunks_created": 0, "chunks_indexed": 0, "duplicates_skipped": 0}
 
-        embeddings = self.embedder.embed([c.text for c in chunks])
+        try:
+            embeddings = self.embedder.embed([c.text for c in chunks])
+        except Exception as e:
+            # Surface upstream embedding errors with context for API layer
+            raise RuntimeError(f"Embedding API call failed ({type(e).__name__}): {e}") from e
 
         dedup = DuplicateIndex(self.settings.dedup_similarity_threshold)
         for existing in self.vector_store.all_chunks(with_vectors=True):
@@ -160,7 +164,7 @@ class RAGPipeline:
             "chunks_indexed": len(kept_chunks),
             "duplicates_skipped": len(dup_idx),
             "strategy": self.settings.chunking_strategy,
-            "source": str(requested_path),
+            "source": original_filename or str(requested_path),
         }
 
     def _rebuild_sparse_index(self):
