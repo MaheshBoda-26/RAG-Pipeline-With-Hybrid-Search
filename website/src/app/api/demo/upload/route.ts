@@ -4,7 +4,6 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const BACKEND_URL = process.env.RAG_API_URL || "http://localhost:8000";
-const API_KEY = process.env.RAG_API_KEY || "your-secure-api-key-here";
 
 export async function POST(req: NextRequest) {
   try {
@@ -15,33 +14,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "file is required" }, { status: 400 });
     }
 
-    // Forward to backend with cookies for authenticated users
+    // Forward to backend demo upload endpoint
     const upstreamFormData = new FormData();
     upstreamFormData.append("file", file, file.name);
 
-    // Check for authentication cookies
-    const cookieHeader = req.headers.get("cookie");
-    const hasAuthCookie = cookieHeader && (
-      cookieHeader.includes("access_token=") ||
-      cookieHeader.includes("refresh_token=")
-    );
-
-    const headers: Record<string, string> = {};
-    let uploadEndpoint = "/v1/upload";
-
-    if (hasAuthCookie) {
-      // Authenticated user - use regular upload endpoint with cookies
-      headers["Cookie"] = cookieHeader;
-    } else {
-      // No auth - use demo upload endpoint (no auth required)
-      uploadEndpoint = "/v1/demo/upload";
-      // Fallback to API key for backward compatibility
-      headers["Authorization"] = `Bearer ${API_KEY}`;
-    }
-
-    const upstream = await fetch(`${BACKEND_URL}${uploadEndpoint}`, {
+    const upstream = await fetch(`${BACKEND_URL}/v1/demo/upload`, {
       method: "POST",
-      headers,
       body: upstreamFormData,
       cache: "no-store",
     });
@@ -57,7 +35,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(data);
   } catch (err) {
-    console.error("RAG API upload proxy error:", err);
+    console.error("RAG API demo upload proxy error:", err);
     return NextResponse.json(
       { error: "Backend RAG API unreachable" },
       { status: 502 }

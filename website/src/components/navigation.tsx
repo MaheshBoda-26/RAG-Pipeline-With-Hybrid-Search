@@ -66,23 +66,28 @@ export function Navigation() {
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 bg-canvas transition-all duration-300 ease-out",
-        isScrolled && "border-b border-hairline backdrop-blur-md bg-canvas/90"
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-out",
+        isScrolled && "border-b backdrop-blur-md"
       )}
       role="navigation"
       aria-label="Main navigation"
+      style={{
+        backgroundColor: 'color-mix(in srgb, var(--color-bg) 78%, transparent)',
+        borderBottomColor: 'var(--color-border)',
+      }}
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <motion.a
             href="#"
-            className="flex items-center gap-2 text-lg text-ink"
+            className="flex items-center gap-2 text-lg"
             aria-label="RAG Pipeline Home"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
+            style={{ color: 'var(--color-text-1)' }}
           >
-            <SpikeMark />
-            <span className="hidden sm:block font-medium tracking-tight">RAG Pipeline</span>
+            <SpikeMark style={{ stroke: 'var(--color-text-1)' }} />
+            <span className="hidden sm:block font-medium tracking-tight" style={{ color: 'var(--color-text-1)' }}>RAG Pipeline</span>
           </motion.a>
 
           <div className="hidden md:flex items-center gap-8">
@@ -90,17 +95,19 @@ export function Navigation() {
               <motion.a
                 key={link.href}
                 href={link.href}
-                className="text-sm font-medium text-muted-foreground hover:text-ink transition-colors duration-200 relative"
+                className="text-sm font-medium transition-colors duration-200 relative"
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05, duration: 0.3 }}
+                style={{ color: 'var(--color-text-2)' }}
               >
                 {link.label}
                 <motion.span
-                  className="absolute bottom-[-4px] left-0 right-0 h-0.5 bg-coral origin-left scale-x-0"
+                  className="absolute bottom-[-4px] left-0 right-0 h-0.5 origin-left scale-x-0"
                   initial={false}
                   whileHover={{ scaleX: 1 }}
                   transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
+                  style={{ backgroundColor: 'var(--color-primary)' }}
                 />
               </motion.a>
             ))}
@@ -113,6 +120,12 @@ export function Navigation() {
               onClick={toggleTheme}
               aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
               className="text-muted-foreground hover:text-ink"
+              style={{
+                color: 'var(--color-text-2)',
+                borderColor: 'var(--color-border-strong)',
+                hoverColor: 'var(--color-text-1)',
+                hoverBorderColor: 'var(--color-primary)',
+              }}
             >
               {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             </Button>
@@ -124,17 +137,19 @@ export function Navigation() {
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
               aria-label="View on GitHub"
+              style={{ color: 'var(--color-text-2)', hoverColor: 'var(--color-text-1)' }}
             >
               <Github className="w-5 h-5" />
             </motion.a>
           </div>
 
           <button
-            className="md:hidden p-2 text-muted-foreground hover:text-ink"
+            className="md:hidden p-2"
             onClick={() => setIsOpen(!isOpen)}
             aria-expanded={isOpen}
             aria-controls="mobile-menu"
             aria-label="Toggle navigation"
+            style={{ color: 'var(--color-text-2)', hoverColor: 'var(--color-text-1)' }}
           >
             {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -149,31 +164,37 @@ export function Navigation() {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             className={cn(
-              "md:hidden overflow-hidden border-t border-hairline bg-canvas",
+              "md:hidden overflow-hidden border-t bg-canvas",
               isScrolled && "backdrop-blur-md"
             )}
+            style={{
+              backgroundColor: 'var(--color-bg)',
+              borderTopColor: 'var(--color-border)',
+            }}
           >
             <div className="px-4 py-4 space-y-4">
               {navLinks.map((link, index) => (
                 <motion.a
                   key={link.href}
                   href={link.href}
-                  className="block text-base font-medium text-muted-foreground hover:text-ink transition-colors"
+                  className="block text-base font-medium transition-colors"
                   onClick={() => setIsOpen(false)}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.05 }}
+                  style={{ color: 'var(--color-text-2)', hoverColor: 'var(--color-text-1)' }}
                 >
                   {link.label}
                 </motion.a>
               ))}
-              <div className="flex flex-col gap-3 pt-4 border-t border-hairline">
+              <div className="flex flex-col gap-3 pt-4 border-t" style={{ borderTopColor: 'var(--color-border)' }}>
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={toggleTheme}
                   aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
                   className="justify-start"
+                  style={{ color: 'var(--color-text-2)', borderColor: 'var(--color-border-strong)', hoverColor: 'var(--color-text-1)', hoverBorderColor: 'var(--color-primary)' }}
                 >
                   {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
                 </Button>
@@ -181,9 +202,10 @@ export function Navigation() {
                   href="https://github.com/MaheshBoda-26/RAG-Pipeline-With-Hybrid-Search"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-muted-foreground hover:text-ink"
+                  className="transition-colors"
                   whileHover={{ scale: 1.1 }}
                   aria-label="View on GitHub"
+                  style={{ color: 'var(--color-text-2)', hoverColor: 'var(--color-text-1)' }}
                 >
                   <Github className="w-5 h-5" />
                 </motion.a>

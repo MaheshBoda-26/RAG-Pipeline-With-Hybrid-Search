@@ -60,8 +60,9 @@ export function Demo() {
   return (
     <section
       id="demo"
-      className="py-24 sm:py-32 lg:py-40 bg-surface/30"
+      className="py-24 sm:py-32 lg:py-40"
       aria-labelledby="demo-title"
+      style={{ backgroundColor: 'var(--color-surface)' }}
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <motion.div
@@ -96,15 +97,15 @@ export function Demo() {
             {/* Document Uploader */}
             <DocumentUploader />
 
-            <div className="bg-surface border border-border rounded-xl p-6">
-              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <div className="bg-surface border border-border rounded-xl p-6" style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}>
+              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: 'var(--color-foreground)' }}>
                 <Info className="w-5 h-5 text-primary" />
                 Configuration
               </h3>
 
               <div className="space-y-4">
                 <div>
-                  <label htmlFor="api-url" className="block text-sm font-medium text-muted-foreground mb-1">
+                  <label htmlFor="api-url" className="block text-sm font-medium text-muted-foreground mb-1" style={{ color: 'var(--color-muted-foreground)' }}>
                     API Endpoint
                   </label>
                   <input
@@ -112,12 +113,13 @@ export function Demo() {
                     type="text"
                     value="http://localhost:8000"
                     readOnly
-                    className="w-full px-3 py-2 bg-muted/30 border border-border rounded-md text-sm font-mono text-muted-foreground"
+                    className="w-full px-3 py-2 rounded-md text-sm font-mono"
+                    style={{ backgroundColor: 'var(--color-surface-soft)', borderColor: 'var(--color-border)', color: 'var(--color-muted-foreground)' }}
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="dense-weight" className="block text-sm font-medium text-muted-foreground mb-1">
+                  <label htmlFor="dense-weight" className="block text-sm font-medium text-muted-foreground mb-1" style={{ color: 'var(--color-muted-foreground)' }}>
                     Dense Weight: {config.denseWeight.toFixed(1)}
                   </label>
                   <input
@@ -128,12 +130,13 @@ export function Demo() {
                     step="0.1"
                     value={config.denseWeight}
                     onChange={(e) => setConfig({ ...config, denseWeight: parseFloat(e.target.value) })}
-                    className="w-full h-2 bg-muted rounded-lg appearance-none accent-primary"
+                    className="w-full h-2 rounded-lg appearance-none"
+                    style={{ backgroundColor: 'var(--color-surface-soft)', accentColor: 'var(--color-primary)' }}
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="sparse-weight" className="block text-sm font-medium text-muted-foreground mb-1">
+                  <label htmlFor="sparse-weight" className="block text-sm font-medium text-muted-foreground mb-1" style={{ color: 'var(--color-muted-foreground)' }}>
                     Sparse Weight: {config.sparseWeight.toFixed(1)}
                   </label>
                   <input
@@ -144,7 +147,8 @@ export function Demo() {
                     step="0.1"
                     value={config.sparseWeight}
                     onChange={(e) => setConfig({ ...config, sparseWeight: parseFloat(e.target.value) })}
-                    className="w-full h-2 bg-muted rounded-lg appearance-none accent-accent"
+                    className="w-full h-2 rounded-lg appearance-none"
+                    style={{ backgroundColor: 'var(--color-surface-soft)', accentColor: 'var(--color-accent)' }}
                   />
                 </div>
 
@@ -154,8 +158,8 @@ export function Demo() {
               </div>
             </div>
 
-            <div className="bg-surface border border-border rounded-xl p-6">
-              <h3 className="text-lg font-semibold mb-4">Sample Questions</h3>
+            <div className="bg-surface border border-border rounded-xl p-6" style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}>
+              <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-foreground)' }}>Sample Questions</h3>
               <ul className="space-y-2" role="list">
                 {sampleQuestions.map((q, i) => (
                   <motion.li
@@ -167,7 +171,8 @@ export function Demo() {
                   >
                     <button
                       onClick={() => handleSampleClick(q)}
-                      className="w-full text-left p-3 rounded-lg bg-muted/30 hover:bg-muted/50 border border-border transition-all duration-200 text-sm text-foreground hover:text-primary text-wrap"
+                      className="w-full text-left p-3 rounded-lg border transition-all duration-200 text-sm text-foreground hover:text-primary text-wrap"
+                      style={{ backgroundColor: 'var(--color-surface-soft)', borderColor: 'var(--color-border)' }}
                     >
                       {q}
                     </button>
@@ -184,7 +189,7 @@ export function Demo() {
             transition={{ delay: 0.3, duration: 0.5 }}
             className="space-y-6"
           >
-            <form onSubmit={handleSubmit} className="bg-surface border border-border rounded-xl p-6">
+            <form onSubmit={handleSubmit} className="bg-surface border border-border rounded-xl p-6" style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}>
               <div className="flex gap-3">
                 <label htmlFor="query" className="visually-hidden">
                   Your question
@@ -195,9 +200,10 @@ export function Demo() {
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Ask a question about the documentation..."
-                  className="flex-1 px-4 py-3 bg-muted/30 border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                  className="flex-1 px-4 py-3 rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                   disabled={isLoading}
                   autoComplete="off"
+                  style={{ backgroundColor: 'var(--color-surface-soft)', borderColor: 'var(--color-border-strong)', color: 'var(--color-foreground)' }}
                 />
                 <Button
                   type="submit"
@@ -230,10 +236,11 @@ export function Demo() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
                   className="bg-surface border border-border rounded-xl p-8 text-center"
+                  style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}
                 >
                   <Loader2 className="w-10 h-10 mx-auto mb-4 text-primary animate-spin" />
-                  <p className="text-muted-foreground">Searching vector space...</p>
-                  <p className="text-sm text-muted-foreground/70 mt-1">Reranking top candidates with LLM judge</p>
+                  <p className="text-muted-foreground" style={{ color: 'var(--color-muted-foreground)' }}>Searching vector space...</p>
+                  <p className="text-sm text-muted-foreground/70 mt-1" style={{ color: 'var(--color-muted-foreground)' }}>Reranking top candidates with LLM judge</p>
                 </motion.div>
               ) : response ? (
                 <motion.div
@@ -242,10 +249,11 @@ export function Demo() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
                   className="bg-surface border border-border rounded-xl overflow-hidden"
+                  style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}
                 >
-                  <div className="p-6 border-b border-border">
+                  <div className="p-6 border-b border-border" style={{ borderColor: 'var(--color-border)' }}>
                     <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-lg font-semibold flex items-center gap-2">
+                      <h3 className="text-lg font-semibold flex items-center gap-2" style={{ color: 'var(--color-foreground)' }}>
                         <Sparkles className="w-5 h-5 text-primary" />
                         Grounded Answer
                       </h3>
@@ -273,22 +281,22 @@ export function Demo() {
 
                   <div className="p-6 space-y-6">
                     <div className="grid sm:grid-cols-3 gap-4">
-                      <div className="bg-primary/10 rounded-lg p-4 text-center">
+                      <div className="rounded-lg p-4 text-center" style={{ backgroundColor: 'color-mix(in srgb, var(--color-primary) 10%, transparent)' }}>
                         <div className="text-3xl font-bold text-primary">{Math.round(response.confidence * 100)}%</div>
                         <div className="text-sm text-muted-foreground">Composite Confidence</div>
                       </div>
-                      <div className="bg-accent/10 rounded-lg p-4 text-center">
+                      <div className="rounded-lg p-4 text-center" style={{ backgroundColor: 'color-mix(in srgb, var(--color-accent) 10%, transparent)' }}>
                         <div className="text-3xl font-bold text-accent">{response.retrieval.reranked}</div>
                         <div className="text-sm text-muted-foreground">Reranked Finalists</div>
                       </div>
-                      <div className="bg-success/10 rounded-lg p-4 text-center">
+                      <div className="rounded-lg p-4 text-center" style={{ backgroundColor: 'color-mix(in srgb, var(--color-success) 10%, transparent)' }}>
                         <div className="text-3xl font-bold text-success-500">{response.sources.length}</div>
                         <div className="text-sm text-muted-foreground">Verified Citations</div>
                       </div>
                     </div>
 
                     <div>
-                      <h4 className="font-semibold mb-3 flex items-center gap-2">
+                      <h4 className="font-semibold mb-3 flex items-center gap-2" style={{ color: 'var(--color-foreground)' }}>
                         <Info className="w-4 h-4" />
                         Sources & Citations
                       </h4>
@@ -299,18 +307,19 @@ export function Demo() {
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: i * 0.05 }}
-                            className="p-3 bg-muted/30 rounded-lg border border-border"
+                            className="p-3 rounded-lg border"
+                            style={{ backgroundColor: 'var(--color-surface-soft)', borderColor: 'var(--color-border)' }}
                           >
                             <div className="flex items-start gap-3">
-                              <span className="flex-shrink-0 w-6 h-6 rounded-full bg-accent/20 text-accent flex items-center justify-center text-xs font-mono">
+                              <span className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-mono" style={{ backgroundColor: 'color-mix(in srgb, var(--color-accent) 20%, transparent)', color: 'var(--color-accent)' }}>
                                 {i + 1}
                               </span>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 text-sm">
-                                  <code className="font-mono bg-muted px-1.5 py-0.5 rounded">{source.source}</code>
-                                  <span className="text-muted-foreground">Score: {Math.round(source.score * 100)}%</span>
+                                  <code className="font-mono px-1.5 py-0.5 rounded" style={{ backgroundColor: 'var(--color-surface-soft)', color: 'var(--color-foreground)' }}>{source.source}</code>
+                                  <span className="text-muted-foreground" style={{ color: 'var(--color-muted-foreground)' }}>Score: {Math.round(source.score * 100)}%</span>
                                 </div>
-                                <p className="text-sm text-muted-foreground mt-1 line-clamp-2 font-mono">
+                                <p className="text-sm text-muted-foreground mt-1 line-clamp-2 font-mono" style={{ color: 'var(--color-muted-foreground)' }}>
                                   {source.text}
                                 </p>
                               </div>
@@ -320,25 +329,25 @@ export function Demo() {
                       </div>
                     </div>
 
-                    <div className="pt-4 border-t border-border">
-                      <h4 className="font-semibold mb-3 flex items-center gap-2">
+                    <div className="pt-4 border-t" style={{ borderColor: 'var(--color-border)' }}>
+                      <h4 className="font-semibold mb-3 flex items-center gap-2" style={{ color: 'var(--color-foreground)' }}>
                         <Info className="w-4 h-4" />
                         Retrieval Breakdown
                       </h4>
                       <div className="grid sm:grid-cols-4 gap-3 text-center">
-                        <div className="p-3 bg-primary/10 rounded-lg">
+                        <div className="p-3 rounded-lg" style={{ backgroundColor: 'color-mix(in srgb, var(--color-primary) 10%, transparent)' }}>
                           <div className="text-2xl font-bold text-primary">{response.retrieval.dense}</div>
                           <div className="text-xs text-muted-foreground">Dense Matches</div>
                         </div>
-                        <div className="p-3 bg-secondary/10 rounded-lg">
+                        <div className="p-3 rounded-lg" style={{ backgroundColor: 'color-mix(in srgb, var(--color-secondary) 10%, transparent)' }}>
                           <div className="text-2xl font-bold text-secondary">{response.retrieval.sparse}</div>
                           <div className="text-xs text-muted-foreground">Sparse Matches</div>
                         </div>
-                        <div className="p-3 bg-accent/10 rounded-lg">
+                        <div className="p-3 rounded-lg" style={{ backgroundColor: 'color-mix(in srgb, var(--color-accent) 10%, transparent)' }}>
                           <div className="text-2xl font-bold text-accent">{response.retrieval.fused}</div>
                           <div className="text-xs text-muted-foreground">After RRF Fusion</div>
                         </div>
-                        <div className="p-3 bg-success/10 rounded-lg">
+                        <div className="p-3 rounded-lg" style={{ backgroundColor: 'color-mix(in srgb, var(--color-success) 10%, transparent)' }}>
                           <div className="text-2xl font-bold text-success-500">{response.retrieval.reranked}</div>
                           <div className="text-xs text-muted-foreground">After LLM Rerank</div>
                         </div>
@@ -352,12 +361,13 @@ export function Demo() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   className="bg-surface border border-border rounded-xl p-12 text-center"
+                  style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}
                 >
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted/30 flex items-center justify-center">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--color-surface-soft)' }}>
                     <Info className="w-8 h-8 text-muted-foreground" />
                   </div>
-                  <h3 className="text-lg font-semibold mb-2">Ready to query</h3>
-                  <p className="text-muted-foreground">Enter a question above or click a sample to see the grounded answer with citations</p>
+                  <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--color-foreground)' }}>Ready to query</h3>
+                  <p className="text-muted-foreground" style={{ color: 'var(--color-muted-foreground)' }}>Enter a question above or click a sample to see the grounded answer with citations</p>
                 </motion.div>
               )}
             </AnimatePresence>

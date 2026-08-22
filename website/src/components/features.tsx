@@ -98,10 +98,10 @@ const features = [
 const colorMap = {
   primary: "bg-primary/10 text-primary border-primary/20",
   accent: "bg-accent/10 text-accent border-accent/20",
-  success: "bg-success-500/10 text-success-500 border-success-500/20",
-  warning: "bg-warning-500/10 text-warning-500 border-warning-500/20",
+  success: "bg-success/10 text-success border-success/20",
+  warning: "bg-warning/10 text-warning border-warning/20",
   secondary: "bg-secondary/10 text-secondary border-secondary/20",
-  info: "bg-info-500/10 text-info-500 border-info-500/20",
+  info: "bg-accent/10 text-accent border-accent/20",
 };
 
 export function Features() {
@@ -142,7 +142,7 @@ export function Features() {
               transition={{ delay: index * 0.1, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
               className={cn(
                 "group relative p-6 lg:p-8 rounded-xl border transition-all duration-300",
-                "bg-surface border-border hover:border-primary/30 hover:shadow-xl",
+                "bg-surface border-border hover:border-primary/40 hover:shadow-[0_30px_60px_-30px_var(--color-primary)]",
                 "hover:-translate-y-1"
               )}
             >

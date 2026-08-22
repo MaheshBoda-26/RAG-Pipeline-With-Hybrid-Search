@@ -84,8 +84,9 @@ export function Docs() {
   return (
     <section
       id="docs"
-      className="py-24 sm:py-32 lg:py-40 bg-surface/30"
+      className="py-24 sm:py-32 lg:py-40"
       aria-labelledby="docs-title"
+      style={{ backgroundColor: 'var(--color-surface)' }}
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <motion.div
@@ -135,23 +136,24 @@ export function Docs() {
                 </div>
 
                 <div className="lg:order-2 relative">
-                  <div className="hidden lg:block absolute left-0 top-14 bottom-0 w-0.5 bg-gradient-to-b from-primary/20 via-primary to-primary/20" />
+                  <div className="hidden lg:block absolute left-0 top-14 bottom-0 w-0.5" style={{ background: 'linear-gradient(180deg, color-mix(in srgb, var(--color-primary) 20%, transparent), var(--color-primary), color-mix(in srgb, var(--color-primary) 20%, transparent))' }} />
                   <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     whileInView={{ opacity: 1, scale: 1 }}
                     viewport={{ once: true, amount: 0.2 }}
                     transition={{ delay: index * 0.1 + 0.2, duration: 0.4 }}
-                    className="relative z-10 bg-neutral-950 dark:bg-neutral-900 rounded-xl overflow-hidden border border-neutral-800"
+                    className="relative z-10 rounded-xl overflow-hidden border"
+                    style={{ backgroundColor: 'var(--color-bg-elev)', borderColor: 'var(--color-border)' }}
                   >
-                    <div className="flex items-center gap-2 px-4 py-3 border-b border-neutral-800 bg-neutral-900">
+                    <div className="flex items-center gap-2 px-4 py-3 border-b" style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-surface)' }}>
                       <div className="flex gap-1.5">
                         <div className="w-3 h-3 rounded-full bg-red-500" />
                         <div className="w-3 h-3 rounded-full bg-yellow-500" />
                         <div className="w-3 h-3 rounded-full bg-green-500" />
                       </div>
-                      <span className="text-xs text-neutral-400 font-mono ml-2">terminal</span>
+                      <span className="text-xs font-mono ml-2" style={{ color: 'var(--color-muted)' }}>terminal</span>
                     </div>
-                    <pre className="p-4 overflow-x-auto"><code className="font-mono text-neutral-100 text-sm leading-relaxed">
+                    <pre className="p-4 overflow-x-auto"><code className="font-mono text-sm leading-relaxed" style={{ color: 'var(--color-text-2)' }}>
 {step.commands.map((cmd, i) => (
   <span key={i} className="block">
     {cmd}
@@ -195,9 +197,9 @@ export function Docs() {
             transition={{ delay: steps.length * 0.1, duration: 0.5 }}
             className="mt-12"
           >
-            <div className="bg-surface border border-border rounded-xl overflow-hidden">
-              <div className="p-6 border-b border-border">
-                <h3 className="text-xl font-semibold flex items-center gap-2">
+            <div className="rounded-xl overflow-hidden border" style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}>
+              <div className="p-6 border-b" style={{ borderColor: 'var(--color-border)' }}>
+                <h3 className="text-xl font-semibold flex items-center gap-2" style={{ color: 'var(--color-foreground)' }}>
                   <Terminal className="w-5 h-5 text-primary" />
                   Key Configuration
                 </h3>
@@ -205,10 +207,10 @@ export function Docs() {
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="bg-muted/30 border-b border-border">
-                      <th className="px-6 py-3 text-left font-semibold text-foreground">Variable</th>
-                      <th className="px-6 py-3 text-left font-semibold text-foreground">Default</th>
-                      <th className="px-6 py-3 text-left font-semibold text-foreground">Description</th>
+                    <tr className="border-b" style={{ backgroundColor: 'var(--color-surface-soft)', borderColor: 'var(--color-border-strong)' }}>
+                      <th className="px-6 py-3 text-left font-semibold" style={{ color: 'var(--color-foreground)' }}>Variable</th>
+                      <th className="px-6 py-3 text-left font-semibold" style={{ color: 'var(--color-foreground)' }}>Default</th>
+                      <th className="px-6 py-3 text-left font-semibold" style={{ color: 'var(--color-foreground)' }}>Description</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -216,13 +218,14 @@ export function Docs() {
                       <tr
                         key={row.variable}
                         className={cn(
-                          "border-b border-border/50 hover:bg-muted/30 transition-colors",
+                          "border-b transition-colors",
                           i === configTable.length - 1 && "border-0"
                         )}
+                        style={{ borderColor: 'color-mix(in srgb, var(--color-border) 50%, transparent)', backgroundColor: 'var(--color-surface)', hoverBackgroundColor: 'var(--color-surface-soft)' }}
                       >
-                        <td className="px-6 py-3 font-mono text-foreground">{row.variable}</td>
-                        <td className="px-6 py-3 font-mono text-muted-foreground">{row.default}</td>
-                        <td className="px-6 py-3 text-muted-foreground">{row.description}</td>
+                        <td className="px-6 py-3 font-mono" style={{ color: 'var(--color-foreground)' }}>{row.variable}</td>
+                        <td className="px-6 py-3 font-mono" style={{ color: 'var(--color-muted-foreground)' }}>{row.default}</td>
+                        <td className="px-6 py-3" style={{ color: 'var(--color-muted-foreground)' }}>{row.description}</td>
                       </tr>
                     ))}
                   </tbody>

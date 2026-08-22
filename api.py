@@ -523,5 +523,94 @@ async def demo_documents():
     return {"documents": docs, "total_documents": len(docs), "total_chunks": total_chunks}
 
 
+@app.post("/v1/demo/upload")
+async def demo_upload(
+    file: UploadFile = File(...),
+):
+    """Upload a document file and ingest it using demo/global collection (no auth required)."""
+    # Check if API key is configured before accepting uploads
+    if not settings.nvidia_api_key or settings.nvidia_api_key in ("", "your-nvidia-key", "test-key"):
+        raise HTTPException(
+            status_code=503,
+            detail="Embedding service not configured. Set NVIDIA_API_KEY in .env file."
+        )
+
+    # Validate file size
+    max_size = settings.max_file_size_mb * 1024 * 1024
+    content = await file.read()
+    if len(content) > max_size:
+        raise HTTPException(
+            status_code=413,
+            detail=f"File too large. Maximum size: {settings.max_file_size_mb}MB"
+        )
+
+    # Validate file extension
+    allowed_exts = {".pdf", ".txt", ".md", ".docx", ".doc"}
+    ext = Path(file.filename).suffix.lower()
+    if ext not in allowed_exts:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unsupported file type: {ext}. Allowed: {', '.join(sorted(allowed_exts))}"
+        )
+
+    # Validate filename (no path traversal)
+    safe_filename = Path(file.filename).name
+    if not safe_filename or safe_filename.startswith("."):
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid filename"
+        )
+
+    # Save to demo upload directory
+    upload_dir = settings.get_user_upload_dir(settings.default_user_id)
+    upload_dir.mkdir(parents=True, exist_ok=True)
+
+    # Add UUID prefix to avoid filename collisions
+    import uuid
+    unique_filename = f"{uuid.uuid4().hex[:8]}_{safe_filename}"
+    file_path = upload_dir / unique_filename
+
+    try:
+        with open(file_path, "wb") as f:
+            f.write(content)
+
+        # Ingest the file - pass original filename for better source tracking
+        pipeline = get_pipeline(settings.default_user_id)
+        result = pipeline.ingest_file(str(file_path), original_filename=safe_filename, user_id=settings.default_user_id)
+        return {
+            "message": "File uploaded and indexed",
+            "file": safe_filename,
+            "stored_as": unique_filename,
+            **result
+        }
+    except HTTPException:
+        # Clean up on failure
+        if file_path.exists():
+            file_path.unlink()
+        raise
+    except RuntimeError as e:
+        # Embedding/indexing service errors - keep file for retry
+        error_msg = str(e)
+        if "AuthenticationError" in error_msg or "401" in error_msg:
+            raise HTTPException(
+                status_code=503,
+                detail=f"Embedding API authentication failed. Check NVIDIA_API_KEY in .env"
+            )
+        if "404" in error_msg and "model" in error_msg.lower():
+            raise HTTPException(
+                status_code=503,
+                detail=f"Embedding model not found. Check EMBEDDING_MODEL in .env"
+            )
+        raise HTTPException(status_code=502, detail=f"Indexing service unavailable: {error_msg}")
+    except ValueError as e:
+        # Path validation / file format errors - clean up file
+        if file_path.exists():
+            file_path.unlink()
+        raise HTTPException(status_code=400, detail=f"Invalid file: {error_msg}")
+    except Exception as e:
+        # Unknown errors - keep file for debugging
+        raise HTTPException(status_code=500, detail=f"Failed to process file: {str(e)}")
+
+
 # Import decode_token for refresh endpoint
 from config import decode_token

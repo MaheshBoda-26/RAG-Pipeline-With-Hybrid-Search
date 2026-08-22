@@ -81,32 +81,75 @@
   }
 
   .dark {
-    --color-canvas: #171613;
-    --color-surface-soft: #211f1c;
-    --color-surface-card: #2b2822;
-    --color-surface-cream-strong: #34302a;
-    --color-ink: #f2efe7;
-    --color-body: #c9c3b5;
-    --color-muted: #8f897c;
-    --color-muted-soft: #7a7468;
-    --color-hairline: #38342c;
-    --color-hairline-soft: #2e2b26;
+    /* ─── Brand & Accent ─────────────────────────────── */
     --color-coral: #cc785c;
     --color-coral-active: #a9583e;
     --color-accent-teal: #5db8a6;
     --color-accent-amber: #e8a55a;
+
+    /* ─── Surface — Cream Family ─────────────────────── */
+    --color-canvas: #171613;
+    --color-surface-soft: #211f1c;
+    --color-surface-card: #2b2822;
+    --color-surface-cream-strong: #34302a;
+
+    /* ─── Surface — Dark Family ──────────────────────── */
     --color-surface-dark: #181715;
     --color-surface-dark-elevated: #252320;
     --color-surface-dark-soft: #1f1e1b;
+
+    /* ─── Borders ────────────────────────────────────── */
+    --color-hairline: #38342c;
+    --color-hairline-soft: #2e2b26;
+
+    /* ─── Text ───────────────────────────────────────── */
+    --color-ink: #f2efe7;
+    --color-body-strong: #e8e0d2;
+    --color-body: #c9c3b5;
+    --color-muted: #8f897c;
+    --color-muted-soft: #7a7468;
     --color-on-primary: #ffffff;
     --color-on-dark: #faf9f5;
     --color-on-dark-soft: #a09d96;
 
+    /* ─── Semantic (re-pointed to Anthropic palette) ─── */
+    --color-primary: #cc785c;
+    --color-primary-hover: #a9583e;
+    --color-primary-light: #34302a;
+    --color-primary-foreground: #ffffff;
+    --color-secondary: #e8a55a;
+    --color-secondary-foreground: #f2efe7;
+    --color-accent: #5db8a6;
+    --color-accent-hover: #4aa38f;
+    --color-accent-light: #1f2a26;
+    --color-accent-foreground: #ffffff;
+    --color-success: #5db872;
+    --color-warning: #d4a017;
+    --color-error: #c64545;
+
+    /* ─── Surface aliases ────────────────────────────── */
     --color-background: var(--color-canvas);
     --color-foreground: var(--color-ink);
     --color-surface: var(--color-surface-card);
+    --color-surface-elevated: var(--color-canvas);
     --color-border: var(--color-hairline);
+    --color-border-strong: #38342c;
     --color-muted-foreground: var(--color-body);
+    --color-ring: var(--color-coral);
+
+    /* ─── Neutrals ───────────────────────────────────── */
+    --color-neutral-0: #181715;
+    --color-neutral-50: #1f1e1b;
+    --color-neutral-100: #2b2822;
+    --color-neutral-200: #34302a;
+    --color-neutral-300: #47423a;
+    --color-neutral-400: #5f594e;
+    --color-neutral-500: #817a6b;
+    --color-neutral-600: #a39c8d;
+    --color-neutral-700: #c9c3b5;
+    --color-neutral-800: #efede6;
+    --color-neutral-900: #f8f7f3;
+    --color-neutral-950: #ffffff;
   }
 }
 
