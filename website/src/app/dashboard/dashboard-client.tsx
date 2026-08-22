@@ -1,8 +1,9 @@
 "use client";
 
 import * as React from "react";
-import { Search, Sparkles, Zap, CheckCircle, Globe } from "lucide-react";
+import { Search, Sparkles, Zap, CheckCircle, Globe, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { DocumentUploader } from "@/components/DocumentUploader";
 
 export function DashboardClient() {
   const [query, setQuery] = React.useState("");
@@ -115,6 +116,11 @@ export function DashboardClient() {
                 )}
               </button>
             </form>
+
+            {/* Document Uploader */}
+            <div className="bg-surface border border-border rounded-xl p-6 animate-in">
+              <DocumentUploader />
+            </div>
 
             {answer && (
               <div className="bg-surface border border-border rounded-xl p-6 space-y-4 animate-in">
