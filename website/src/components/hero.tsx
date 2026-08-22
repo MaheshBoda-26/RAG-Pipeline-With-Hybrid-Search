@@ -43,6 +43,7 @@ export function Hero() {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.1, duration: 0.4 }}
               className="inline-flex items-center gap-2 rounded-full bg-surface-card px-3 py-1 text-caption text-xs text-ink border border-hairline"
+              style={{ backgroundColor: 'var(--color-surface-card)', borderColor: 'var(--color-hairline)', color: 'var(--color-ink)' }}
             >
               <span className="w-1.5 h-1.5 bg-coral rounded-full" />
               <span className="text-muted-foreground">v2.0 — Hybrid Search + LLM Reranking</span>
@@ -54,6 +55,7 @@ export function Hero() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.5 }}
               className="text-5xl sm:text-6xl lg:text-7xl text-ink text-balance tracking-tight leading-[1.1]"
+              style={{ color: 'var(--color-ink)' }}
             >
               <span className="block">Hybrid Search</span>
               <span className="block text-coral">Over Internal Docs</span>
@@ -64,6 +66,7 @@ export function Hero() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.5 }}
               className="text-lg sm:text-xl text-body max-w-xl text-pretty leading-relaxed"
+              style={{ color: 'var(--color-body)' }}
             >
               Production-grade RAG pipeline with dense vector search, BM25 sparse retrieval,
               reciprocal rank fusion, LLM-as-judge reranking, and grounded generation
@@ -125,7 +128,7 @@ export function Hero() {
             transition={{ delay: 0.3, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
             className="flex flex-col gap-6 lg:-ml-4"
           >
-            <div className="relative overflow-hidden rounded-2xl border border-white/5 bg-surface-dark shadow-[0_32px_90px_-56px_rgba(20,20,19,0.9)]">
+            <div className="relative overflow-hidden rounded-2xl border border-white/5 bg-surface-dark shadow-[0_32px_90px_-56px_rgba(20,20,19,0.9)]" style={{ backgroundColor: 'var(--color-surface-dark)' }}>
               <VectorSpace3D
                 chunks={sampleChunks}
                 query="How do I authenticate?"
@@ -134,16 +137,16 @@ export function Hero() {
               />
             </div>
 
-            <div className="bg-surface-dark rounded-2xl overflow-hidden">
-              <div className="flex items-center gap-3 px-4 sm:px-5 pt-4 pb-3">
+            <div className="rounded-2xl overflow-hidden" style={{ backgroundColor: 'var(--color-surface-dark)' }}>
+              <div className="flex items-center gap-3 px-4 sm:px-5 pt-4 pb-3" style={{ backgroundColor: 'var(--color-surface-dark-elevated)' }}>
                 <div className="flex gap-1.5">
                   <div className="w-3 h-3 rounded-full bg-coral" />
                   <div className="w-3 h-3 rounded-full bg-accent-amber" />
                   <div className="w-3 h-3 rounded-full bg-accent-teal" />
                 </div>
-                <span className="text-xs text-on-dark-soft font-mono">pipeline.ask()</span>
+                <span className="text-xs font-mono" style={{ color: 'var(--color-on-dark-soft)' }}>pipeline.ask()</span>
               </div>
-              <pre className="text-xs font-mono text-on-dark bg-surface-dark-soft p-5 overflow-x-auto leading-relaxed"><code>{`const pipeline = new RAGPipeline(settings);
+              <pre className="text-xs font-mono p-5 overflow-x-auto leading-relaxed" style={{ backgroundColor: 'var(--color-surface-dark-soft)', color: 'var(--color-on-dark)' }}><code>{`const pipeline = new RAGPipeline(settings);
 await pipeline.ingest_directory("./docs");
 
 const response = await pipeline.ask(
@@ -154,12 +157,12 @@ const response = await pipeline.ask(
 console.log(response.answer);
 console.log(response.confidence);
 console.log(response.sources);`}</code></pre>
-              <div className="flex items-center justify-between px-5 py-3">
+              <div className="flex items-center justify-between px-5 py-3" style={{ backgroundColor: 'var(--color-surface-dark-elevated)' }}>
                 <p className="flex items-center gap-2 text-sm font-mono text-accent-teal">
                   <span className="w-2 h-2 bg-accent-teal rounded-full" />
                   confidence: 0.94
                 </p>
-                <p className="text-xs text-on-dark-soft">3 sources · reranked</p>
+                <p className="text-xs" style={{ color: 'var(--color-on-dark-soft)' }}>3 sources · reranked</p>
               </div>
             </div>
           </motion.div>
