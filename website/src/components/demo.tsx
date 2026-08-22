@@ -2,10 +2,11 @@
 
 import * as React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Loader2, Copy, Check, AlertCircle, Info, Sparkles } from "lucide-react";
+import { Loader2, Copy, Check, AlertCircle, Info, Sparkles, Upload } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { VectorSpace3D } from "@/components/vector-space-3d";
+import { DocumentUploader } from "@/components/DocumentUploader";
 
 const sampleQuestions = [
   "How do I authenticate with the API?",
@@ -92,6 +93,9 @@ export function Demo() {
             transition={{ delay: 0.2, duration: 0.5 }}
             className="space-y-6"
           >
+            {/* Document Uploader */}
+            <DocumentUploader />
+
             <div className="bg-surface border border-border rounded-xl p-6">
               <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                 <Info className="w-5 h-5 text-primary" />

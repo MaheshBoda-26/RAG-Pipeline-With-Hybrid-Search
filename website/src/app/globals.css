@@ -1,193 +1,86 @@
-@import "tailwindcss";
-
-@theme {
-  /* ─── Brand & Accent ─────────────────────────────── */
-  --color-coral: #cc785c;              /* Primary CTA, wordmark, callout
-    cards */
-  --color-coral-active: #a9583e;       /* Press / active state */
-  --color-accent-teal: #5db8a6;        /* Terminal status, secondary surfaces
-    */
-  --color-accent-amber: #e8a55a;       /* Category badges, inline highlights */
-
-  /* ─── Surface — Cream Family ─────────────────────── */
-  --color-canvas: #faf9f5;             /* Default page floor (NOT pure white)
-    */
-  --color-surface-soft: #f5f0e8;       /* Section dividers, soft bands */
-  --color-surface-card: #efe9de;       /* Feature / content cards */
-  --color-surface-cream-strong: #e8e0d2; /* Selected tabs, emphasized bands */
-
-  /* ─── Surface — Dark Family ──────────────────────── */
-  --color-surface-dark: #181715;       /* Code mockups, footer, dark cards */
-  --color-surface-dark-elevated: #252320; /* Elevated cards inside dark bands */
-  --color-surface-dark-soft: #1f1e1b;  /* Code block backgrounds */
-
-  /* ─── Borders ────────────────────────────────────── */
-  --color-hairline: #e6dfd8;           /* 1px border on cream surfaces */
-  --color-hairline-soft: #ebe6df;      /* Barely-visible divider */
-
-  /* ─── Text ───────────────────────────────────────── */
-  --color-ink: #141413;                /* Headlines, primary text */
-  --color-body-strong: #252523;        /* Emphasized paragraphs, lead text */
-  --color-body: #3d3d3a;               /* Default running text */
-  --color-muted: #8e8b82;              /* Soft captions / fills */
-  --color-muted-soft: #8e8b82;         /* Captions, fine-print */
-  --color-on-primary: #ffffff;         /* Text on coral buttons */
-  --color-on-dark: #faf9f5;            /* Cream-tinted white on dark */
-  --color-on-dark-soft: #a09d96;       /* Footer body text */
-
-  /* ─── Semantic (re-pointed to Anthropic palette) ─── */
-  --color-primary: #cc785c;            /* coral */
-  --color-primary-hover: #a9583e;
-  --color-primary-light: #f5f0e8;
-  --color-primary-foreground: #ffffff;
-  /* coral scale (legacy `-NNN` utility compat) */
-  --color-primary-50: #faf4f1;
-  --color-primary-100: #f3e4dc;
-  --color-primary-200: #e9cbb9;
-  --color-primary-300: #dcab91;
-  --color-primary-400: #d28e70;
-  --color-primary-500: #cc785c;
-  --color-primary-600: #bd6649;
-  --color-primary-700: #a9583e;
-  --color-primary-800: #8a442f;
-  --color-primary-900: #6b3424;
-  --color-primary-950: #452117;
-  --color-secondary: #e8a55a;          /* amber — sparse / secondary accent */
-  --color-secondary-500: #e8a55a;
-  --color-secondary-600: #d48f3f;
-  --color-secondary-foreground: #141413;
-  --color-accent: #5db8a6;             /* teal — sparse / reranked accent */
-  --color-accent-500: #5db8a6;
-  --color-accent-hover: #4aa38f;
-  --color-accent-600: #4aa38f;
-  --color-accent-light: #eaf5f2;
-  --color-accent-foreground: #ffffff;
-  --color-success: #5db872;
-  --color-success-500: #5db872;
-  --color-warning: #d4a017;
-  --color-warning-500: #d4a017;
-  --color-error-500: #c64545;
-  --color-info-500: #5db8a6;
-
-  /* ─── Surface aliases ────────────────────────────── */
-  --color-background: var(--color-canvas);
-  --color-foreground: var(--color-ink);
-  --color-surface: var(--color-surface-card);
-  --color-surface-elevated: var(--color-canvas);
-  --color-border: var(--color-hairline);
-  --color-border-strong: #d9d0c0;
-  --color-muted-foreground: var(--color-body);
-  --color-ring: var(--color-coral);
-
-  /* ─── Neutrals (code blocks / dark chrome) ───────── */
-  --color-neutral-0: #ffffff;
-  --color-neutral-50: #f8f7f3;
-  --color-neutral-100: #efede6;
-  --color-neutral-200: #e2ded3;
-  --color-neutral-300: #c9c3b5;
-  --color-neutral-400: #a39c8d;
-  --color-neutral-500: #817a6b;
-  --color-neutral-600: #5f594e;
-  --color-neutral-700: #47423a;
-  --color-neutral-800: #2e2b25;
-  --color-neutral-900: #211f1b;
-  --color-neutral-950: #181715;
-
-  /* ─── Fonts ──────────────────────────────────────── */
-  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-
-    serif;
-  --font-display: var(--font-display), "Cormorant Garamond", Georgia, "Times
-    New Roman", serif;
-  --font-mono: "JetBrains Mono", "SF Mono", "Consolas", monospace;
-
-  /* ─── Spacing scale (4px base) ───────────────────── */
-  --spacing-1: 4px;
-  --spacing-2: 8px;
-  --spacing-3: 12px;
-  --spacing-4: 16px;
-  --spacing-5: 20px;
-  --spacing-6: 24px;
-  --spacing-8: 32px;
-  --spacing-10: 40px;
-  --spacing-12: 48px;
-  --spacing-16: 64px;
-  --spacing-20: 80px;
-  --spacing-24: 96px;
-
-  /* ─── Border radius ──────────────────────────────── */
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
-  --radius-2xl: 20px;
-
-  /* ─── Motion tokens ──────────────────────────────── */
-  --duration-micro: 120ms;
-  --duration-standard: 200ms;
-  --duration-page: 240ms;
-  --duration-emphasis: 480ms;
-  --duration-3d-camera: 480ms;
-
-  --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
-  --ease-page: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-emphasis: cubic-bezier(0.16, 1, 0.3, 1);
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 @layer base {
   :root {
-    --background: #faf9f5;             /* cream canvas */
-    --foreground: #141413;             /* warm ink */
-    --surface: #efe9de;                /* surface-card */
-    --surface-elevated: #faf9f5;
-    --border: #e6dfd8;                 /* hairline */
-    --border-strong: #d9d0c0;
-    --muted: #8e8b82;
-    --muted-foreground: #3d3d3a;
+    /* ─── Brand & Accent ─────────────────────────────── */
+    --color-coral: #cc785c;
+    --color-coral-active: #a9583e;
+    --color-accent-teal: #5db8a6;
+    --color-accent-amber: #e8a55a;
 
-    --primary: #cc785c;
-    --primary-hover: #a9583e;
-    --primary-light: #f5f0e8;
-    --primary-foreground: #ffffff;
+    /* ─── Surface — Cream Family ─────────────────────── */
+    --color-canvas: #faf9f5;
+    --color-surface-soft: #f5f0e8;
+    --color-surface-card: #efe9de;
+    --color-surface-cream-strong: #e8e0d2;
 
-    --secondary: #e8a55a;
-    --secondary-foreground: #141413;
+    /* ─── Surface — Dark Family ──────────────────────── */
+    --color-surface-dark: #181715;
+    --color-surface-dark-elevated: #252320;
+    --color-surface-dark-soft: #1f1e1b;
 
-    --accent: #5db8a6;
-    --accent-hover: #4aa38f;
-    --accent-light: #eaf5f2;
-    --accent-foreground: #ffffff;
+    /* ─── Borders ────────────────────────────────────── */
+    --color-hairline: #e6dfd8;
+    --color-hairline-soft: #ebe6df;
 
-    --ring: #cc785c;
+    /* ─── Text ───────────────────────────────────────── */
+    --color-ink: #141413;
+    --color-body-strong: #252523;
+    --color-body: #3d3d3a;
+    --color-muted: #8e8b82;
+    --color-muted-soft: #8e8b82;
+    --color-on-primary: #ffffff;
+    --color-on-dark: #faf9f5;
+    --color-on-dark-soft: #a09d96;
+
+    /* ─── Semantic (re-pointed to Anthropic palette) ─── */
+    --color-primary: #cc785c;
+    --color-primary-hover: #a9583e;
+    --color-primary-light: #f5f0e8;
+    --color-primary-foreground: #ffffff;
+    --color-secondary: #e8a55a;
+    --color-secondary-foreground: #141413;
+    --color-accent: #5db8a6;
+    --color-accent-hover: #4aa38f;
+    --color-accent-light: #eaf5f2;
+    --color-accent-foreground: #ffffff;
+    --color-success: #5db872;
+    --color-warning: #d4a017;
+    --color-error: #c64545;
+
+    /* ─── Surface aliases ────────────────────────────── */
+    --color-background: var(--color-canvas);
+    --color-foreground: var(--color-ink);
+    --color-surface: var(--color-surface-card);
+    --color-surface-elevated: var(--color-canvas);
+    --color-border: var(--color-hairline);
+    --color-border-strong: #d9d0c0;
+    --color-muted-foreground: var(--color-body);
+    --color-ring: var(--color-coral);
+
+    /* ─── Neutrals ───────────────────────────────────── */
+    --color-neutral-0: #ffffff;
+    --color-neutral-50: #f8f7f3;
+    --color-neutral-100: #efede6;
+    --color-neutral-200: #e2ded3;
+    --color-neutral-300: #c9c3b5;
+    --color-neutral-400: #a39c8d;
+    --color-neutral-500: #817a6b;
+    --color-neutral-600: #5f594e;
+    --color-neutral-700: #47423a;
+    --color-neutral-800: #2e2b25;
+    --color-neutral-900: #211f1b;
+    --color-neutral-950: #181715;
+
+    /* ─── Fonts ──────────────────────────────────────── */
+    --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --font-display: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+    --font-mono: "JetBrains Mono", "SF Mono", "Consolas", monospace;
   }
 
   .dark {
-    --background: #181715;             /* dark canvas — flips to dark navy */
-    --foreground: #faf9f5;             /* on-dark cream text */
-    --surface: #211f1b;                /* dark-soft surface */
-    --surface-elevated: #252320;       /* surface-dark-elevated */
-    --border: #2e2b25;                 /* dark hairline */
-    --border-strong: #47423a;
-    --muted: #5f594e;
-    --muted-foreground: #a09d96;
-
-    --primary: #cc785c;
-    --primary-hover: #a9583e;
-    --primary-light: #3a2a22;
-    --primary-foreground: #ffffff;
-
-    --secondary: #e8a55a;
-    --secondary-foreground: #141413;
-
-    --accent: #5db8a6;
-    --accent-hover: #4aa38f;
-    --accent-light: #18302b;
-    --accent-foreground: #141413;
-
-    --ring: #cc785c;
-
-    /* Anthropic color tokens — flip the cream family to a warm dark family
-       so bg-canvas / text-ink / bg-surface-card / border-hairline switch in
-       dark mode. Coral + dark surfaces + on-* stay fixed. */
     --color-canvas: #171613;
     --color-surface-soft: #211f1c;
     --color-surface-card: #2b2822;
@@ -208,19 +101,24 @@
     --color-on-primary: #ffffff;
     --color-on-dark: #faf9f5;
     --color-on-dark-soft: #a09d96;
+
+    --color-background: var(--color-canvas);
+    --color-foreground: var(--color-ink);
+    --color-surface: var(--color-surface-card);
+    --color-border: var(--color-hairline);
+    --color-muted-foreground: var(--color-body);
   }
 }
 
 @layer base {
   * {
-    @apply border-neutral-200 dark:border-neutral-800;
+    border-color: var(--color-border);
   }
 
   html {
     scroll-behavior: smooth;
   }
 
-  /* Editorial display voice: slab/didone serif on headlines */
   h1, h2, h3 {
     font-family: var(--font-display);
     letter-spacing: -0.02em;
@@ -246,16 +144,25 @@
   }
 
   body {
-    @apply bg-[var(--background)] text-[var(--foreground)] font-sans antialiased;
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 
   ::selection {
-    @apply bg-primary/20 text-primary;
+    background-color: var(--color-primary);
+    opacity: 0.2;
+    color: var(--color-primary);
   }
 
   :focus-visible {
-    @apply outline-none ring-2 ring-[var(--ring)] ring-offset-2 ring-offset-[var(--background)];
+    outline: none;
+    ring: 2px solid var(--color-ring);
+    ring-offset: 2px;
+    ring-offset-color: var(--color-background);
   }
 }
 
@@ -281,7 +188,7 @@
   }
 
   .animate-in {
-    animation: animate-in var(--duration-standard) var(--ease-out) forwards;
+    animation: animate-in 200ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
   }
 
   @keyframes animate-in {
@@ -296,7 +203,7 @@
   }
 
   .animate-fade-in {
-    animation: fade-in var(--duration-standard) var(--ease-out) forwards;
+    animation: fade-in 200ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
   }
 
   @keyframes fade-in {
@@ -305,7 +212,7 @@
   }
 
   .animate-slide-up {
-    animation: slide-up var(--duration-standard) var(--ease-out) forwards;
+    animation: slide-up 200ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
   }
 
   @keyframes slide-up {
@@ -320,7 +227,7 @@
   }
 
   .animate-scale-in {
-    animation: scale-in var(--duration-micro) var(--ease-out) forwards;
+    animation: scale-in 120ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
   }
 
   @keyframes scale-in {
