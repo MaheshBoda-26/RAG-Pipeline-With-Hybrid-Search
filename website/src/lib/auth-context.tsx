@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { useRouter, usePathname } from "next/navigation";
 
 interface User {
   user_id: string;
@@ -24,94 +23,21 @@ interface AuthContextType {
 const AuthContext = React.createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const [user, setUser] = React.useState<User | null>(null);
-  const [isLoading, setIsLoading] = React.useState(true);
   const [mode, setMode] = React.useState<"demo" | "user">("demo");
 
-  const fetchUser = React.useCallback(async () => {
-    try {
-      const res = await fetch("/api/auth/me", {
-        credentials: "include",
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setUser(data);
-        setMode("user");
-      } else {
-        setUser(null);
-        setMode("demo");
-      }
-    } catch {
-      setUser(null);
-      setMode("demo");
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  React.useEffect(() => {
-    fetchUser();
-  }, [fetchUser]);
-
-  const login = async (email: string, password: string) => {
-    const res = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ email, password }),
-    });
-
-    if (!res.ok) {
-      const data = await res.json();
-      throw new Error(data.error || data.detail || "Login failed");
-    }
-
-    await fetchUser();
-  };
-
-  const register = async (email: string, password: string, name?: string) => {
-    const res = await fetch("/api/auth/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ email, password, name }),
-    });
-
-    if (!res.ok) {
-      const data = await res.json();
-      throw new Error(data.error || data.detail || "Registration failed");
-    }
-
-    await fetchUser();
-  };
-
-  const logout = async () => {
-    await fetch("/api/auth/logout", {
-      method: "POST",
-      credentials: "include",
-    });
-    setUser(null);
-    setMode("demo");
-    router.push("/dashboard");
-    router.refresh();
-  };
-
-  const refreshUser = fetchUser;
-
+  // Always return demo mode - no authentication
   return (
     <AuthContext.Provider
       value={{
-        user,
-        isLoading,
-        isAuthenticated: !!user,
+        user: null,
+        isLoading: false,
+        isAuthenticated: false,
         mode,
         setMode,
-        login,
-        register,
-        logout,
-        refreshUser,
+        login: async () => {},
+        register: async () => {},
+        logout: async () => {},
+        refreshUser: async () => {},
       }}
     >
       {children}

@@ -3,10 +3,9 @@
 import * as React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { Menu, X, Sun, Moon, Github, LogIn, UserPlus, LayoutDashboard, LogOut } from "lucide-react";
+import { Menu, X, Sun, Moon, Github } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/lib/auth-context";
 
 const navLinks = [
   { href: "#features", label: "Features" },
@@ -37,7 +36,6 @@ export function Navigation() {
   const [isOpen, setIsOpen] = React.useState(false);
   const [isScrolled, setIsScrolled] = React.useState(false);
   const [isDark, setIsDark] = React.useState(false);
-  const { isAuthenticated, isLoading, logout } = useAuth();
 
   React.useEffect(() => {
     const handleScroll = () => {
@@ -61,21 +59,6 @@ export function Navigation() {
     localStorage.setItem("theme", newDark ? "dark" : "light");
     document.documentElement.classList.toggle("dark", newDark);
   };
-
-  const handleLogout = () => {
-    logout();
-    setIsOpen(false);
-  };
-
-  const authLinks = isAuthenticated
-    ? [
-        { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-        { href: "#", label: "Logout", icon: LogOut, onClick: handleLogout },
-      ]
-    : [
-        { href: "/auth/login", label: "Sign In", icon: LogIn },
-        { href: "/auth/register", label: "Get Started", icon: UserPlus, primary: true },
-      ];
 
   return (
     <motion.nav
@@ -144,35 +127,6 @@ export function Navigation() {
             >
               <Github className="w-5 h-5" />
             </motion.a>
-            {isLoading ? (
-              <Button className="bg-coral text-on-primary hover:bg-coral-active rounded-lg h-10 px-5" disabled>
-                Loading...
-              </Button>
-            ) : (
-              <>
-                {authLinks.map((link, index) => (
-                  <motion.a
-                    key={link.href}
-                    href={link.href}
-                    onClick={link.onClick}
-                    className={cn(
-                      "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200",
-                      link.primary
-                        ? "bg-coral text-on-primary hover:bg-coral-active"
-                        : "text-muted-foreground hover:text-ink hover:bg-accent"
-                    )}
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.05, duration: 0.3 }}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <link.icon className="w-4 h-4" />
-                    {link.label}
-                  </motion.a>
-                ))}
-              </>
-            )}
           </div>
 
           <button
@@ -233,33 +187,6 @@ export function Navigation() {
                 >
                   <Github className="w-5 h-5" />
                 </motion.a>
-                {isLoading ? (
-                  <Button className="bg-coral text-on-primary hover:bg-coral-active rounded-lg h-10 px-5" disabled>
-                    Loading...
-                  </Button>
-                ) : (
-                  authLinks.map((link, index) => (
-                    <motion.a
-                      key={link.href}
-                      href={link.href}
-                      onClick={link.onClick}
-                      className={cn(
-                        "flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium transition-all duration-200",
-                        link.primary
-                          ? "bg-coral text-on-primary hover:bg-coral-active"
-                          : "text-muted-foreground hover:text-ink hover:bg-accent"
-                      )}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.05 }}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      <link.icon className="w-5 h-5" />
-                      {link.label}
-                    </motion.a>
-                  ))
-                )}
               </div>
             </div>
           </motion.div>
