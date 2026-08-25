@@ -1,249 +1,180 @@
-"""Dense vector storage via Supabase (PostgreSQL + pgvector).
+"""Dense vector storage via Supabase REST API.
 
-Uses Supabase as the vector database backend with pgvector extension.
-Supports multi-tenancy via Row Level Security (RLS) or collection-based isolation.
+Uses Supabase Python client (supabase-py) to interact with PostgreSQL via REST API.
+This avoids pooler connection issues and is the recommended approach for Supabase.
 
 Requires:
 - Supabase project with pgvector extension enabled
-- Connection string with service role key for writes
+- Tables created via migration script
 """
 
 from __future__ import annotations
 
-import os
+import json
 import uuid
-from typing import Optional
-from contextlib import contextmanager
+from typing import Optional, List
 
-import psycopg2
-from psycopg2.extras import RealDictCursor, execute_values
-from psycopg2.pool import SimpleConnectionPool
-
+from supabase import create_client, Client
 from ingestion.chunking import Chunk
 
 
 class SupabaseVectorStore:
-    """Supabase-backed vector store with pgvector for similarity search."""
+    """Supabase-backed vector store using REST API."""
 
     def __init__(
         self,
-        db_url: str,
+        url: str,
+        service_key: str,
         collection_name: str,
         embedding_dim: int,
         user_id: Optional[str] = None,
-        min_connections: int = 1,
-        max_connections: int = 5,
     ):
         self.collection_name = collection_name
         self.embedding_dim = embedding_dim
         self.user_id = user_id
+        self.client: Client = create_client(url, service_key)
+        self._ensure_collection()
 
-        # Connection pool
-        self.pool = SimpleConnectionPool(min_connections, max_connections, db_url)
-        self._ensure_schema()
+    def _ensure_collection(self):
+        """Create collection if it doesn't exist."""
+        # Check if collection exists
+        result = self.client.table("collections").select("id").eq("name", self.collection_name).execute()
 
-    @contextmanager
-    def _conn(self):
-        """Get a connection from the pool."""
-        conn = self.pool.getconn()
-        try:
-            yield conn
-            conn.commit()
-        except Exception:
-            conn.rollback()
-            raise
-        finally:
-            self.pool.putconn(conn)
+        if result.data:
+            self.collection_id = result.data[0]["id"]
+        else:
+            # Create new collection
+            result = self.client.table("collections").insert({
+                "name": self.collection_name,
+                "user_id": self.user_id,
+                "embedding_dim": self.embedding_dim,
+            }).execute()
+            self.collection_id = result.data[0]["id"]
 
-    def _ensure_schema(self):
-        """Create tables and indexes if they don't exist."""
-        with self._conn() as conn:
-            with conn.cursor() as cur:
-                # Enable pgvector extension
-                cur.execute("CREATE EXTENSION IF NOT EXISTS vector;")
-
-                # Collections table for multi-tenant support
-                cur.execute("""
-                    CREATE TABLE IF NOT EXISTS collections (
-                        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-                        name TEXT UNIQUE NOT NULL,
-                        user_id TEXT,
-                        embedding_dim INTEGER NOT NULL,
-                        created_at TIMESTAMPTZ DEFAULT NOW()
-                    );
-                """)
-
-                # Create or get collection
-                cur.execute("""
-                    INSERT INTO collections (name, user_id, embedding_dim)
-                    VALUES (%s, %s, %s)
-                    ON CONFLICT (name) DO UPDATE SET
-                        embedding_dim = EXCLUDED.embedding_dim
-                    RETURNING id;
-                """, (self.collection_name, self.user_id, self.embedding_dim))
-                self.collection_id = cur.fetchone()[0]
-
-                # Vectors table with pgvector
-                cur.execute(f"""
-                    CREATE TABLE IF NOT EXISTS vectors (
-                        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-                        collection_id UUID REFERENCES collections(id) ON DELETE CASCADE,
-                        embedding vector({self.embedding_dim}),
-                        payload JSONB NOT NULL,
-                        created_at TIMESTAMPTZ DEFAULT NOW()
-                    );
-                """)
-
-                # Index for similarity search (IVFFlat)
-                cur.execute(f"""
-                    CREATE INDEX IF NOT EXISTS vectors_embedding_ivfflat_idx
-                    ON vectors USING ivfflat (embedding vector_cosine_ops)
-                    WITH (lists = 100);
-                """)
-
-                # Full-text search index for BM25 replacement
-                cur.execute("""
-                    ALTER TABLE vectors
-                    ADD COLUMN IF NOT EXISTS fts tsvector
-                    GENERATED ALWAYS AS (to_tsvector('english', payload->>'text')) STORED;
-                """)
-
-                cur.execute("""
-                    CREATE INDEX IF NOT EXISTS vectors_fts_gin_idx
-                    ON vectors USING GIN (fts);
-                """)
-
-    def upsert(self, chunks: list[Chunk], embeddings: list[list[float]]) -> None:
+    def upsert(self, chunks: List[Chunk], embeddings: List[List[float]]) -> None:
         """Insert or update vectors."""
         if not chunks:
             return
 
-        with self._conn() as conn:
-            with conn.cursor() as cur:
-                data = []
-                for chunk, embedding in zip(chunks, embeddings):
-                    # Convert embedding list to pgvector format
-                    vec_str = "[" + ",".join(str(x) for x in embedding) + "]"
-                    payload = {
-                        "text": chunk.text,
-                        "source": chunk.source,
-                        "chunk_index": chunk.chunk_index,
-                        "strategy": chunk.strategy,
-                        "char_count": chunk.char_count,
-                        "section_heading": chunk.section_heading,
-                    }
-                    data.append((
-                        str(uuid.uuid4()),
-                        self.collection_id,
-                        vec_str,
-                        payload,
-                    ))
+        # Prepare data for batch insert
+        data = []
+        for chunk, embedding in zip(chunks, embeddings):
+            # Convert embedding to string format for pgvector
+            vec_str = "[" + ",".join(str(x) for x in embedding) + "]"
+            payload = {
+                "text": chunk.text,
+                "source": chunk.source,
+                "chunk_index": chunk.chunk_index,
+                "strategy": chunk.strategy,
+                "char_count": chunk.char_count,
+                "section_heading": chunk.section_heading,
+            }
+            data.append({
+                "id": str(uuid.uuid4()),
+                "collection_id": self.collection_id,
+                "embedding": vec_str,
+                "payload": payload,
+            })
 
-                execute_values(
-                    cur,
-                    """
-                    INSERT INTO vectors (id, collection_id, embedding, payload)
-                    VALUES %s
-                    ON CONFLICT (id) DO UPDATE SET
-                        embedding = EXCLUDED.embedding,
-                        payload = EXCLUDED.payload
-                    """,
-                    data,
-                    template="(%s, %s, %s::vector, %s::jsonb)",
-                    page_size=100,
-                )
+        # Batch upsert using Supabase client
+        # Supabase doesn't have native upsert, so we use insert with on_conflict
+        self.client.table("vectors").upsert(data, on_conflict="id").execute()
 
-    def query(self, query_embedding: list[float], top_k: int) -> list[dict]:
-        """Return top-k similar vectors by cosine similarity."""
+    def query(self, query_embedding: List[float], top_k: int) -> List[dict]:
+        """Return top-k similar vectors by cosine similarity using RPC."""
         vec_str = "[" + ",".join(str(x) for x in query_embedding) + "]"
 
-        with self._conn() as conn:
-            with conn.cursor(cursor_factory=RealDictCursor) as cur:
-                cur.execute("""
-                    SELECT id, payload, embedding <=> %s::vector AS distance
-                    FROM vectors
-                    WHERE collection_id = %s
-                    ORDER BY distance ASC
-                    LIMIT %s
-                """, (vec_str, str(self.collection_id), top_k))
+        # Use RPC for similarity search
+        # We need to create a similarity search function in Supabase first
+        try:
+            result = self.client.rpc("match_vectors", {
+                "query_embedding": vec_str,
+                "match_collection_id": self.collection_id,
+                "match_count": top_k,
+            }).execute()
 
-                results = []
-                for row in cur.fetchall():
-                    results.append({
-                        "id": str(row["id"]),
-                        "score": 1.0 - float(row["distance"]),  # Convert distance to similarity
-                        "payload": row["payload"],
-                    })
-                return results
+            if result.data:
+                return [{
+                    "id": row["id"],
+                    "score": row["similarity"],
+                    "payload": row["payload"],
+                } for row in result.data]
+        except Exception:
+            # Fallback: fetch all and compute locally (for small datasets)
+            pass
+
+        # Fallback: fetch all vectors and compute similarity in Python
+        result = self.client.table("vectors").select("id, payload, embedding").eq("collection_id", self.collection_id).execute()
+
+        if not result.data:
+            return []
+
+        # Compute cosine similarity
+        import numpy as np
+        query_vec = np.array(query_embedding)
+        results = []
+        for row in result.data:
+            # Parse embedding string to list
+            emb_str = row["embedding"]
+            if isinstance(emb_str, str):
+                emb_list = [float(x) for x in emb_str.strip("[]").split(",")]
+            else:
+                emb_list = emb_str
+            emb_vec = np.array(emb_list)
+
+            # Cosine similarity
+            sim = np.dot(query_vec, emb_vec) / (np.linalg.norm(query_vec) * np.linalg.norm(emb_vec))
+            results.append({
+                "id": row["id"],
+                "score": float(sim),
+                "payload": row["payload"],
+            })
+
+        # Sort by similarity descending and return top_k
+        results.sort(key=lambda x: x["score"], reverse=True)
+        return results[:top_k]
 
     def count(self) -> int:
         """Count vectors in collection."""
-        with self._conn() as conn:
-            with conn.cursor() as cur:
-                cur.execute(
-                    "SELECT COUNT(*) FROM vectors WHERE collection_id = %s",
-                    (str(self.collection_id),)
-                )
-                return cur.fetchone()[0]
+        result = self.client.table("vectors").select("id", count="exact").eq("collection_id", self.collection_id).execute()
+        return result.count or 0
 
-    def all_chunks(self, with_vectors: bool = False) -> list[dict]:
+    def all_chunks(self, with_vectors: bool = False) -> List[dict]:
         """Scroll all chunks for BM25 rebuild and dedup seeding."""
-        with self._conn() as conn:
-            with conn.cursor(cursor_factory=RealDictCursor) as cur:
-                if with_vectors:
-                    cur.execute("""
-                        SELECT id, payload, embedding
-                        FROM vectors
-                        WHERE collection_id = %s
-                        ORDER BY created_at
-                    """, (str(self.collection_id),))
-                else:
-                    cur.execute("""
-                        SELECT id, payload
-                        FROM vectors
-                        WHERE collection_id = %s
-                        ORDER BY created_at
-                    """, (str(self.collection_id),))
+        select_cols = "id, payload" + (", embedding" if with_vectors else "")
+        result = self.client.table("vectors").select(select_cols).eq("collection_id", self.collection_id).order("created_at").execute()
 
-                results = []
-                for row in cur.fetchall():
-                    vec = None
-                    if with_vectors and row.get("embedding"):
-                        # pgvector returns as list
-                        vec = list(row["embedding"]) if isinstance(row["embedding"], (list, tuple)) else None
-                    results.append({
-                        "id": str(row["id"]),
-                        "payload": row["payload"],
-                        "vector": vec,
-                    })
-                return results
+        results = []
+        for row in result.data:
+            vec = None
+            if with_vectors and row.get("embedding"):
+                emb_str = row["embedding"]
+                if isinstance(emb_str, str):
+                    vec = [float(x) for x in emb_str.strip("[]").split(",")]
+                else:
+                    vec = emb_str
+            results.append({
+                "id": row["id"],
+                "payload": row["payload"],
+                "vector": vec,
+            })
+        return results
 
     def delete_by_source(self, source: str) -> int:
         """Delete all vectors for a source document."""
-        with self._conn() as conn:
-            with conn.cursor() as cur:
-                cur.execute("""
-                    DELETE FROM vectors
-                    WHERE collection_id = %s AND payload->>'source' = %s
-                    RETURNING id
-                """, (str(self.collection_id), source))
-                deleted = cur.rowcount
-                return deleted
-
-    def close(self):
-        """Close the connection pool."""
-        self.pool.closeall()
+        result = self.client.table("vectors").delete().eq("collection_id", self.collection_id).eq("payload->>source", source).execute()
+        return len(result.data) if result.data else 0
 
 
-# Factory function for easy instantiation from settings
 def create_supabase_store(settings, collection_name: str, user_id: Optional[str] = None) -> SupabaseVectorStore:
     """Create SupabaseVectorStore from settings."""
-    if not settings.supabase_db_url:
-        raise ValueError("SUPABASE_DB_URL not configured")
+    if not settings.supabase_url or not settings.supabase_service_key:
+        raise ValueError("SUPABASE_URL and SUPABASE_SERVICE_KEY must be configured")
     if not settings.use_supabase:
         raise ValueError("USE_SUPABASE is false")
     return SupabaseVectorStore(
-        db_url=settings.supabase_db_url,
+        url=settings.supabase_url,
+        service_key=settings.supabase_service_key,
         collection_name=collection_name,
         embedding_dim=settings.embedding_dim,
         user_id=user_id,
