@@ -42,7 +42,7 @@ def get_user_by_api_key(api_key: str) -> str | None:
     return None
 
 
-def create_user(name: str, email: str | None = None, password: str | None = None) -> tuple[str, str]:
+def create_user(name: str, email: str | None = None, password: str | None = None, role: str = "user") -> tuple[str, str]:
     """Create a new user. Returns (user_id, api_key)."""
     user_id = f"user_{secrets.token_urlsafe(8)}"
     api_key = f"sk_{secrets.token_urlsafe(32)}"
@@ -52,6 +52,7 @@ def create_user(name: str, email: str | None = None, password: str | None = None
         "email": email or name,
         "api_key": api_key,
         "created": datetime.now().isoformat(),
+        "role": role,
     }
     if password:
         import bcrypt
@@ -168,6 +169,18 @@ class Settings:
 
     # --- Upload limits ---
     max_file_size_mb: int = int(os.getenv("MAX_FILE_SIZE_MB", "10"))
+
+    # --- Cookie security ---
+    environment: str = os.getenv("ENVIRONMENT", "development")
+    cookie_secure: bool = field(default_factory=lambda: os.getenv("ENVIRONMENT", "development") == "production")
+    cookie_domain: str = field(default_factory=lambda: os.getenv("COOKIE_DOMAIN", ""))
+
+    # --- Supabase ---
+    supabase_url: str = os.getenv("SUPABASE_URL", "")
+    supabase_anon_key: str = os.getenv("SUPABASE_ANON_KEY", "")
+    supabase_service_key: str = os.getenv("SUPABASE_SERVICE_KEY", "")
+    supabase_db_url: str = os.getenv("SUPABASE_DB_URL", "")
+    use_supabase: bool = field(default_factory=lambda: os.getenv("USE_SUPABASE", "false").lower() == "true")
 
     def validate(self):
         if not self.nvidia_api_key:
