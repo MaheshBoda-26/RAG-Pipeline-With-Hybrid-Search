@@ -28,6 +28,7 @@ from retrieval.fusion import reciprocal_rank_fusion
 from retrieval.reranker import rerank
 from retrieval.sparse import BM25Index
 from retrieval.vector_store import QdrantVectorStore
+from retrieval.supabase_store import SupabaseVectorStore, create_supabase_store
 
 
 @dataclass
@@ -55,15 +56,21 @@ class RAGPipeline:
         # Get user-specific collection name
         collection_name = self.settings.get_collection_name(self.user_id)
 
-        self.vector_store = QdrantVectorStore(
-            path=self.settings.qdrant_path,
-            url=self.settings.qdrant_url,
-            collection_name=collection_name,
-            embedding_dim=self.settings.embedding_dim,
-            user_id=self.user_id,
-        )
+        # Choose vector store based on config
+        if self.settings.use_supabase:
+            self.vector_store = create_supabase_store(
+                self.settings, collection_name, self.user_id
+            )
+        else:
+            self.vector_store = QdrantVectorStore(
+                path=self.settings.qdrant_path,
+                url=self.settings.qdrant_url,
+                collection_name=collection_name,
+                embedding_dim=self.settings.embedding_dim,
+                user_id=self.user_id,
+            )
         self.bm25 = BM25Index(user_id=self.user_id)
-        self._rebuild_sparse_index()  # picks up anything already in Qdrant from a prior run
+        self._rebuild_sparse_index()  # picks up anything already in vector store from a prior run
 
     # ------------------------------------------------------------------
     # Ingestion

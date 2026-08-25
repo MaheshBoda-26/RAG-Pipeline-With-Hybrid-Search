@@ -7,7 +7,6 @@ POST /v1/ingest           {"path": "./sample_docs"}
 POST /v1/upload           multipart/form-data file upload
 GET  /v1/documents        list user's documents
 DELETE /v1/documents/{source}  delete a document
-POST /v1/users            create a new user (admin)
 POST /v1/auth/register    register new user
 POST /v1/auth/login       login user (returns JWT cookies)
 POST /v1/auth/refresh     refresh access token
@@ -20,6 +19,7 @@ import shutil
 from pathlib import Path
 from typing import Optional
 from datetime import timedelta
+import magic
 
 from fastapi import (
     FastAPI, HTTPException, Security, Depends, UploadFile, File, Form,
@@ -27,7 +27,12 @@ from fastapi import (
 )
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.responses import Response as StarletteResponse
 from pydantic import BaseModel
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
 from config import (
     settings, get_user_by_api_key, create_user, load_user_registry, save_user_registry,
@@ -39,14 +44,77 @@ from pipeline import RAGPipeline
 
 app = FastAPI(title="RAG Pipeline API")
 
+# Rate limiter
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
 # CORS middleware for frontend
+cors_origins = os.getenv("CORS_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000").split(",")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_origins=[o.strip() for o in cors_origins],
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "Cookie"],
+    expose_headers=["Retry-After"],
+    max_age=86400,
 )
+
+
+class RequestSizeLimitMiddleware(BaseHTTPMiddleware):
+    """Limit request body size globally."""
+
+    def __init__(self, app, max_size: int = 10 * 1024 * 1024):
+        super().__init__(app)
+        self.max_size = max_size
+
+    async def dispatch(self, request, call_next):
+        content_length = request.headers.get("content-length")
+        if content_length and int(content_length) > self.max_size:
+            return StarletteResponse("Request body too large", status_code=413)
+        return await call_next(request)
+
+
+app.add_middleware(RequestSizeLimitMiddleware, max_size=10 * 1024 * 1024)
+
+
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    """Add security headers to all responses."""
+
+    async def dispatch(self, request: Request, call_next):
+        response: StarletteResponse = await call_next(request)
+
+        # Security headers
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
+
+        # Remove server header to avoid leaking version info
+        if "server" in response.headers:
+            del response.headers["server"]
+
+        # Content-Security-Policy
+        csp = (
+            "default-src 'self'; "
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval'; "
+            "style-src 'self' 'unsafe-inline'; "
+            "img-src 'self' data: https:; "
+            "font-src 'self' data:; "
+            "connect-src 'self' http://localhost:8000 ws://localhost:8000;"
+        )
+        response.headers["Content-Security-Policy"] = csp
+
+        # Strict-Transport-Security (only on HTTPS)
+        if request.url.scheme == "https":
+            response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+
+        return response
+
+
+# Security headers middleware (added after CORS so it wraps all responses)
+app.add_middleware(SecurityHeadersMiddleware)
 
 
 @app.get("/")
@@ -61,7 +129,6 @@ def root():
             "upload": "POST /v1/upload",
             "documents": "GET /v1/documents",
             "delete_document": "DELETE /v1/documents/{source}",
-            "create_user": "POST /v1/users",
             "docs": "GET /docs",
             "openapi": "GET /openapi.json"
         }
@@ -151,6 +218,15 @@ async def verify_jwt_token(
     return user_id
 
 
+async def verify_admin(user_id: str = Depends(verify_jwt_token)) -> str:
+    """Verify the authenticated user has admin role."""
+    registry = load_user_registry()
+    user = registry.get(user_id)
+    if not user or user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    return user_id
+
+
 async def get_optional_user_id(
     request: Request,
     access_token: str | None = Cookie(default=None, alias="access_token")
@@ -172,6 +248,29 @@ async def get_optional_user_id(
     return user_id
 
 
+async def verify_demo_upload(
+    request: Request,
+    access_token: str | None = Cookie(default=None, alias="access_token")
+) -> str:
+    """
+    Verify token for demo upload endpoint.
+    Returns user_id if authenticated, otherwise returns "anonymous" for rate limiting.
+    """
+    token = access_token
+
+    if not token:
+        auth_header = request.headers.get("Authorization")
+        if auth_header and auth_header.startswith("Bearer "):
+            token = auth_header[7:]
+
+    if token:
+        user_id = get_user_id_from_token(token)
+        if user_id:
+            return user_id
+
+    return "anonymous"
+
+
 class AskRequest(BaseModel):
     question: str
 
@@ -182,17 +281,20 @@ class IngestRequest(BaseModel):
 
 class CreateUserRequest(BaseModel):
     name: str
+    role: str = "user"
 
 
+@limiter.limit("30/minute")
 @app.post("/v1/ask")
-async def ask(req: AskRequest, user_id: str = Depends(verify_jwt_token)):
+async def ask(request: Request, req: AskRequest, user_id: str = Depends(verify_jwt_token)):
     pipeline = get_pipeline(user_id)
     response = pipeline.ask(req.question)
     return response.__dict__
 
 
+@limiter.limit("10/minute")
 @app.post("/v1/ingest")
-async def ingest(req: IngestRequest, user_id: str = Depends(verify_jwt_token)):
+async def ingest(request: Request, req: IngestRequest, user_id: str = Depends(verify_jwt_token)):
     pipeline = get_pipeline(user_id)
     try:
         return pipeline.ingest_directory(req.path)
@@ -200,8 +302,10 @@ async def ingest(req: IngestRequest, user_id: str = Depends(verify_jwt_token)):
         raise HTTPException(status_code=400, detail=str(e))
 
 
+@limiter.limit("10/minute")
 @app.post("/v1/upload")
 async def upload(
+    request: Request,
     file: UploadFile = File(...),
     user_id: str = Depends(verify_jwt_token)
 ):
@@ -238,6 +342,30 @@ async def upload(
             status_code=400,
             detail="Invalid filename"
         )
+
+    # Validate MIME type from content
+    mime = magic.from_buffer(content, mime=True)
+    allowed_mimes = {
+        "application/pdf",
+        "text/plain",
+        "text/markdown",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "application/msword",
+    }
+    if mime not in allowed_mimes:
+        raise HTTPException(400, f"Invalid file type: {mime}. Allowed: PDF, TXT, MD, DOCX, DOC")
+
+    # Check extension matches MIME
+    ext_mime_map = {
+        ".pdf": "application/pdf",
+        ".txt": "text/plain",
+        ".md": "text/markdown",
+        ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        ".doc": "application/msword",
+    }
+    ext = Path(safe_filename).suffix.lower()
+    if ext in ext_mime_map and mime != ext_mime_map[ext]:
+        raise HTTPException(400, "File extension does not match content type")
 
     # Save to user's upload directory
     upload_dir = settings.get_user_upload_dir(user_id)
@@ -314,57 +442,24 @@ async def delete_document(source: str, user_id: str = Depends(verify_jwt_token))
     return {"message": f"Document deleted", "chunks_removed": deleted, "source": source}
 
 
-@app.post("/v1/users")
-def create_user_endpoint(req: CreateUserRequest):
-    """Create a new user with API key. Requires admin API key."""
-    # Simple admin check - in production use proper role-based auth
-    admin_key = os.getenv("ADMIN_API_KEY")
-    if not admin_key:
-        raise HTTPException(
-            status_code=503,
-            detail="User creation not configured. Set ADMIN_API_KEY."
-        )
-
-    # Verify admin key from header
-    # Note: In real app, use proper auth middleware
-    import inspect
-    frame = inspect.currentframe()
-    try:
-        # Can't easily get header here without Depends - require in body for simplicity
-        pass
-    finally:
-        del frame
-
-    user_id, api_key = create_user(req.name)
-    return {"user_id": user_id, "api_key": api_key, "name": req.name}
-
-
-# Admin endpoint to create users (with admin API key in header)
+# Admin endpoint to create users (requires authenticated admin user)
 @app.post("/v1/admin/users")
 async def admin_create_user(
     req: CreateUserRequest,
-    auth: HTTPAuthorizationCredentials = Security(security)
+    user_id: str = Depends(verify_admin)
 ):
-    """Create a new user. Requires ADMIN_API_KEY as Bearer token."""
-    admin_key = os.getenv("ADMIN_API_KEY")
-    if not admin_key or auth.credentials != admin_key:
-        raise HTTPException(status_code=403, detail="Admin access required")
-
-    user_id, api_key = create_user(req.name)
-    return {"user_id": user_id, "api_key": api_key, "name": req.name}
+    """Create a new user. Requires authenticated admin user."""
+    user_id, api_key = create_user(req.name, role=req.role)
+    return {"user_id": user_id, "api_key": api_key, "name": req.name, "role": req.role}
 
 
 @app.get("/v1/admin/users")
-async def admin_list_users(auth: HTTPAuthorizationCredentials = Security(security)):
-    """List all users. Requires ADMIN_API_KEY as Bearer token."""
-    admin_key = os.getenv("ADMIN_API_KEY")
-    if not admin_key or auth.credentials != admin_key:
-        raise HTTPException(status_code=403, detail="Admin access required")
-
+async def admin_list_users(user_id: str = Depends(verify_admin)):
+    """List all users. Requires authenticated admin user."""
     registry = load_user_registry()
     return {
         "users": [
-            {"user_id": uid, "name": info["name"], "created": info["created"]}
+            {"user_id": uid, "name": info["name"], "created": info["created"], "role": info.get("role", "user")}
             for uid, info in registry.items()
         ]
     }
@@ -390,23 +485,27 @@ class TokenResponse(BaseModel):
 
 def set_auth_cookies(response: Response, access_token: str, refresh_token: str):
     """Set HttpOnly cookies for auth tokens."""
+    secure = settings.cookie_secure
+    domain = settings.cookie_domain or None
     response.set_cookie(
         key="access_token",
         value=access_token,
         httponly=True,
-        secure=False,  # Set to True in production with HTTPS
+        secure=secure,
         samesite="lax",
         max_age=settings.access_token_expire_minutes * 60,
         path="/",
+        domain=domain,
     )
     response.set_cookie(
         key="refresh_token",
         value=refresh_token,
         httponly=True,
-        secure=False,
+        secure=secure,
         samesite="lax",
         max_age=settings.refresh_token_expire_days * 24 * 60 * 60,
         path="/",
+        domain=domain,
     )
 
 
@@ -416,8 +515,9 @@ def clear_auth_cookies(response: Response):
     response.delete_cookie(key="refresh_token", path="/")
 
 
+@limiter.limit("3/minute")
 @app.post("/v1/auth/register", response_model=TokenResponse)
-async def register(req: RegisterRequest, response: Response):
+async def register(request: Request, req: RegisterRequest, response: Response):
     """Register a new user and return JWT tokens in HttpOnly cookies."""
     # Check if user already exists
     existing_user_id = get_user_by_email(req.email)
@@ -437,8 +537,9 @@ async def register(req: RegisterRequest, response: Response):
     return TokenResponse(access_token=access_token, refresh_token=refresh_token)
 
 
+@limiter.limit("5/minute")
 @app.post("/v1/auth/login", response_model=TokenResponse)
-async def login(req: LoginRequest, response: Response):
+async def login(request: Request, req: LoginRequest, response: Response):
     """Login user and return JWT tokens in HttpOnly cookies."""
     user_id = get_user_by_email(req.email)
     if not user_id:
@@ -506,8 +607,9 @@ async def get_current_user(user_id: str = Depends(verify_jwt_token)):
 
 
 # --- Demo mode endpoint (uses global 'docs' collection) ---
+@limiter.limit("10/minute")
 @app.post("/v1/demo/ask")
-async def demo_ask(req: AskRequest):
+async def demo_ask(request: Request, req: AskRequest):
     """Ask question using demo/global collection (no auth required)."""
     pipeline = get_pipeline(settings.default_user_id)
     response = pipeline.ask(req.question)
@@ -523,11 +625,16 @@ async def demo_documents():
     return {"documents": docs, "total_documents": len(docs), "total_chunks": total_chunks}
 
 
+@limiter.limit("5/minute")
 @app.post("/v1/demo/upload")
 async def demo_upload(
+    request: Request,
     file: UploadFile = File(...),
 ):
     """Upload a document file and ingest it using demo/global collection (no auth required)."""
+    if user_id == "anonymous":
+        import logging
+        logging.getLogger(__name__).info("Demo upload by anonymous user")
     # Check if API key is configured before accepting uploads
     if not settings.nvidia_api_key or settings.nvidia_api_key in ("", "your-nvidia-key", "test-key"):
         raise HTTPException(
@@ -560,6 +667,30 @@ async def demo_upload(
             status_code=400,
             detail="Invalid filename"
         )
+
+    # Validate MIME type from content
+    mime = magic.from_buffer(content, mime=True)
+    allowed_mimes = {
+        "application/pdf",
+        "text/plain",
+        "text/markdown",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "application/msword",
+    }
+    if mime not in allowed_mimes:
+        raise HTTPException(400, f"Invalid file type: {mime}. Allowed: PDF, TXT, MD, DOCX, DOC")
+
+    # Check extension matches MIME
+    ext_mime_map = {
+        ".pdf": "application/pdf",
+        ".txt": "text/plain",
+        ".md": "text/markdown",
+        ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        ".doc": "application/msword",
+    }
+    ext = Path(safe_filename).suffix.lower()
+    if ext in ext_mime_map and mime != ext_mime_map[ext]:
+        raise HTTPException(400, "File extension does not match content type")
 
     # Save to demo upload directory
     upload_dir = settings.get_user_upload_dir(settings.default_user_id)

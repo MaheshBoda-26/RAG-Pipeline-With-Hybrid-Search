@@ -24,6 +24,7 @@ pypdf==4.2.0
 python-docx==1.1.2
 python-dotenv==1.0.0
 python-jose[cryptography]==3.3.0
+python-magic==0.4.27
 python-multipart==0.0.20
 qdrant-client==1.10.0
 rank_bm25==0.2.2
@@ -36,3 +37,6 @@ uvicorn==0.30.0
 uvloop==0.22.1
 watchfiles==1.2.0
 websockets==17.0.1
+slowapi==0.1.9
+psycopg2-binary==2.9.9
+supabase-py==2.10.0
