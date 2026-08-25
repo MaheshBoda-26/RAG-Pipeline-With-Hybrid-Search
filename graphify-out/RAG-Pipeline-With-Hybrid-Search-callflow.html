@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAG-Pipeline-With-Hybrid-Search — Complete Call Flow &amp; Architecture Documentation</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<style>
+:root {
+  --bg: #0f172a; --surface: #1e293b; --border: #334155;
+  --text: #e2e8f0; --muted: #94a3b8; --accent: #38bdf8;
+  --warn: #fbbf24; --err: #f87171; --ok: #34d399;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; }
+.container { max-width: 1200px; margin: 0 auto; padding: 40px 24px; }
+h1 { font-size: 2.4rem; margin-bottom: 8px; background: linear-gradient(135deg, var(--accent), #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+h2 { font-size: 1.7rem; margin: 48px 0 16px; padding-bottom: 8px; border-bottom: 2px solid var(--accent); }
+h3 { font-size: 1.25rem; margin: 32px 0 12px; color: var(--accent); }
+h4 { font-size: 1.05rem; margin: 20px 0 8px; color: var(--warn); }
+p { margin: 8px 0; color: var(--muted); }
+.subtitle { color: var(--muted); font-size: 1.1rem; margin-bottom: 32px; }
+.mermaid { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin: 20px 0; overflow-x: auto; position: relative; }
+.mermaid.is-enhanced { padding: 0; overflow: hidden; min-height: 260px; }
+.mermaid-viewport { padding: 54px 24px 24px; overflow: hidden; cursor: grab; touch-action: none; min-height: 260px; }
+.mermaid-viewport.is-dragging { cursor: grabbing; }
+.mermaid-viewport svg { max-width: none !important; height: auto; transform-origin: 0 0; transition: transform 120ms ease; }
+.mermaid-toolbar { position: absolute; top: 10px; right: 10px; z-index: 3; display: flex; align-items: center; gap: 6px; padding: 6px; background: rgba(15,23,42,0.92); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.28); }
+.mermaid-toolbar button, .mermaid-toolbar .zoom-level { height: 28px; min-width: 32px; border: 1px solid var(--border); border-radius: 6px; background: #1e293b; color: var(--text); font: 600 0.78rem system-ui, sans-serif; display: inline-flex; align-items: center; justify-content: center; }
+.mermaid-toolbar button { cursor: pointer; }
+.mermaid-toolbar button:hover { border-color: var(--accent); color: var(--accent); }
+.mermaid-toolbar .zoom-level { min-width: 52px; color: var(--muted); background: transparent; }
+.call-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.92rem; }
+.call-table th { background: #1a2744; color: var(--accent); text-align: left; padding: 10px 14px; border: 1px solid var(--border); }
+.call-table td { padding: 8px 14px; border: 1px solid var(--border); vertical-align: top; }
+.call-table tr:nth-child(even) { background: rgba(255,255,255,0.02); }
+.tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 600; }
+.tag-async { background: #7c3aed33; color: #a78bfa; }
+.tag-class { background: #05966933; color: var(--ok); }
+.tag-func { background: #2563eb33; color: var(--accent); }
+.tag-cmd { background: #d9770633; color: var(--warn); }
+.tag-endpoint { background: #dc262633; color: var(--err); }
+.tag-hook { background: #db277733; color: #f472b6; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin: 16px 0; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 16px; margin: 16px 0; }
+.arrow-chain { font-family: 'Fira Code', monospace; font-size: 0.85rem; color: var(--accent); padding: 10px; background: rgba(56,189,248,0.06); border-radius: 6px; }
+code { font-family: 'Fira Code', 'Cascadia Code', monospace; background: rgba(255,255,255,0.06); padding: 1px 6px; border-radius: 3px; font-size: 0.88em; }
+ul, ol { margin: 8px 0 8px 24px; color: var(--muted); }
+li { margin: 4px 0; }
+a { color: var(--accent); }
+hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+.nav { position: sticky; top: 0; background: var(--bg); z-index: 10; padding: 12px 0; border-bottom: 1px solid var(--border); display: flex; gap: 20px; flex-wrap: wrap; font-size: 0.9rem; }
+.nav a { text-decoration: none; }
+.nav a:hover { text-decoration: underline; }
+@media (max-width: 768px) { .container { padding: 16px; } h1 { font-size: 1.8rem; } }
+
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>RAG-Pipeline-With-Hybrid-Search — Complete Call Flow &amp; Architecture Documentation</h1>
+<p class="subtitle">Generated from graphify knowledge graph: 655 nodes, 1166 edges, 1 communities. Commit: unknown</p>
+
+<div class="nav">
+    <a href="#overview">Architecture Overview</a>
+    <a href="#serve-api">Serving API</a>
+</div>
+
+<!-- ====== Architecture Overview ====== -->
+<h2 id="overview">1. Architecture Overview</h2>
+
+<div class="mermaid">
+
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    SERVE_API_35EC8E86("Serving API<br/><small>655 nodes</small>")
+    class SERVE_API_35EC8E86 module;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<div class="grid">
+  <div class="card">
+    <h4>Architecture Layers</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>Layer</th><th>Nodes</th><th>Communities</th></tr>
+      <tr><td>Serving API</td><td>655</td><td><code>unknown</code></td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Core Flow</h4>
+    <div class="arrow-chain">Serving API</div>
+  </div>
+</div>
+<hr>
+<!-- ====== 2. Serving API ====== -->
+<h2 id="serve-api">2. Serving API</h2>
+<p>Serving API groups implementation around website, tests, test, apipy, mostly in website/package.json, api.py, tests/test_api.py. This section covers 655 nodes and 1166 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Serving API (655 nodes, 1166 edges)
+    subgraph serve_api_api_py_46f06b28["api.py"]
+        api_a033a528("api.py")
+        api_get_pipeline_cc6d4f9e("get_pipeline()<br/><small>api.py</small>")
+        api_verify_api_key_879c3fae("verify_api_key()<br/><small>api.py</small>")
+        api_verify_jwt_token_1c37474b("verify_jwt_token()<br/><small>api.py</small>")
+        api_get_optional_user_id_782d92a0("get_optional_user_id()<br/><small>api.py</small>")
+        api_ask_688fc572("ask()<br/><small>api.py</small>")
+        api_ingest_584f4411("ingest()<br/><small>api.py</small>")
+        api_upload_f7792ef7("upload()<br/><small>api.py</small>")
+        api_documents_5f84a427("documents()<br/><small>api.py</small>")
+        api_delete_document_97da60ca("delete_document()<br/><small>api.py</small>")
+    end
+    subgraph serve_api_config_py_6f2b8c72["config.py"]
+        config_get_user_by_api_key_bae3f166("get_user_by_api_key()<br/><small>config.py</small>")
+        config_get_user_id_from_token_0f86a0c7("get_user_id_from_token()<br/><small>config.py</small>")
+    end
+    subgraph serve_api_pipeline_py_4f1cd51d["pipeline.py"]
+        pipeline_992b5d66("pipeline.py")
+        pipeline_ragpipeline_76e985f9("RAGPipeline<br/><small>pipeline.py</small>")
+    end
+    website_src_app_page_bbd56732("page.tsx")
+    tests_eval_run_eval_7971e4b4("run_eval.py")
+    tests_eval_run_eval_mocked_0f9cef0c("run_eval_mocked.py")
+    tests_test_api_8a295473("test_api.py")
+    api_get_pipeline_cc6d4f9e -->|calls| pipeline_ragpipeline_76e985f9
+    api_verify_api_key_879c3fae -->|calls| config_get_user_by_api_key_bae3f166
+    api_verify_jwt_token_1c37474b -->|calls| config_get_user_id_from_token_0f86a0c7
+    api_get_optional_user_id_782d92a0 -->|calls| config_get_user_id_from_token_0f86a0c7
+    api_ask_688fc572 -->|calls| api_get_pipeline_cc6d4f9e
+    api_ingest_584f4411 -->|calls| api_get_pipeline_cc6d4f9e
+    api_upload_f7792ef7 -->|calls| api_get_pipeline_cc6d4f9e
+    api_documents_5f84a427 -->|calls| api_get_pipeline_cc6d4f9e
+    api_delete_document_97da60ca -->|calls| api_get_pipeline_cc6d4f9e
+    api_a033a528 -->|imports| pipeline_992b5d66
+    api_a033a528 -->|imports| config_get_user_by_api_key_bae3f166
+    api_a033a528 -->|imports| config_get_user_id_from_token_0f86a0c7
+    api_a033a528 -->|imports| pipeline_ragpipeline_76e985f9
+    tests_eval_run_eval_7971e4b4 -->|imports| pipeline_992b5d66
+    tests_eval_run_eval_7971e4b4 -->|imports| pipeline_ragpipeline_76e985f9
+    tests_eval_run_eval_mocked_0f9cef0c -->|imports| pipeline_992b5d66
+    tests_eval_run_eval_mocked_0f9cef0c -->|imports| pipeline_ragpipeline_76e985f9
+    tests_test_api_8a295473 -->|imports| pipeline_ragpipeline_76e985f9
+    api_get_pipeline_cc6d4f9e -->|uses| pipeline_ragpipeline_76e985f9
+    %% Omitted for readability: 637 nodes, 0 edges
+    class api_a033a528 api;
+    class api_get_pipeline_cc6d4f9e function;
+    class api_verify_api_key_879c3fae api;
+    class api_verify_jwt_token_1c37474b function;
+    class api_get_optional_user_id_782d92a0 function;
+    class api_ask_688fc572 function;
+    class api_ingest_584f4411 function;
+    class api_upload_f7792ef7 function;
+    class api_documents_5f84a427 function;
+    class api_delete_document_97da60ca function;
+    class config_get_user_by_api_key_bae3f166 api;
+    class config_get_user_id_from_token_0f86a0c7 function;
+    class pipeline_992b5d66 module;
+    class pipeline_ragpipeline_76e985f9 klass;
+    class website_src_app_page_bbd56732 ui;
+    class tests_eval_run_eval_7971e4b4 test;
+    class tests_eval_run_eval_mocked_0f9cef0c test;
+    class tests_test_api_8a295473 test;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>api.py</code><br><small style="color:var(--muted)">api.py</small></td>
+  <td><span class="tag tag-endpoint">API</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>config.py</code><br><small style="color:var(--muted)">config.py</small><br><code>create_access_token()</code><br><small style="color:var(--muted)">config.py</small><br><code>create_refresh_token()</code><br><small style="color:var(--muted)">config.py</small><br>+19 more</td>
+  <td>Module file in api.py.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>get</code><br><small style="color:var(--muted)"></small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>get node in project.</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td><code>root()</code><br><small style="color:var(--muted)">api.py</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>root() node in api.py.</td>
+</tr>
+<tr>
+  <td>4</td>
+  <td><code>health()</code><br><small style="color:var(--muted)">api.py</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>health() node in api.py.</td>
+</tr>
+<tr>
+  <td>5</td>
+  <td><code>get_pipeline()</code><br><small style="color:var(--muted)">api.py</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>ask()</code><br><small style="color:var(--muted)">api.py</small><br><code>delete_document()</code><br><small style="color:var(--muted)">api.py</small><br><code>demo_ask()</code><br><small style="color:var(--muted)">api.py</small><br>+5 more</td>
+  <td><code>RAGPipeline</code><br><small style="color:var(--muted)">pipeline.py</small></td>
+  <td>get_pipeline() node in api.py.</td>
+</tr>
+<tr>
+  <td>6</td>
+  <td><code>verify_api_key()</code><br><small style="color:var(--muted)">api.py</small></td>
+  <td><span class="tag tag-endpoint">API</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>get_user_by_api_key()</code><br><small style="color:var(--muted)">config.py</small></td>
+  <td>verify_api_key() node in api.py.</td>
+</tr>
+<tr>
+  <td>7</td>
+  <td><code>HTTPAuthorizationCredentials</code><br><small style="color:var(--muted)"></small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>HTTPAuthorizationCredentials node in project.</td>
+</tr>
+<tr>
+  <td>8</td>
+  <td><code>verify_jwt_token()</code><br><small style="color:var(--muted)">api.py</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>get_user_id_from_token()</code><br><small style="color:var(--muted)">config.py</small></td>
+  <td>verify_jwt_token() node in api.py.</td>
+</tr>
+<tr>
+  <td>9</td>
+  <td><code>Request</code><br><small style="color:var(--muted)"></small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Request node in project.</td>
+</tr>
+<tr>
+  <td>10</td>
+  <td><code>get_optional_user_id()</code><br><small style="color:var(--muted)">api.py</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>get_user_id_from_token()</code><br><small style="color:var(--muted)">config.py</small></td>
+  <td>get_optional_user_id() node in api.py.</td>
+</tr>
+<tr>
+  <td>11</td>
+  <td><code>AskRequest</code><br><small style="color:var(--muted)">api.py</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>AskRequest node in api.py.</td>
+</tr>
+<tr>
+  <td>12</td>
+  <td><code>BaseModel</code><br><small style="color:var(--muted)"></small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>BaseModel node in project.</td>
+</tr>
+<tr>
+  <td>13</td>
+  <td><code>IngestRequest</code><br><small style="color:var(--muted)">api.py</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Turns a local path or remote repository into analysis context.</td>
+</tr>
+<tr>
+  <td>14</td>
+  <td><code>CreateUserRequest</code><br><small style="color:var(--muted)">api.py</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>CreateUserRequest node in api.py.</td>
+</tr>
+<tr>
+  <td>15</td>
+  <td><code>post</code><br><small style="color:var(--muted)"></small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>post node in project.</td>
+</tr>
+<tr>
+  <td>16</td>
+  <td><code>ask()</code><br><small style="color:var(--muted)">api.py</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>get_pipeline()</code><br><small style="color:var(--muted)">api.py</small></td>
+  <td>ask() node in api.py.</td>
+</tr>
+<tr>
+  <td>17</td>
+  <td><code>ingest()</code><br><small style="color:var(--muted)">api.py</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>get_pipeline()</code><br><small style="color:var(--muted)">api.py</small></td>
+  <td>Turns a local path or remote repository into analysis context.</td>
+</tr>
+<tr>
+  <td>18</td>
+  <td><code>upload()</code><br><small style="color:var(--muted)">api.py</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>get_pipeline()</code><br><small style="color:var(--muted)">api.py</small></td>
+  <td>upload() node in api.py.</td>
+</tr>
+<tr>
+  <td>19</td>
+  <td><code>UploadFile</code><br><small style="color:var(--muted)"></small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>UploadFile node in project.</td>
+</tr>
+<tr>
+  <td>20</td>
+  <td><code>documents()</code><br><small style="color:var(--muted)">api.py</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>get_pipeline()</code><br><small style="color:var(--muted)">api.py</small></td>
+  <td>documents() node in api.py.</td>
+</tr>
+<tr>
+  <td>21</td>
+  <td><code>delete</code><br><small style="color:var(--muted)"></small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>delete node in project.</td>
+</tr>
+<tr>
+  <td>22</td>
+  <td><code>delete_document()</code><br><small style="color:var(--muted)">api.py</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>get_pipeline()</code><br><small style="color:var(--muted)">api.py</small></td>
+  <td>delete_document() node in api.py.</td>
+</tr>
+<tr>
+  <td>23</td>
+  <td><code>create_user_endpoint()</code><br><small style="color:var(--muted)">api.py</small></td>
+  <td><span class="tag tag-endpoint">API</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>create_user()</code><br><small style="color:var(--muted)">config.py</small></td>
+  <td>create_user_endpoint() node in api.py.</td>
+</tr>
+<tr>
+  <td>24</td>
+  <td><code>admin_create_user()</code><br><small style="color:var(--muted)">api.py</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>create_user()</code><br><small style="color:var(--muted)">config.py</small></td>
+  <td>admin_create_user() node in api.py.</td>
+</tr>
+<tr>
+  <td>25</td>
+  <td><code>admin_list_users()</code><br><small style="color:var(--muted)">api.py</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>load_user_registry()</code><br><small style="color:var(--muted)">config.py</small></td>
+  <td>admin_list_users() node in api.py.</td>
+</tr>
+<tr>
+  <td>26</td>
+  <td><code>RegisterRequest</code><br><small style="color:var(--muted)">api.py</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>RegisterRequest node in api.py.</td>
+</tr>
+<tr>
+  <td>27</td>
+  <td><code>LoginRequest</code><br><small style="color:var(--muted)">api.py</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>LoginRequest node in api.py.</td>
+</tr>
+<tr>
+  <td>28</td>
+  <td><code>TokenResponse</code><br><small style="color:var(--muted)">api.py</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td><code>login()</code><br><small style="color:var(--muted)">api.py</small><br><code>refresh_token()</code><br><small style="color:var(--muted)">api.py</small><br><code>register()</code><br><small style="color:var(--muted)">api.py</small></td>
+  <td>No direct outbound edge</td>
+  <td>TokenResponse node in api.py.</td>
+</tr>
+<tr>
+  <td>29</td>
+  <td><code>set_auth_cookies()</code><br><small style="color:var(--muted)">api.py</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>login()</code><br><small style="color:var(--muted)">api.py</small><br><code>refresh_token()</code><br><small style="color:var(--muted)">api.py</small><br><code>register()</code><br><small style="color:var(--muted)">api.py</small></td>
+  <td>No direct outbound edge</td>
+  <td>set_auth_cookies() node in api.py.</td>
+</tr>
+<tr>
+  <td>30</td>
+  <td><code>Response</code><br><small style="color:var(--muted)"></small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Response node in project.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>website/package.json</code></td><td>55 nodes</td></tr>
+<tr><td><code>api.py</code></td><td>49 nodes</td></tr>
+<tr><td><code>tests/test_api.py</code></td><td>42 nodes</td></tr>
+<tr><td><code>website/tsconfig.json</code></td><td>28 nodes</td></tr>
+<tr><td><code>config.py</code></td><td>26 nodes</td></tr>
+<tr><td><code>website/app.js</code></td><td>26 nodes</td></tr>
+<tr><td><code>tests/test_chunking.py</code></td><td>21 nodes</td></tr>
+<tr><td><code>tests/eval/run_eval_mocked.py</code></td><td>18 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: contains x302, calls x204, imports x168, imports x158. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<h2 id="stats">Project Statistics</h2>
+
+<div class="grid">
+  <div class="card">
+    <h4>Graph</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><td>Nodes</td><td>655</td></tr>
+      <tr><td>Edges</td><td>1166</td></tr>
+      <tr><td>Hyperedges</td><td>0</td></tr>
+      <tr><td>Communities</td><td>1</td></tr>
+      <tr><td>Documented Sections</td><td>1</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Edge Confidence</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><td>EXTRACTED</td><td>1132</td></tr>
+      <tr><td>INFERRED</td><td>34</td></tr>
+      <tr><td>AMBIGUOUS</td><td>0</td></tr>
+    </table>
+  </div>
+</div>
+
+<div style="text-align:center; padding:40px 0; color: var(--muted); font-size:0.9rem;">
+  <p>RAG-Pipeline-With-Hybrid-Search — Architecture Documentation</p>
+  <p>Generated: 2026-08-25 17:04 UTC · graphify callflow-html</p>
+</div>
+
+</div><!-- .container -->
+
+<script>
+(function () {
+  const mermaidConfig = {
+    startOnLoad: false,
+    theme: 'dark',
+    securityLevel: 'loose',
+    flowchart: { htmlLabels: true, useMaxWidth: true },
+    themeVariables: {
+      primaryColor: '#1e293b',
+      primaryTextColor: '#e2e8f0',
+      primaryBorderColor: '#38bdf8',
+      secondaryColor: '#0f172a',
+      tertiaryColor: '#334155',
+      lineColor: '#64748b',
+      textColor: '#e2e8f0',
+    }
+  };
+
+  mermaid.initialize(mermaidConfig);
+
+  function clamp(value, min, max) {
+    return Math.min(max, Math.max(min, value));
+  }
+
+  function enhanceMermaidDiagrams() {
+    document.querySelectorAll('.mermaid').forEach((container) => {
+      if (container.dataset.zoomReady === 'true') return;
+      const svg = container.querySelector('svg');
+      if (!svg) return;
+
+      container.dataset.zoomReady = 'true';
+      container.classList.add('is-enhanced');
+
+      const viewport = document.createElement('div');
+      viewport.className = 'mermaid-viewport';
+      svg.parentNode.insertBefore(viewport, svg);
+      viewport.appendChild(svg);
+
+      const toolbar = document.createElement('div');
+      toolbar.className = 'mermaid-toolbar';
+      toolbar.innerHTML = [
+        '<button type="button" data-action="zoom-out" title="Zoom out">-</button>',
+        '<span class="zoom-level" data-role="level">100%</span>',
+        '<button type="button" data-action="zoom-in" title="Zoom in">+</button>',
+        '<button type="button" data-action="fit" title="Fit width">Fit</button>',
+        '<button type="button" data-action="reset" title="Reset view">Reset</button>'
+      ].join('');
+      container.insertBefore(toolbar, viewport);
+
+      const state = { scale: 1, x: 0, y: 0, dragging: false, startX: 0, startY: 0, originX: 0, originY: 0 };
+      const level = toolbar.querySelector('[data-role="level"]');
+
+      function applyTransform() {
+        svg.style.transform = `translate(${state.x}px, ${state.y}px) scale(${state.scale})`;
+        level.textContent = `${Math.round(state.scale * 100)}%`;
+      }
+
+      function zoomBy(delta) {
+        state.scale = clamp(state.scale + delta, 0.25, 3);
+        applyTransform();
+      }
+
+      function reset() {
+        state.scale = 1;
+        state.x = 0;
+        state.y = 0;
+        applyTransform();
+      }
+
+      function fitWidth() {
+        const rawWidth = svg.viewBox && svg.viewBox.baseVal && svg.viewBox.baseVal.width
+          ? svg.viewBox.baseVal.width
+          : svg.getBoundingClientRect().width / state.scale;
+        if (!rawWidth) {
+          reset();
+          return;
+        }
+        state.scale = clamp((viewport.clientWidth - 48) / rawWidth, 0.25, 1.4);
+        state.x = 0;
+        state.y = 0;
+        applyTransform();
+      }
+
+      toolbar.addEventListener('click', (event) => {
+        const button = event.target.closest('button[data-action]');
+        if (!button) return;
+        const action = button.dataset.action;
+        if (action === 'zoom-in') zoomBy(0.15);
+        if (action === 'zoom-out') zoomBy(-0.15);
+        if (action === 'fit') fitWidth();
+        if (action === 'reset') reset();
+      });
+
+      viewport.addEventListener('wheel', (event) => {
+        if (!event.ctrlKey && !event.metaKey) return;
+        event.preventDefault();
+        zoomBy(event.deltaY < 0 ? 0.1 : -0.1);
+      }, { passive: false });
+
+      viewport.addEventListener('pointerdown', (event) => {
+        if (event.button !== 0) return;
+        state.dragging = true;
+        state.startX = event.clientX;
+        state.startY = event.clientY;
+        state.originX = state.x;
+        state.originY = state.y;
+        viewport.classList.add('is-dragging');
+        viewport.setPointerCapture(event.pointerId);
+      });
+
+      viewport.addEventListener('pointermove', (event) => {
+        if (!state.dragging) return;
+        state.x = state.originX + event.clientX - state.startX;
+        state.y = state.originY + event.clientY - state.startY;
+        applyTransform();
+      });
+
+      function endDrag(event) {
+        if (!state.dragging) return;
+        state.dragging = false;
+        viewport.classList.remove('is-dragging');
+        if (viewport.hasPointerCapture(event.pointerId)) {
+          viewport.releasePointerCapture(event.pointerId);
+        }
+      }
+
+      viewport.addEventListener('pointerup', endDrag);
+      viewport.addEventListener('pointercancel', endDrag);
+      applyTransform();
+    });
+  }
+
+  function renderMermaid() {
+    const result = mermaid.run
+      ? mermaid.run({ querySelector: '.mermaid' })
+      : Promise.resolve();
+    Promise.resolve(result)
+      .then(enhanceMermaidDiagrams)
+      .catch((error) => {
+        console.error('Mermaid render failed:', error);
+        enhanceMermaidDiagrams();
+      });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', renderMermaid);
+  } else {
+    renderMermaid();
+  }
+})();
+</script>
+
+</body>
+</html>
