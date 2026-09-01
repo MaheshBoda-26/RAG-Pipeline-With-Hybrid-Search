@@ -14,7 +14,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import numpy as np
 
-EMBED_DIM = 1536
+EMBED_DIM = 768
 
 
 def fake_embedding(text: str) -> list[float]:
@@ -97,6 +97,7 @@ def run():
 
         settings = Settings()
         settings.qdrant_path = qdrant_tmp
+        settings.use_supabase = False
         settings.chunking_strategy = "recursive"
         settings.embedding_dim = EMBED_DIM
 
