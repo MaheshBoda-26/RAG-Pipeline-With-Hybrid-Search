@@ -103,11 +103,11 @@ def create_refresh_token(user_id: str) -> str:
 
 def decode_token(token: str) -> dict | None:
     """Decode and validate JWT token."""
-    from jose import jwt
+    from jose import jwt, JWTError
     try:
         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
         return payload
-    except jwt.PyJWTError:
+    except JWTError:
         return None
 
 

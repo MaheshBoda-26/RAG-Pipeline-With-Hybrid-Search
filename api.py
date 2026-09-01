@@ -98,10 +98,10 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         # Content-Security-Policy
         csp = (
             "default-src 'self'; "
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval'; "
-            "style-src 'self' 'unsafe-inline'; "
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; "
+            "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
             "img-src 'self' data: https:; "
-            "font-src 'self' data:; "
+            "font-src 'self' data: https://cdn.jsdelivr.net; "
             "connect-src 'self' http://localhost:8000 ws://localhost:8000;"
         )
         response.headers["Content-Security-Policy"] = csp
@@ -218,7 +218,44 @@ async def verify_jwt_token(
     return user_id
 
 
-async def verify_admin(user_id: str = Depends(verify_jwt_token)) -> str:
+async def verify_auth(
+    request: Request,
+    access_token: str | None = Cookie(default=None, alias="access_token")
+) -> str:
+    """
+    Verify authentication via JWT token OR API key.
+    Checks JWT first (cookie or Authorization header), then falls back to API key.
+    """
+    # Try JWT token first (from cookie)
+    token = access_token
+    if not token:
+        auth_header = request.headers.get("Authorization")
+        if auth_header and auth_header.startswith("Bearer "):
+            token = auth_header[7:]
+
+    if token:
+        # Try JWT
+        user_id = get_user_id_from_token(token)
+        if user_id:
+            return user_id
+
+        # Try API key
+        user_id = get_user_by_api_key(token)
+        if user_id:
+            return user_id
+
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid or expired token/API key."
+        )
+
+    raise HTTPException(
+        status_code=401,
+        detail="Not authenticated. Please login or provide API key."
+    )
+
+
+async def verify_admin(user_id: str = Depends(verify_auth)) -> str:
     """Verify the authenticated user has admin role."""
     registry = load_user_registry()
     user = registry.get(user_id)
@@ -286,7 +323,7 @@ class CreateUserRequest(BaseModel):
 
 @limiter.limit("30/minute")
 @app.post("/v1/ask")
-async def ask(request: Request, req: AskRequest, user_id: str = Depends(verify_jwt_token)):
+async def ask(request: Request, req: AskRequest, user_id: str = Depends(verify_auth)):
     pipeline = get_pipeline(user_id)
     response = pipeline.ask(req.question)
     return response.__dict__
@@ -294,7 +331,7 @@ async def ask(request: Request, req: AskRequest, user_id: str = Depends(verify_j
 
 @limiter.limit("10/minute")
 @app.post("/v1/ingest")
-async def ingest(request: Request, req: IngestRequest, user_id: str = Depends(verify_jwt_token)):
+async def ingest(request: Request, req: IngestRequest, user_id: str = Depends(verify_auth)):
     pipeline = get_pipeline(user_id)
     try:
         return pipeline.ingest_directory(req.path)
@@ -307,7 +344,7 @@ async def ingest(request: Request, req: IngestRequest, user_id: str = Depends(ve
 async def upload(
     request: Request,
     file: UploadFile = File(...),
-    user_id: str = Depends(verify_jwt_token)
+    user_id: str = Depends(verify_auth)
 ):
     """Upload a document file and ingest it."""
     # Check if API key is configured before accepting uploads
@@ -419,7 +456,7 @@ async def upload(
 
 
 @app.get("/v1/documents")
-async def documents(user_id: str = Depends(verify_jwt_token)):
+async def documents(user_id: str = Depends(verify_auth)):
     pipeline = get_pipeline(user_id)
     docs = pipeline.list_documents()
     total_chunks = sum(d.get("chunk_count", 0) for d in docs)
@@ -427,7 +464,7 @@ async def documents(user_id: str = Depends(verify_jwt_token)):
 
 
 @app.delete("/v1/documents/{source:path}")
-async def delete_document(source: str, user_id: str = Depends(verify_jwt_token)):
+async def delete_document(source: str, user_id: str = Depends(verify_auth)):
     pipeline = get_pipeline(user_id)
     deleted = pipeline.delete_document(source)
     if deleted == 0:
@@ -593,7 +630,7 @@ async def logout(response: Response):
 
 
 @app.get("/v1/auth/me")
-async def get_current_user(user_id: str = Depends(verify_jwt_token)):
+async def get_current_user(user_id: str = Depends(verify_auth)):
     """Get current authenticated user info."""
     registry = load_user_registry()
     user = registry.get(user_id)
@@ -632,9 +669,9 @@ async def demo_upload(
     file: UploadFile = File(...),
 ):
     """Upload a document file and ingest it using demo/global collection (no auth required)."""
-    if user_id == "anonymous":
-        import logging
-        logging.getLogger(__name__).info("Demo upload by anonymous user")
+    user_id = settings.default_user_id
+    import logging
+    logging.getLogger(__name__).info("Demo upload by anonymous user")
     # Check if API key is configured before accepting uploads
     if not settings.nvidia_api_key or settings.nvidia_api_key in ("", "your-nvidia-key", "test-key"):
         raise HTTPException(
