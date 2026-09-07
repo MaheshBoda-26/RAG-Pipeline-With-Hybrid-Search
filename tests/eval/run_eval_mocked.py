@@ -17,7 +17,7 @@ import numpy as np
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-EMBED_DIM = 1536
+EMBED_DIM = 768
 
 
 def fake_embedding(text: str) -> list[float]:
@@ -96,7 +96,7 @@ class FakeChatAPI:
 
 
 class FakeOpenAI:
-    def __init__(self, api_key=None):
+    def __init__(self, api_key=None, base_url=None, **kwargs):
         self.embeddings = FakeEmbeddingsAPI()
         self.chat = mock.Mock(completions=FakeChatAPI())
 
