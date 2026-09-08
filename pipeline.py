@@ -205,10 +205,12 @@ class RAGPipeline:
             return AskResponse(
                 question=question,
                 answer=(
-                    "I couldn't find enough relevant information in the indexed "
-                    "documentation to answer this confidently. You may want to "
-                    "check the following documents manually: "
-                    + ", ".join(sorted({c["payload"]["source"] for c in candidate_pool[:3]}))
+                    (
+                        "I couldn't find enough relevant information in the indexed "
+                        "documentation to answer this confidently. You may want to "
+                        "check the following documents manually: "
+                        + ", ".join(sorted({c["payload"]["source"] for c in candidate_pool[:3]}))
+                    )
                     if candidate_pool else
                     "I couldn't find any relevant information in the indexed documentation."
                 ),

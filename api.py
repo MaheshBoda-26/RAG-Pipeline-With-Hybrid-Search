@@ -155,6 +155,15 @@ def get_pipeline(user_id: str) -> RAGPipeline:
 security = HTTPBearer(auto_error=False)
 
 
+def _get_token_from_request(request: Request, access_token: str | None = None) -> str | None:
+    token = access_token
+    if not token:
+        auth_header = request.headers.get("Authorization")
+        if auth_header and auth_header.startswith("Bearer "):
+            token = auth_header[7:]
+    return token
+
+
 async def verify_api_key(auth: HTTPAuthorizationCredentials = Security(security)) -> str:
     """
     Verify API key and return user_id.
@@ -194,13 +203,7 @@ async def verify_jwt_token(
     Verify JWT token from HttpOnly cookie and return user_id.
     Supports both cookie and Authorization header (for backward compatibility).
     """
-    token = access_token
-
-    # Fallback to Authorization header if no cookie
-    if not token:
-        auth_header = request.headers.get("Authorization")
-        if auth_header and auth_header.startswith("Bearer "):
-            token = auth_header[7:]
+    token = _get_token_from_request(request, access_token)
 
     if not token:
         raise HTTPException(
@@ -226,12 +229,7 @@ async def verify_auth(
     Verify authentication via JWT token OR API key.
     Checks JWT first (cookie or Authorization header), then falls back to API key.
     """
-    # Try JWT token first (from cookie)
-    token = access_token
-    if not token:
-        auth_header = request.headers.get("Authorization")
-        if auth_header and auth_header.startswith("Bearer "):
-            token = auth_header[7:]
+    token = _get_token_from_request(request, access_token)
 
     if token:
         # Try JWT
@@ -271,12 +269,7 @@ async def get_optional_user_id(
     """
     Get user_id if authenticated, otherwise return None (for demo mode).
     """
-    token = access_token
-
-    if not token:
-        auth_header = request.headers.get("Authorization")
-        if auth_header and auth_header.startswith("Bearer "):
-            token = auth_header[7:]
+    token = _get_token_from_request(request, access_token)
 
     if not token:
         return None
@@ -293,12 +286,7 @@ async def verify_demo_upload(
     Verify token for demo upload endpoint.
     Returns user_id if authenticated, otherwise returns "anonymous" for rate limiting.
     """
-    token = access_token
-
-    if not token:
-        auth_header = request.headers.get("Authorization")
-        if auth_header and auth_header.startswith("Bearer "):
-            token = auth_header[7:]
+    token = _get_token_from_request(request, access_token)
 
     if token:
         user_id = get_user_id_from_token(token)
@@ -339,14 +327,8 @@ async def ingest(request: Request, req: IngestRequest, user_id: str = Depends(ve
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@limiter.limit("10/minute")
-@app.post("/v1/upload")
-async def upload(
-    request: Request,
-    file: UploadFile = File(...),
-    user_id: str = Depends(verify_auth)
-):
-    """Upload a document file and ingest it."""
+async def _process_file_upload(file: UploadFile, user_id: str) -> dict:
+    """Process file upload: validation, saving, and ingestion."""
     # Check if API key is configured before accepting uploads
     if not settings.nvidia_api_key or settings.nvidia_api_key in ("", "your-nvidia-key", "test-key"):
         raise HTTPException(
@@ -453,6 +435,17 @@ async def upload(
     except Exception as e:
         # Unknown errors - keep file for debugging
         raise HTTPException(status_code=500, detail=f"Failed to process file: {str(e)}")
+
+
+@limiter.limit("10/minute")
+@app.post("/v1/upload")
+async def upload(
+    request: Request,
+    file: UploadFile = File(...),
+    user_id: str = Depends(verify_auth)
+):
+    """Upload a document file and ingest it."""
+    return await _process_file_upload(file, user_id)
 
 
 @app.get("/v1/documents")
@@ -669,115 +662,9 @@ async def demo_upload(
     file: UploadFile = File(...),
 ):
     """Upload a document file and ingest it using demo/global collection (no auth required)."""
-    user_id = settings.default_user_id
     import logging
     logging.getLogger(__name__).info("Demo upload by anonymous user")
-    # Check if API key is configured before accepting uploads
-    if not settings.nvidia_api_key or settings.nvidia_api_key in ("", "your-nvidia-key", "test-key"):
-        raise HTTPException(
-            status_code=503,
-            detail="Embedding service not configured. Set NVIDIA_API_KEY in .env file."
-        )
-
-    # Validate file size
-    max_size = settings.max_file_size_mb * 1024 * 1024
-    content = await file.read()
-    if len(content) > max_size:
-        raise HTTPException(
-            status_code=413,
-            detail=f"File too large. Maximum size: {settings.max_file_size_mb}MB"
-        )
-
-    # Validate file extension
-    allowed_exts = {".pdf", ".txt", ".md", ".docx", ".doc"}
-    ext = Path(file.filename).suffix.lower()
-    if ext not in allowed_exts:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Unsupported file type: {ext}. Allowed: {', '.join(sorted(allowed_exts))}"
-        )
-
-    # Validate filename (no path traversal)
-    safe_filename = Path(file.filename).name
-    if not safe_filename or safe_filename.startswith("."):
-        raise HTTPException(
-            status_code=400,
-            detail="Invalid filename"
-        )
-
-    # Validate MIME type from content
-    mime = magic.from_buffer(content, mime=True)
-    allowed_mimes = {
-        "application/pdf",
-        "text/plain",
-        "text/markdown",
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        "application/msword",
-    }
-    if mime not in allowed_mimes:
-        raise HTTPException(400, f"Invalid file type: {mime}. Allowed: PDF, TXT, MD, DOCX, DOC")
-
-    # Check extension matches MIME
-    ext_mime_map = {
-        ".pdf": "application/pdf",
-        ".txt": "text/plain",
-        ".md": "text/markdown",
-        ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        ".doc": "application/msword",
-    }
-    ext = Path(safe_filename).suffix.lower()
-    if ext in ext_mime_map and mime != ext_mime_map[ext]:
-        raise HTTPException(400, "File extension does not match content type")
-
-    # Save to demo upload directory
-    upload_dir = settings.get_user_upload_dir(settings.default_user_id)
-    upload_dir.mkdir(parents=True, exist_ok=True)
-
-    # Add UUID prefix to avoid filename collisions
-    import uuid
-    unique_filename = f"{uuid.uuid4().hex[:8]}_{safe_filename}"
-    file_path = upload_dir / unique_filename
-
-    try:
-        with open(file_path, "wb") as f:
-            f.write(content)
-
-        # Ingest the file - pass original filename for better source tracking
-        pipeline = get_pipeline(settings.default_user_id)
-        result = pipeline.ingest_file(str(file_path), original_filename=safe_filename, user_id=settings.default_user_id)
-        return {
-            "message": "File uploaded and indexed",
-            "file": safe_filename,
-            "stored_as": unique_filename,
-            **result
-        }
-    except HTTPException:
-        # Clean up on failure
-        if file_path.exists():
-            file_path.unlink()
-        raise
-    except RuntimeError as e:
-        # Embedding/indexing service errors - keep file for retry
-        error_msg = str(e)
-        if "AuthenticationError" in error_msg or "401" in error_msg:
-            raise HTTPException(
-                status_code=503,
-                detail=f"Embedding API authentication failed. Check NVIDIA_API_KEY in .env"
-            )
-        if "404" in error_msg and "model" in error_msg.lower():
-            raise HTTPException(
-                status_code=503,
-                detail=f"Embedding model not found. Check EMBEDDING_MODEL in .env"
-            )
-        raise HTTPException(status_code=502, detail=f"Indexing service unavailable: {error_msg}")
-    except ValueError as e:
-        # Path validation / file format errors - clean up file
-        if file_path.exists():
-            file_path.unlink()
-        raise HTTPException(status_code=400, detail=f"Invalid file: {str(e)}")
-    except Exception as e:
-        # Unknown errors - keep file for debugging
-        raise HTTPException(status_code=500, detail=f"Failed to process file: {str(e)}")
+    return await _process_file_upload(file, settings.default_user_id)
 
 
 # Import decode_token for refresh endpoint
