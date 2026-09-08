@@ -65,6 +65,11 @@ class QdrantVectorStore:
                 # Single unnamed vector
                 size = vectors_config.size
             if size != self.embedding_dim:
+                import logging
+                logging.getLogger(__name__).warning(
+                    "Qdrant collection '%s' dimension mismatch (%s != %s). Recreating collection.",
+                    self.collection_name, size, self.embedding_dim
+                )
                 self.client.delete_collection(self.collection_name)
                 self.client.create_collection(
                     collection_name=self.collection_name,
