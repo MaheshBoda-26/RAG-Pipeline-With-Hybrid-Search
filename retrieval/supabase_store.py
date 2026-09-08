@@ -70,7 +70,7 @@ class SupabaseVectorStore:
                 "section_heading": chunk.section_heading,
             }
             data.append({
-                "id": str(uuid.uuid4()),
+                "id": chunk.id,
                 "collection_id": self.collection_id,
                 "embedding": vec_str,
                 "payload": payload,
@@ -99,9 +99,9 @@ class SupabaseVectorStore:
                     "score": row["similarity"],
                     "payload": row["payload"],
                 } for row in result.data]
-        except Exception:
+        except Exception as e:
+            print(f"WARNING: RPC match_vectors failed ({e}), using fallback")
             # Fallback: fetch all and compute locally (for small datasets)
-            pass
 
         # Fallback: fetch all vectors and compute similarity in Python
         result = self.client.table("vectors").select("id, payload, embedding").eq("collection_id", self.collection_id).execute()
