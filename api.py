@@ -449,7 +449,7 @@ async def upload(
         # Path validation / file format errors - clean up file
         if file_path.exists():
             file_path.unlink()
-        raise HTTPException(status_code=400, detail=f"Invalid file: {error_msg}")
+        raise HTTPException(status_code=400, detail=f"Invalid file: {str(e)}")
     except Exception as e:
         # Unknown errors - keep file for debugging
         raise HTTPException(status_code=500, detail=f"Failed to process file: {str(e)}")
@@ -774,7 +774,7 @@ async def demo_upload(
         # Path validation / file format errors - clean up file
         if file_path.exists():
             file_path.unlink()
-        raise HTTPException(status_code=400, detail=f"Invalid file: {error_msg}")
+        raise HTTPException(status_code=400, detail=f"Invalid file: {str(e)}")
     except Exception as e:
         # Unknown errors - keep file for debugging
         raise HTTPException(status_code=500, detail=f"Failed to process file: {str(e)}")
