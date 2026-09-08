@@ -73,10 +73,10 @@ def verify_user_password(user_id: str, password: str) -> bool:
 
 
 def get_user_by_email(email: str) -> str | None:
-    """Look up user_id by email (stored as email field or name for backward compat)."""
+    """Look up user_id by email."""
     registry = load_user_registry()
     for uid, info in registry.items():
-        if info.get("email") == email or info.get("name") == email:
+        if info.get("email") == email:
             return uid
     return None
 
@@ -172,8 +172,12 @@ class Settings:
 
     # --- Cookie security ---
     environment: str = os.getenv("ENVIRONMENT", "development")
-    cookie_secure: bool = field(default_factory=lambda: os.getenv("ENVIRONMENT", "development") == "production")
     cookie_domain: str = field(default_factory=lambda: os.getenv("COOKIE_DOMAIN", ""))
+
+    @property
+    def cookie_secure(self) -> bool:
+        """Compute secure flag from environment."""
+        return os.getenv("ENVIRONMENT", "development").lower() == "production"
 
     # --- Supabase ---
     supabase_url: str = os.getenv("SUPABASE_URL", "")
