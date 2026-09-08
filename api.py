@@ -298,6 +298,7 @@ async def verify_demo_upload(
 
 class AskRequest(BaseModel):
     question: str
+    source: str | None = None
 
 
 class IngestRequest(BaseModel):
@@ -313,7 +314,7 @@ class CreateUserRequest(BaseModel):
 @app.post("/v1/ask")
 async def ask(request: Request, req: AskRequest, user_id: str = Depends(verify_auth)):
     pipeline = get_pipeline(user_id)
-    response = pipeline.ask(req.question)
+    response = pipeline.ask(req.question, source=req.source)
     return response.__dict__
 
 
@@ -642,7 +643,7 @@ async def get_current_user(user_id: str = Depends(verify_auth)):
 async def demo_ask(request: Request, req: AskRequest):
     """Ask question using demo/global collection (no auth required)."""
     pipeline = get_pipeline(settings.default_user_id)
-    response = pipeline.ask(req.question)
+    response = pipeline.ask(req.question, source=req.source)
     return response.__dict__
 
 

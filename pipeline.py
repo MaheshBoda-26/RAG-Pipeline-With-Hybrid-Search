@@ -181,11 +181,24 @@ class RAGPipeline:
     # ------------------------------------------------------------------
     # Retrieval + generation
     # ------------------------------------------------------------------
-    def ask(self, question: str) -> AskResponse:
+    def ask(self, question: str, source: str | None = None) -> AskResponse:
         query_embedding = self.embedder.embed_one(question)
 
-        dense = self.vector_store.query(query_embedding, self.settings.dense_top_k)
-        sparse = self.bm25.query(question, self.settings.sparse_top_k)
+        # If a specific source is targeted, query a larger initial pool to ensure chunks are captured
+        dense_k = max(self.settings.dense_top_k * 3, 50) if (source and source.lower() != "all") else self.settings.dense_top_k
+        sparse_k = max(self.settings.sparse_top_k * 3, 50) if (source and source.lower() != "all") else self.settings.sparse_top_k
+
+        dense = self.vector_store.query(query_embedding, dense_k)
+        sparse = self.bm25.query(question, sparse_k)
+
+        if source and source.strip() and source.lower() != "all":
+            src_target = source.strip()
+            def _matches_source(item: dict) -> bool:
+                p_src = item.get("payload", {}).get("source", "")
+                return p_src == src_target or Path(p_src).name == Path(src_target).name
+
+            dense = [c for c in dense if _matches_source(c)]
+            sparse = [c for c in sparse if _matches_source(c)]
 
         fused = reciprocal_rank_fusion(
             dense, sparse,
