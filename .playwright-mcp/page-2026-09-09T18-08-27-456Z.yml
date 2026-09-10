@@ -1,0 +1,86 @@
+- generic [ref=f1e2]:
+  - generic [ref=f1e11]:
+    - heading "⚙️ RAG Studio Settings" [level=1] [ref=f1e15]
+    - group [ref=f1e18]:
+      - generic "keyboard_arrow_down API Connection" [ref=f1e19] [cursor=pointer]:
+        - generic [ref=f1e20]:
+          - generic [ref=f1e21]: keyboard_arrow_down
+          - paragraph [ref=f1e25]: API Connection
+      - generic [ref=f1e27]:
+        - generic [ref=f1e29]:
+          - generic [ref=f1e30]:
+            - paragraph [ref=f1e33]: API Base URL
+            - button "Help for API Base URL" [ref=f1e37] [cursor=pointer]
+          - textbox "API Base URL" [ref=f1e43]:
+            - /placeholder: ""
+            - text: http://localhost:8000
+        - generic [ref=f1e45]:
+          - generic [ref=f1e46]:
+            - paragraph [ref=f1e49]: API Key
+            - button "Help for API Key" [ref=f1e53] [cursor=pointer]
+          - generic [ref=f1e58]:
+            - textbox "API Key" [ref=f1e59]:
+              - /placeholder: ""
+              - text: dev-secret-key
+            - button "Show password" [ref=f1e61] [cursor=pointer]:
+              - generic [ref=f1e62]: visibility
+        - button [ref=f1e66] [cursor=pointer]:
+          - paragraph [ref=f1e71]: Test Connection
+    - group [ref=f1e74]:
+      - generic "keyboard_arrow_right Hybrid Retrieval Parameters" [ref=f1e75] [cursor=pointer]:
+        - generic [ref=f1e76]:
+          - generic [ref=f1e77]: keyboard_arrow_right
+          - paragraph [ref=f1e81]: Hybrid Retrieval Parameters
+    - separator [ref=f1e86]
+    - button [ref=f1e89] [cursor=pointer]:
+      - paragraph [ref=f1e94]: Clear Chat History
+  - generic [ref=f1e3]:
+    - banner [ref=f1e97]:
+      - generic [ref=f1e100]:
+        - button "Deploy" [ref=f1e102] [cursor=pointer]
+        - button "Main menu" [ref=f1e106] [cursor=pointer]
+    - generic [ref=f1e112]:
+      - tablist [ref=f1e113]:
+        - tab [active] [selected] [ref=f1e114] [cursor=pointer]:
+          - paragraph [ref=f1e116]: 💬 NotebookLM Chat & Search
+        - tab [ref=f1e118] [cursor=pointer]:
+          - paragraph [ref=f1e120]: 📤 Upload & Document Sources
+      - tabpanel "💬 NotebookLM Chat & Search" [ref=f1e121]:
+        - generic [ref=f1e122]:
+          - heading "💬 NotebookLM Chat & Search" [level=2] [ref=f1e127]:
+            - text: 💬 NotebookLM Chat & Search
+            - generic [ref=f1e128]:
+              - link "Link to heading":
+                - /url: "#notebook-lm-chat-and-search"
+          - paragraph [ref=f1e133]: Explore and query your indexed documents with grounded citations and confidence scores.
+          - generic [ref=f1e135]:
+            - generic [ref=f1e139]:
+              - generic [ref=f1e140]:
+                - paragraph [ref=f1e143]: Search Scope (Grounding Source)
+                - button "Help for Search Scope (Grounding Source)" [ref=f1e147] [cursor=pointer]
+              - group [ref=f1e152]:
+                - combobox "Search Scope (Grounding Source)" [ref=f1e153]: 📚 All Documents
+                - button "Open" [ref=f1e154] [cursor=pointer]
+            - generic [ref=f1e158]: 🌐 Synthesizing Across Entire Notebook
+          - heading "💡 Suggested Questions" [level=5] [ref=f1e171]:
+            - text: 💡 Suggested Questions
+            - generic [ref=f1e172]:
+              - link "Link to heading":
+                - /url: "#suggested-questions"
+          - generic [ref=f1e174]:
+            - button [ref=f1e179] [cursor=pointer]:
+              - generic "📝 Executive Summary" [ref=f1e180]:
+                - paragraph [ref=f1e184]: 📝 Executive Summary
+            - button [ref=f1e189] [cursor=pointer]:
+              - generic "🔑 Key Takeaways" [ref=f1e190]:
+                - paragraph [ref=f1e194]: 🔑 Key Takeaways
+            - button [ref=f1e199] [cursor=pointer]:
+              - generic "📋 Requirements & Rules" [ref=f1e200]:
+                - paragraph [ref=f1e204]: 📋 Requirements & Rules
+            - button [ref=f1e209] [cursor=pointer]:
+              - generic "❓ Key Questions" [ref=f1e210]:
+                - paragraph [ref=f1e214]: ❓ Key Questions
+          - separator [ref=f1e219]
+          - generic [ref=f1e223]:
+            - textbox "Ask a question about your documents..." [ref=f1e225]
+            - button "Send message" [disabled] [ref=f1e227]

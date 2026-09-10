@@ -1,0 +1,3 @@
+# Test Document 2: Neural Networks Deep Dive
+
+Neural networks are computing systems inspired by biological neural networks. They consist of layers of interconnected nodes that process information using weighted connections and activation functions.

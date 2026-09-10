@@ -1,0 +1,147 @@
+- generic:
+  - generic [ref=f1e1083]:
+    - log [ref=f1e1084]:
+      - generic [ref=f1e1085]: 📚 All Documents, selected
+      - generic [ref=f1e1086]: 22 options available.
+    - log
+  - generic [ref=f1e2]:
+    - generic [ref=f1e11]:
+      - heading [level=1] [ref=f1e1087]: ⚙️ RAG Studio Settings
+      - group [ref=f1e18]:
+        - generic [ref=f1e20] [cursor=pointer]:
+          - generic [ref=f1e21]: keyboard_arrow_down
+          - paragraph [ref=f1e25]: API Connection
+        - generic [ref=f1e27]:
+          - generic [ref=f1e29]:
+            - generic [ref=f1e30]:
+              - paragraph [ref=f1e33]: API Base URL
+              - button [ref=f1e1089] [cursor=pointer]
+            - textbox [ref=f1e1090]: http://localhost:8000
+          - generic [ref=f1e45]:
+            - generic [ref=f1e46]:
+              - paragraph [ref=f1e49]: API Key
+              - button [ref=f1e1091] [cursor=pointer]
+            - generic [ref=f1e58]:
+              - textbox [ref=f1e1092]: dev-secret-key
+              - button [ref=f1e1093] [cursor=pointer]:
+                - generic [ref=f1e62]: visibility
+          - button [ref=f1e1094] [cursor=pointer]:
+            - paragraph [ref=f1e71]: Test Connection
+      - group [ref=f1e74]:
+        - generic [ref=f1e76] [cursor=pointer]:
+          - generic [ref=f1e77]: keyboard_arrow_right
+          - paragraph [ref=f1e81]: Hybrid Retrieval Parameters
+      - separator [ref=f1e86]
+      - button [ref=f1e1096] [cursor=pointer]:
+        - paragraph [ref=f1e94]: Clear Chat History
+    - generic [ref=f1e3]:
+      - banner [aria-hidden] [ref=f1e97]:
+        - generic [ref=f1e100]:
+          - button [ref=f1e1097] [cursor=pointer]:
+            - generic [ref=f1e103]: Deploy
+          - button [ref=f1e1098] [cursor=pointer]
+      - generic [ref=f1e112]:
+        - tablist [aria-hidden] [ref=f1e113]:
+          - tab [selected] [ref=f1e1099] [cursor=pointer]:
+            - paragraph [ref=f1e116]: 💬 NotebookLM Chat & Search
+          - tab [ref=f1e1100] [cursor=pointer]:
+            - paragraph [ref=f1e120]: 📤 Upload & Document Sources
+        - tabpanel "💬 NotebookLM Chat & Search" [ref=f1e121]:
+          - generic [ref=f1e122]:
+            - heading [level=2] [ref=f1e1101]:
+              - text: 💬 NotebookLM Chat & Search
+              - generic [ref=f1e128]:
+                - link:
+                  - /url: "#notebook-lm-chat-and-search"
+            - paragraph [ref=f1e133]: Explore and query your indexed documents with grounded citations and confidence scores.
+            - generic [ref=f1e135]:
+              - generic [ref=f1e139]:
+                - generic [aria-hidden] [ref=f1e140]:
+                  - paragraph [ref=f1e143]: Search Scope (Grounding Source)
+                  - button [ref=f1e1102] [cursor=pointer]
+                - group [ref=f1e152]:
+                  - combobox "Search Scope (Grounding Source)" [expanded] [active] [ref=f1e153]: 📚 All Documents
+                  - button [expanded] [aria-hidden] [ref=f1e1103] [cursor=pointer]
+              - generic [ref=f1e159]: 🌐 Synthesizing Across Entire Notebook
+            - heading [level=5] [ref=f1e1104]:
+              - text: 💡 Suggested Questions
+              - generic [ref=f1e172]:
+                - link:
+                  - /url: "#suggested-questions"
+            - generic [ref=f1e174]:
+              - button [ref=f1e1105] [cursor=pointer]:
+                - paragraph [ref=f1e184]: 📝 Executive Summary
+              - button [ref=f1e1107] [cursor=pointer]:
+                - paragraph [ref=f1e194]: 🔑 Key Takeaways
+              - button [ref=f1e1109] [cursor=pointer]:
+                - paragraph [ref=f1e204]: 📋 Requirements & Rules
+              - button [ref=f1e1111] [cursor=pointer]:
+                - paragraph [ref=f1e214]: ❓ Key Questions
+            - separator [ref=f1e219]
+            - generic [ref=f1e223]:
+              - textbox [ref=f1e1113]:
+                - /placeholder: Ask a question about your documents...
+              - button [disabled] [ref=f1e1114]
+            - generic [ref=f1e941]:
+              - generic [ref=f1e942]: face
+              - paragraph [ref=f1e951]: Summarize the core topics covered across all documents.
+            - generic [ref=f1e953]:
+              - generic [ref=f1e954]: smart_toy
+              - generic [ref=f1e961]:
+                - generic [ref=f1e977]:
+                  - paragraph [ref=f1e978]: "The core topics covered across all documents include:"
+                  - list [ref=f1e979]:
+                    - listitem [ref=f1e980]: The RAG Pipeline Overview, which describes the RAG (Retrieval-Augmented Generation) Pipeline as a production-grade system for querying internal documents using hybrid search [3][4][5].
+                    - listitem [ref=f1e981]: The pipeline architecture, which combines multiple components for hybrid search, including Dense Vector Search, Sparse BM25 Retrieval, Reciprocal Rank Fusion (RRF), LLM-as-Judge Reranking, and Grounded Generation [1].
+                    - listitem [ref=f1e982]: The features of the RAG Pipeline, which include multi-tenant support, document upload and ingestion, real-time query dashboard, configurable chunking strategies, deduplication, and confidence-based fallback [2].
+                  - paragraph [ref=f1e983]: "Note: The provided context does not cover any other core topics beyond these three."
+                - heading [level=5] [ref=f1e1117]:
+                  - text: Verification Metrics
+                  - generic [ref=f1e990]:
+                    - link:
+                      - /url: "#verification-metrics"
+                - generic [ref=f1e992]:
+                  - generic [ref=f1e993]: Retrieval Confidence 0.90
+                  - generic [ref=f1e1000]: Citation Coverage 1.00
+                  - generic [ref=f1e1007]: Answer Completeness 0.80
+                  - generic [ref=f1e1014]: Composite Quality 0.90
+                - heading [level=4] [ref=f1e1118]:
+                  - text: 📖 Grounded Source Citations
+                  - generic [ref=f1e1027]:
+                    - link:
+                      - /url: "#grounded-source-citations"
+                - group [ref=f1e1030]:
+                  - generic [ref=f1e1032] [cursor=pointer]:
+                    - generic [ref=f1e1033]: keyboard_arrow_right
+                    - paragraph [ref=f1e1037]: "[1] /Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/default/uploads/rag_overview.txt (Architecture)"
+                - group [ref=f1e1040]:
+                  - generic [ref=f1e1042] [cursor=pointer]:
+                    - generic [ref=f1e1043]: keyboard_arrow_right
+                    - paragraph [ref=f1e1047]: "[2] /Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/default/uploads/rag_overview.txt (Features)"
+                - group [ref=f1e1050]:
+                  - generic [ref=f1e1052] [cursor=pointer]:
+                    - generic [ref=f1e1053]: keyboard_arrow_right
+                    - paragraph [ref=f1e1057]: "[3] /Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/default/uploads/rag_overview.txt (RAG Pipeline Overview)"
+                - group [ref=f1e1060]:
+                  - generic [ref=f1e1062] [cursor=pointer]:
+                    - generic [ref=f1e1063]: keyboard_arrow_right
+                    - paragraph [ref=f1e1067]: "[4] /Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/default/uploads/rag_overview.txt (RAG Pipeline Overview)"
+                - group [ref=f1e1070]:
+                  - generic [ref=f1e1072] [cursor=pointer]:
+                    - generic [ref=f1e1073]: keyboard_arrow_right
+                    - paragraph [ref=f1e1077]: "[5] /Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/default/uploads/rag_overview.txt"
+                - paragraph [ref=f1e1082]: ⏱️ Generated in 34.13s
+  - generic [ref=f1e1125]:
+    - listbox "Search Scope (Grounding Source) Open" [ref=f1e1126]:
+      - option "📚 All Documents" [selected] [ref=f1e1127] [cursor=pointer]
+      - option "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/default/uploads/1d2f3c9d_test_new.txt" [ref=f1e1129] [cursor=pointer]
+      - option "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/default/uploads/48ce91db_test_upload.txt" [ref=f1e1131] [cursor=pointer]
+      - option "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/default/uploads/4c269067_test.txt" [ref=f1e1133] [cursor=pointer]
+      - option "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/default/uploads/4c58d0d8_test.txt" [ref=f1e1135] [cursor=pointer]
+      - option "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/default/uploads/rag_overview.txt" [ref=f1e1137] [cursor=pointer]
+      - option "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/user_test_b/uploads/doc_b.txt" [ref=f1e1139] [cursor=pointer]
+      - option "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/user_vqAgPyxxWmw/uploads/test.txt" [ref=f1e1141] [cursor=pointer]
+      - option "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/user_vqAgPyxxWmw/uploads/test2.txt" [ref=f1e1143] [cursor=pointer]
+      - option "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/user_vqAgPyxxWmw/uploads/test_doc.txt" [ref=f1e1145] [cursor=pointer]
+      - option "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/user_test_a/uploads/doc_a.txt" [ref=f1e1147] [cursor=pointer]
+    - button "Dismiss" [ref=f1e1150] [cursor=pointer]

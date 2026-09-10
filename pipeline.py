@@ -22,7 +22,7 @@ from generation.generate import generate_answer
 from generation.prompts import build_context_block
 from ingestion.chunking import Chunk, chunk_fixed, chunk_recursive, chunk_semantic
 from ingestion.dedup import DuplicateIndex
-from ingestion.loaders import load_directory
+from ingestion.loaders import RawDocument, load_directory, load_file
 from retrieval.embeddings import Embedder, create_openai_client
 from retrieval.fusion import reciprocal_rank_fusion
 from retrieval.reranker import rerank
@@ -142,6 +142,10 @@ class RAGPipeline:
         doc = load_file(requested_path)
         if not doc:
             return {"documents": 0, "chunks_created": 0, "chunks_indexed": 0, "duplicates_skipped": 0}
+
+        # Override the document source with the original filename for better UX
+        if original_filename:
+            doc = RawDocument(source=original_filename, text=doc.text, doc_type=doc.doc_type, pages=doc.pages)
 
         chunks = self._chunk_document(doc)
         if not chunks:

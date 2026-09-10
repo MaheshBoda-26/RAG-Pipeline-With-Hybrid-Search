@@ -1,0 +1,3 @@
+# Test Document: Data Science Overview
+
+Data science is an interdisciplinary field that uses scientific methods, processes, algorithms, and systems to extract knowledge and insights from structured and unstructured data. It combines statistics, mathematics, programming, and domain expertise to analyze and interpret complex data.

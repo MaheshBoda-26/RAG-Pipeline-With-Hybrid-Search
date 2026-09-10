@@ -1,0 +1,3 @@
+# Test Document: Generative AI Overview
+
+Generative AI refers to artificial intelligence systems that can create new content, including text, images, code, and music. These systems learn patterns from training data and generate novel outputs that resemble the training data.

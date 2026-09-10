@@ -13,3 +13,17 @@
   $ xcode-select --install
   $ pip install watchdog
             
+
+✓ Installed:
+  → .agents/skills/developing-with-streamlit
+  → .claude/skills/developing-with-streamlit
+
+✨ Successfully installed to /Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search
+
+Note: Installed skills are symlinks to your local Streamlit environment.
+      They generally should not be committed to git.
+
+Recommended .gitignore snippet:
+  # Streamlit agent skills (environment-specific symlinks)
+  .agents/skills/developing-with-streamlit
+  .claude/skills/developing-with-streamlit
