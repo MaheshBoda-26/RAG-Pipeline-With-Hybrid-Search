@@ -281,3 +281,14 @@ INFO:     127.0.0.1:62718 - "POST /v1/demo/upload HTTP/1.1" 200 OK
 WARNING: RPC match_vectors failed ({'message': 'Could not find the function public.match_vectors(match_collection_id, match_count, query_embedding) in the schema cache', 'code': 'PGRST202', 'hint': None, 'details': 'Searched for the function public.match_vectors with parameters match_collection_id, match_count, query_embedding or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.'}), using fallback
 INFO:     127.0.0.1:62735 - "POST /v1/demo/ask HTTP/1.1" 200 OK
 INFO:     127.0.0.1:62762 - "GET /v1/demo/documents HTTP/1.1" 200 OK
+WARNING:  WatchFiles detected changes in 'website/node_modules/flatted/python/flatted.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [68914]
+/opt/homebrew/lib/python3.14/site-packages/pypdf/_crypt_providers/_cryptography.py:32: CryptographyDeprecationWarning: ARC4 has been moved to cryptography.hazmat.decrepit.ciphers.algorithms.ARC4 and will be removed from cryptography.hazmat.primitives.ciphers.algorithms in 48.0.0.
+  from cryptography.hazmat.primitives.ciphers.algorithms import AES, ARC4
+INFO:     Started server process [30307]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     127.0.0.1:64921 - "POST /v1/upload HTTP/1.1" 401 Unauthorized
