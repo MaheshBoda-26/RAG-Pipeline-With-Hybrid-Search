@@ -272,3 +272,12 @@ Traceback (most recent call last):
 ValueError: Invalid salt
 WARNING: RPC match_vectors failed ({'message': 'Could not find the function public.match_vectors(match_collection_id, match_count, query_embedding) in the schema cache', 'code': 'PGRST202', 'hint': None, 'details': 'Searched for the function public.match_vectors with parameters match_collection_id, match_count, query_embedding or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.'}), using fallback
 INFO:     127.0.0.1:49300 - "POST /v1/demo/ask HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61607 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62669 - "HEAD / HTTP/1.1" 405 Method Not Allowed
+INFO:     127.0.0.1:62714 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62714 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+API embedding failed, using local model: Error code: 404 - {'status': 404, 'title': 'Not Found', 'detail': "Function '1528a0ad-205a-46ac-a783-94e2372586a9': Not found for account 'SZ9KOUceR1X04dvQORa9swcan4pzm308PoufuozCVpU'"}
+INFO:     127.0.0.1:62718 - "POST /v1/demo/upload HTTP/1.1" 200 OK
+WARNING: RPC match_vectors failed ({'message': 'Could not find the function public.match_vectors(match_collection_id, match_count, query_embedding) in the schema cache', 'code': 'PGRST202', 'hint': None, 'details': 'Searched for the function public.match_vectors with parameters match_collection_id, match_count, query_embedding or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.'}), using fallback
+INFO:     127.0.0.1:62735 - "POST /v1/demo/ask HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62762 - "GET /v1/demo/documents HTTP/1.1" 200 OK
