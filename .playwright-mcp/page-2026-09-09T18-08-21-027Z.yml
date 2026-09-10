@@ -1,0 +1,334 @@
+- generic [ref=f1e2]:
+  - generic [ref=f1e11]:
+    - heading "⚙️ RAG Studio Settings" [level=1] [ref=f1e15]
+    - group [ref=f1e18]:
+      - generic "keyboard_arrow_down API Connection" [ref=f1e19] [cursor=pointer]:
+        - generic [ref=f1e20]:
+          - generic [ref=f1e21]: keyboard_arrow_down
+          - paragraph [ref=f1e25]: API Connection
+      - generic [ref=f1e27]:
+        - generic [ref=f1e29]:
+          - generic [ref=f1e30]:
+            - paragraph [ref=f1e33]: API Base URL
+            - button "Help for API Base URL" [ref=f1e37] [cursor=pointer]
+          - textbox "API Base URL" [ref=f1e43]:
+            - /placeholder: ""
+            - text: http://localhost:8000
+        - generic [ref=f1e45]:
+          - generic [ref=f1e46]:
+            - paragraph [ref=f1e49]: API Key
+            - button "Help for API Key" [ref=f1e53] [cursor=pointer]
+          - generic [ref=f1e58]:
+            - textbox "API Key" [ref=f1e59]:
+              - /placeholder: ""
+              - text: dev-secret-key
+            - button "Show password" [ref=f1e61] [cursor=pointer]:
+              - generic [ref=f1e62]: visibility
+        - button [ref=f1e66] [cursor=pointer]:
+          - paragraph [ref=f1e71]: Test Connection
+    - group [ref=f1e74]:
+      - generic "keyboard_arrow_right Hybrid Retrieval Parameters" [ref=f1e75] [cursor=pointer]:
+        - generic [ref=f1e76]:
+          - generic [ref=f1e77]: keyboard_arrow_right
+          - paragraph [ref=f1e81]: Hybrid Retrieval Parameters
+    - separator [ref=f1e86]
+    - button [ref=f1e89] [cursor=pointer]:
+      - paragraph [ref=f1e94]: Clear Chat History
+  - generic [ref=f1e3]:
+    - banner [ref=f1e97]:
+      - generic [ref=f1e100]:
+        - button "Deploy" [ref=f1e102] [cursor=pointer]
+        - button "Main menu" [ref=f1e106] [cursor=pointer]
+    - generic [ref=f1e112]:
+      - tablist [ref=f1e113]:
+        - tab [ref=f1e114] [cursor=pointer]:
+          - paragraph [ref=f1e116]: 💬 NotebookLM Chat & Search
+        - tab [active] [selected] [ref=f1e118] [cursor=pointer]:
+          - paragraph [ref=f1e120]: 📤 Upload & Document Sources
+      - tabpanel "📤 Upload & Document Sources" [ref=f1e232]:
+        - generic [ref=f1e233]:
+          - heading "📤 Upload & Document Sources" [level=2] [ref=f1e238]:
+            - text: 📤 Upload & Document Sources
+            - generic [ref=f1e239]:
+              - link "Link to heading":
+                - /url: "#upload-and-document-sources"
+          - paragraph [ref=f1e244]: Add new documents to your notebook knowledge base. Files are automatically chunked, embedded, and indexed for hybrid search.
+          - generic [ref=f1e246]:
+            - generic [ref=f1e247]:
+              - paragraph [ref=f1e250]: Choose PDF, DOCX, DOC, TXT, or MD files
+              - button "Help for Choose PDF, DOCX, DOC, TXT, or MD files" [ref=f1e254] [cursor=pointer]
+            - region "Choose PDF, DOCX, DOC, TXT, or MD files" [ref=f1e258] [cursor=pointer]:
+              - button "file upload"
+              - button "upload Upload" [ref=f1e260]:
+                - generic [ref=f1e262]:
+                  - generic [ref=f1e263]: upload
+                  - paragraph [ref=f1e267]: Upload
+              - generic [ref=f1e268]: 200MB per file • PDF, DOCX, DOC, TXT, MD
+          - separator [ref=f1e275]
+          - heading "📚 Active Document Sources" [level=3] [ref=f1e280]:
+            - text: 📚 Active Document Sources
+            - generic [ref=f1e281]:
+              - link "Link to heading":
+                - /url: "#active-document-sources"
+          - button [ref=f1e288] [cursor=pointer]:
+            - generic "🔄 Refresh List" [ref=f1e289]:
+              - paragraph [ref=f1e293]: 🔄 Refresh List
+          - generic [ref=f1e297]:
+            - generic [ref=f1e302]:
+              - paragraph [ref=f1e306]: Indexed Documents
+              - paragraph [ref=f1e309]: "21"
+            - generic [ref=f1e314]:
+              - paragraph [ref=f1e318]: Total Chunks Stored
+              - paragraph [ref=f1e321]: "46"
+          - generic [ref=f1e323]:
+            - paragraph [ref=f1e330]:
+              - text: 📄
+              - strong [ref=f1e331]: /Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/default/uploads/1d2f3c9d_test_new.txt
+            - paragraph [ref=f1e338]:
+              - text: "Chunks:"
+              - code [ref=f1e339]: "2"
+              - text: "| Chars:"
+              - code [ref=f1e340]: "160"
+            - button [ref=f1e345] [cursor=pointer]:
+              - generic "🗑️ Delete" [ref=f1e346]:
+                - paragraph [ref=f1e350]: 🗑️ Delete
+          - generic [ref=f1e352]:
+            - paragraph [ref=f1e359]:
+              - text: 📄
+              - strong [ref=f1e360]: /Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/default/uploads/48ce91db_test_upload.txt
+            - paragraph [ref=f1e367]:
+              - text: "Chunks:"
+              - code [ref=f1e368]: "4"
+              - text: "| Chars:"
+              - code [ref=f1e369]: "374"
+            - button [ref=f1e374] [cursor=pointer]:
+              - generic "🗑️ Delete" [ref=f1e375]:
+                - paragraph [ref=f1e379]: 🗑️ Delete
+          - generic [ref=f1e381]:
+            - paragraph [ref=f1e388]:
+              - text: 📄
+              - strong [ref=f1e389]: /Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/default/uploads/4c269067_test.txt
+            - paragraph [ref=f1e396]:
+              - text: "Chunks:"
+              - code [ref=f1e397]: "2"
+              - text: "| Chars:"
+              - code [ref=f1e398]: "68"
+            - button [ref=f1e403] [cursor=pointer]:
+              - generic "🗑️ Delete" [ref=f1e404]:
+                - paragraph [ref=f1e408]: 🗑️ Delete
+          - generic [ref=f1e410]:
+            - paragraph [ref=f1e417]:
+              - text: 📄
+              - strong [ref=f1e418]: /Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/default/uploads/4c58d0d8_test.txt
+            - paragraph [ref=f1e425]:
+              - text: "Chunks:"
+              - code [ref=f1e426]: "2"
+              - text: "| Chars:"
+              - code [ref=f1e427]: "80"
+            - button [ref=f1e432] [cursor=pointer]:
+              - generic "🗑️ Delete" [ref=f1e433]:
+                - paragraph [ref=f1e437]: 🗑️ Delete
+          - generic [ref=f1e439]:
+            - paragraph [ref=f1e446]:
+              - text: 📄
+              - strong [ref=f1e447]: /Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/default/uploads/rag_overview.txt
+            - paragraph [ref=f1e454]:
+              - text: "Chunks:"
+              - code [ref=f1e455]: "15"
+              - text: "| Chars:"
+              - code [ref=f1e456]: "3591"
+            - button [ref=f1e461] [cursor=pointer]:
+              - generic "🗑️ Delete" [ref=f1e462]:
+                - paragraph [ref=f1e466]: 🗑️ Delete
+          - generic [ref=f1e468]:
+            - paragraph [ref=f1e475]:
+              - text: 📄
+              - strong [ref=f1e476]: /Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/user_test_b/uploads/doc_b.txt
+            - paragraph [ref=f1e483]:
+              - text: "Chunks:"
+              - code [ref=f1e484]: "1"
+              - text: "| Chars:"
+              - code [ref=f1e485]: "49"
+            - button [ref=f1e490] [cursor=pointer]:
+              - generic "🗑️ Delete" [ref=f1e491]:
+                - paragraph [ref=f1e495]: 🗑️ Delete
+          - generic [ref=f1e497]:
+            - paragraph [ref=f1e504]:
+              - text: 📄
+              - strong [ref=f1e505]: /Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/user_vqAgPyxxWmw/uploads/test.txt
+            - paragraph [ref=f1e512]:
+              - text: "Chunks:"
+              - code [ref=f1e513]: "2"
+              - text: "| Chars:"
+              - code [ref=f1e514]: "76"
+            - button [ref=f1e519] [cursor=pointer]:
+              - generic "🗑️ Delete" [ref=f1e520]:
+                - paragraph [ref=f1e524]: 🗑️ Delete
+          - generic [ref=f1e526]:
+            - paragraph [ref=f1e533]:
+              - text: 📄
+              - strong [ref=f1e534]: /Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/user_vqAgPyxxWmw/uploads/test2.txt
+            - paragraph [ref=f1e541]:
+              - text: "Chunks:"
+              - code [ref=f1e542]: "2"
+              - text: "| Chars:"
+              - code [ref=f1e543]: "66"
+            - button [ref=f1e548] [cursor=pointer]:
+              - generic "🗑️ Delete" [ref=f1e549]:
+                - paragraph [ref=f1e553]: 🗑️ Delete
+          - generic [ref=f1e555]:
+            - paragraph [ref=f1e562]:
+              - text: 📄
+              - strong [ref=f1e563]: /Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/user_vqAgPyxxWmw/uploads/test_doc.txt
+            - paragraph [ref=f1e570]:
+              - text: "Chunks:"
+              - code [ref=f1e571]: "4"
+              - text: "| Chars:"
+              - code [ref=f1e572]: "335"
+            - button [ref=f1e577] [cursor=pointer]:
+              - generic "🗑️ Delete" [ref=f1e578]:
+                - paragraph [ref=f1e582]: 🗑️ Delete
+          - generic [ref=f1e584]:
+            - paragraph [ref=f1e591]:
+              - text: 📄
+              - strong [ref=f1e592]: /Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/user_test_a/uploads/doc_a.txt
+            - paragraph [ref=f1e599]:
+              - text: "Chunks:"
+              - code [ref=f1e600]: "1"
+              - text: "| Chars:"
+              - code [ref=f1e601]: "45"
+            - button [ref=f1e606] [cursor=pointer]:
+              - generic "🗑️ Delete" [ref=f1e607]:
+                - paragraph [ref=f1e611]: 🗑️ Delete
+          - generic [ref=f1e613]:
+            - paragraph [ref=f1e620]:
+              - text: 📄
+              - strong [ref=f1e621]: /Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/user_test_b/uploads/00d78980_doc_b.txt
+            - paragraph [ref=f1e628]:
+              - text: "Chunks:"
+              - code [ref=f1e629]: "1"
+              - text: "| Chars:"
+              - code [ref=f1e630]: "49"
+            - button [ref=f1e635] [cursor=pointer]:
+              - generic "🗑️ Delete" [ref=f1e636]:
+                - paragraph [ref=f1e640]: 🗑️ Delete
+          - generic [ref=f1e642]:
+            - paragraph [ref=f1e649]:
+              - text: 📄
+              - strong [ref=f1e650]: /Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/user_test_a/uploads/07dca045_doc_a.txt
+            - paragraph [ref=f1e657]:
+              - text: "Chunks:"
+              - code [ref=f1e658]: "1"
+              - text: "| Chars:"
+              - code [ref=f1e659]: "45"
+            - button [ref=f1e664] [cursor=pointer]:
+              - generic "🗑️ Delete" [ref=f1e665]:
+                - paragraph [ref=f1e669]: 🗑️ Delete
+          - generic [ref=f1e671]:
+            - paragraph [ref=f1e678]:
+              - text: 📄
+              - strong [ref=f1e679]: /Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/default/uploads/6ca01804_test_upload.txt
+            - paragraph [ref=f1e686]:
+              - text: "Chunks:"
+              - code [ref=f1e687]: "1"
+              - text: "| Chars:"
+              - code [ref=f1e688]: "70"
+            - button [ref=f1e693] [cursor=pointer]:
+              - generic "🗑️ Delete" [ref=f1e694]:
+                - paragraph [ref=f1e698]: 🗑️ Delete
+          - generic [ref=f1e700]:
+            - paragraph [ref=f1e707]:
+              - text: 📄
+              - strong [ref=f1e708]: /Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/default/uploads/8efe8b91_test_new_upload.txt
+            - paragraph [ref=f1e715]:
+              - text: "Chunks:"
+              - code [ref=f1e716]: "1"
+              - text: "| Chars:"
+              - code [ref=f1e717]: "92"
+            - button [ref=f1e722] [cursor=pointer]:
+              - generic "🗑️ Delete" [ref=f1e723]:
+                - paragraph [ref=f1e727]: 🗑️ Delete
+          - generic [ref=f1e729]:
+            - paragraph [ref=f1e736]:
+              - text: 📄
+              - strong [ref=f1e737]: /Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/default/uploads/193c5ff4_ml_intro.txt
+            - paragraph [ref=f1e744]:
+              - text: "Chunks:"
+              - code [ref=f1e745]: "1"
+              - text: "| Chars:"
+              - code [ref=f1e746]: "183"
+            - button [ref=f1e751] [cursor=pointer]:
+              - generic "🗑️ Delete" [ref=f1e752]:
+                - paragraph [ref=f1e756]: 🗑️ Delete
+          - generic [ref=f1e758]:
+            - paragraph [ref=f1e765]:
+              - text: 📄
+              - strong [ref=f1e766]: /Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/default/uploads/df5029a5_neural_networks.txt
+            - paragraph [ref=f1e773]:
+              - text: "Chunks:"
+              - code [ref=f1e774]: "1"
+              - text: "| Chars:"
+              - code [ref=f1e775]: "202"
+            - button [ref=f1e780] [cursor=pointer]:
+              - generic "🗑️ Delete" [ref=f1e781]:
+                - paragraph [ref=f1e785]: 🗑️ Delete
+          - generic [ref=f1e787]:
+            - paragraph [ref=f1e794]:
+              - text: 📄
+              - strong [ref=f1e795]: /Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/default/uploads/60ce2e37_nlp_overview.txt
+            - paragraph [ref=f1e802]:
+              - text: "Chunks:"
+              - code [ref=f1e803]: "1"
+              - text: "| Chars:"
+              - code [ref=f1e804]: "201"
+            - button [ref=f1e809] [cursor=pointer]:
+              - generic "🗑️ Delete" [ref=f1e810]:
+                - paragraph [ref=f1e814]: 🗑️ Delete
+          - generic [ref=f1e816]:
+            - paragraph [ref=f1e823]:
+              - text: 📄
+              - strong [ref=f1e824]: /Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/default/uploads/42ae84cc_computer_vision.txt
+            - paragraph [ref=f1e831]:
+              - text: "Chunks:"
+              - code [ref=f1e832]: "1"
+              - text: "| Chars:"
+              - code [ref=f1e833]: "247"
+            - button [ref=f1e838] [cursor=pointer]:
+              - generic "🗑️ Delete" [ref=f1e839]:
+                - paragraph [ref=f1e843]: 🗑️ Delete
+          - generic [ref=f1e845]:
+            - paragraph [ref=f1e852]:
+              - text: 📄
+              - strong [ref=f1e853]: reinforcement_learning.txt
+            - paragraph [ref=f1e860]:
+              - text: "Chunks:"
+              - code [ref=f1e861]: "1"
+              - text: "| Chars:"
+              - code [ref=f1e862]: "251"
+            - button [ref=f1e867] [cursor=pointer]:
+              - generic "🗑️ Delete" [ref=f1e868]:
+                - paragraph [ref=f1e872]: 🗑️ Delete
+          - generic [ref=f1e874]:
+            - paragraph [ref=f1e881]:
+              - text: 📄
+              - strong [ref=f1e882]: ml_fundamentals.txt
+            - paragraph [ref=f1e889]:
+              - text: "Chunks:"
+              - code [ref=f1e890]: "1"
+              - text: "| Chars:"
+              - code [ref=f1e891]: "248"
+            - button [ref=f1e896] [cursor=pointer]:
+              - generic "🗑️ Delete" [ref=f1e897]:
+                - paragraph [ref=f1e901]: 🗑️ Delete
+          - generic [ref=f1e903]:
+            - paragraph [ref=f1e910]:
+              - text: 📄
+              - strong [ref=f1e911]: data_science.txt
+            - paragraph [ref=f1e918]:
+              - text: "Chunks:"
+              - code [ref=f1e919]: "1"
+              - text: "| Chars:"
+              - code [ref=f1e920]: "290"
+            - button [ref=f1e925] [cursor=pointer]:
+              - generic "🗑️ Delete" [ref=f1e926]:
+                - paragraph [ref=f1e930]: 🗑️ Delete

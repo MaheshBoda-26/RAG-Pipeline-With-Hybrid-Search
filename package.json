@@ -1,0 +1,27 @@
+{
+  "name": "rag-pipeline-with-hybrid-search",
+  "version": "1.0.0",
+  "description": "A retrieval-augmented generation system that ingests internal documentation, indexes it with both dense vector and BM25 sparse search, fuses and reranks results, and generates grounded answers with verified inline citations and a composite confidence score.",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MaheshBoda-26/RAG-Pipeline-With-Hybrid-Search.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/MaheshBoda-26/RAG-Pipeline-With-Hybrid-Search/issues"
+  },
+  "homepage": "https://github.com/MaheshBoda-26/RAG-Pipeline-With-Hybrid-Search#readme",
+  "dependencies": {
+    "@playwright/test": "^1.63.0"
+  }
+}

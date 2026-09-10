@@ -1,0 +1,270 @@
+- generic [ref=e4]:
+  - generic [ref=e8]:
+    - heading "RAG Pipeline API 0.1.0 OAS 3.1" [level=2] [ref=e9]:
+      - text: RAG Pipeline API
+      - generic [ref=e10]:
+        - generic [ref=e11]: 0.1.0
+        - generic [ref=e13]: OAS 3.1
+    - link "/openapi.json" [ref=e15] [cursor=pointer]:
+      - /url: /openapi.json
+  - generic [ref=e21]:
+    - heading [level=3] [ref=e22] [cursor=pointer]:
+      - link "default" [ref=e23]:
+        - /url: "#/default"
+      - button "Collapse operation" [expanded] [ref=e24]
+    - generic [ref=e28]:
+      - generic [ref=e31] [cursor=pointer]:
+        - button "get /" [ref=e32]:
+          - generic [ref=e33]: GET
+          - link / [ref=e35]:
+            - /url: "#/default/root__get"
+          - generic [ref=e36]: Root
+        - generic "Copy to clipboard"
+        - button "get /" [ref=e39]
+      - generic [ref=e44] [cursor=pointer]:
+        - button "get /health" [ref=e45]:
+          - generic [ref=e46]: GET
+          - link "/health" [ref=e48]:
+            - /url: "#/default/health_health_get"
+          - generic [ref=e49]: Health
+        - generic "Copy to clipboard"
+        - button "get /health" [ref=e52]
+      - generic [ref=e57] [cursor=pointer]:
+        - button "post /v1/ask" [ref=e58]:
+          - generic [ref=e59]: POST
+          - link "/v1/ask" [ref=e61]:
+            - /url: "#/default/ask_v1_ask_post"
+          - generic [ref=e63]: Ask
+        - generic "Copy to clipboard"
+        - button "post /v1/ask" [ref=e66]
+      - generic [ref=e71] [cursor=pointer]:
+        - button "post /v1/ingest" [ref=e72]:
+          - generic [ref=e73]: POST
+          - link "/v1/ingest" [ref=e75]:
+            - /url: "#/default/ingest_v1_ingest_post"
+          - generic [ref=e77]: Ingest
+        - generic "Copy to clipboard"
+        - button "post /v1/ingest" [ref=e80]
+      - generic [ref=e85] [cursor=pointer]:
+        - button "post /v1/upload" [ref=e86]:
+          - generic [ref=e87]: POST
+          - link "/v1/upload" [ref=e89]:
+            - /url: "#/default/upload_v1_upload_post"
+          - generic [ref=e91]: Upload
+        - generic "Copy to clipboard"
+        - button "post /v1/upload" [ref=e94]
+      - generic [ref=e99] [cursor=pointer]:
+        - button "get /v1/documents" [ref=e100]:
+          - generic [ref=e101]: GET
+          - link "/v1/documents" [ref=e103]:
+            - /url: "#/default/documents_v1_documents_get"
+          - generic [ref=e105]: Documents
+        - generic "Copy to clipboard"
+        - button "get /v1/documents" [ref=e108]
+      - generic [ref=e113] [cursor=pointer]:
+        - 'button "delete /v1/documents/{source}" [ref=e114]':
+          - generic [ref=e115]: DELETE
+          - 'link "/v1/documents/{source}" [ref=e117]':
+            - /url: "#/default/delete_document_v1_documents__source__delete"
+          - generic [ref=e119]: Delete Document
+        - generic "Copy to clipboard"
+        - 'button "delete /v1/documents/{source}" [ref=e122]'
+      - generic [ref=e127] [cursor=pointer]:
+        - button "post /v1/admin/users" [ref=e128]:
+          - generic [ref=e129]: POST
+          - link "/v1/admin/users" [ref=e131]:
+            - /url: "#/default/admin_create_user_v1_admin_users_post"
+          - generic [ref=e133]: Admin Create User
+        - generic "Copy to clipboard"
+        - button "post /v1/admin/users" [ref=e136]
+      - generic [ref=e141] [cursor=pointer]:
+        - button "get /v1/admin/users" [ref=e142]:
+          - generic [ref=e143]: GET
+          - link "/v1/admin/users" [ref=e145]:
+            - /url: "#/default/admin_list_users_v1_admin_users_get"
+          - generic [ref=e147]: Admin List Users
+        - generic "Copy to clipboard"
+        - button "get /v1/admin/users" [ref=e150]
+      - generic [ref=e155] [cursor=pointer]:
+        - button "post /v1/auth/register" [ref=e156]:
+          - generic [ref=e157]: POST
+          - link "/v1/auth/register" [ref=e159]:
+            - /url: "#/default/register_v1_auth_register_post"
+          - generic [ref=e161]: Register
+        - generic "Copy to clipboard"
+        - button "post /v1/auth/register" [ref=e164]
+      - generic [ref=e169] [cursor=pointer]:
+        - button "post /v1/auth/login" [ref=e170]:
+          - generic [ref=e171]: POST
+          - link "/v1/auth/login" [ref=e173]:
+            - /url: "#/default/login_v1_auth_login_post"
+          - generic [ref=e175]: Login
+        - generic "Copy to clipboard"
+        - button "post /v1/auth/login" [ref=e178]
+      - generic [ref=e183] [cursor=pointer]:
+        - button "post /v1/auth/refresh" [ref=e184]:
+          - generic [ref=e185]: POST
+          - link "/v1/auth/refresh" [ref=e187]:
+            - /url: "#/default/refresh_token_v1_auth_refresh_post"
+          - generic [ref=e189]: Refresh Token
+        - generic "Copy to clipboard"
+        - button "post /v1/auth/refresh" [ref=e192]
+      - generic [ref=e197] [cursor=pointer]:
+        - button "post /v1/auth/logout" [ref=e198]:
+          - generic [ref=e199]: POST
+          - link "/v1/auth/logout" [ref=e201]:
+            - /url: "#/default/logout_v1_auth_logout_post"
+          - generic [ref=e203]: Logout
+        - generic "Copy to clipboard"
+        - button "post /v1/auth/logout" [ref=e206]
+      - generic [ref=e211] [cursor=pointer]:
+        - button "get /v1/auth/me" [ref=e212]:
+          - generic [ref=e213]: GET
+          - link "/v1/auth/me" [ref=e215]:
+            - /url: "#/default/get_current_user_v1_auth_me_get"
+          - generic [ref=e217]: Get Current User
+        - generic "Copy to clipboard"
+        - button "get /v1/auth/me" [ref=e220]
+      - generic [ref=e225] [cursor=pointer]:
+        - button "post /v1/demo/ask" [ref=e226]:
+          - generic [ref=e227]: POST
+          - link "/v1/demo/ask" [ref=e229]:
+            - /url: "#/default/demo_ask_v1_demo_ask_post"
+          - generic [ref=e231]: Demo Ask
+        - generic "Copy to clipboard"
+        - button "post /v1/demo/ask" [ref=e234]
+      - generic [ref=e239] [cursor=pointer]:
+        - button "get /v1/demo/documents" [ref=e240]:
+          - generic [ref=e241]: GET
+          - link "/v1/demo/documents" [ref=e243]:
+            - /url: "#/default/demo_documents_v1_demo_documents_get"
+          - generic [ref=e245]: Demo Documents
+        - generic "Copy to clipboard"
+        - button "get /v1/demo/documents" [ref=e248]
+      - generic [ref=e252]:
+        - generic [ref=e253] [cursor=pointer]:
+          - button "post /v1/demo/upload" [expanded] [active] [ref=e254]:
+            - generic [ref=e255]: POST
+            - link "/v1/demo/upload" [ref=e257]:
+              - /url: "#/default/demo_upload_v1_demo_upload_post"
+            - generic [ref=e259]: Demo Upload
+          - generic "Copy to clipboard" [ref=e374]
+          - button "post /v1/demo/upload" [expanded] [ref=e262]
+        - generic [ref=e379]:
+          - paragraph [ref=e383]: Upload a document file and ingest it using demo/global collection (no auth required).
+          - generic [ref=e384]:
+            - generic [ref=e385]:
+              - heading "Parameters" [level=4] [ref=e388] [cursor=pointer]
+              - button "Try it out" [ref=e390] [cursor=pointer]
+            - paragraph [ref=e393]: No parameters
+            - generic [ref=e394]:
+              - generic [ref=e395]:
+                - heading "Request bodyrequired" [level=4] [ref=e396]
+                - combobox "Request content type" [ref=e399]:
+                  - option "multipart/form-data" [selected]
+              - table [ref=e402]:
+                - rowgroup [ref=e403]:
+                  - row [ref=e404]:
+                    - cell "file *required string($binary)" [ref=e405]:
+                      - generic [ref=e406]: file *required
+                      - generic [ref=e407]:
+                        - text: string
+                        - generic [ref=e408]: ($binary)
+                    - cell [ref=e409]
+          - generic [ref=e411]:
+            - heading "Responses" [level=4] [ref=e413]
+            - region [ref=e415]:
+              - rowgroup [ref=e416]:
+                - row [ref=e417]:
+                  - cell "Code" [ref=e418]
+                  - cell "Description" [ref=e419]
+                  - cell "Links" [ref=e420]
+              - rowgroup [ref=e421]:
+                - row [ref=e422]:
+                  - cell "200" [ref=e423]
+                  - cell "Successful Response Media type application/json Controls Accept header. Example Value" [ref=e424]:
+                    - paragraph [ref=e427]: Successful Response
+                    - generic [ref=e429]:
+                      - generic [ref=e430]: Media type
+                      - combobox "Media Type" [ref=e432]:
+                        - option "application/json" [selected]
+                      - generic [ref=e433]:
+                        - text: Controls
+                        - code [ref=e434]: Accept
+                        - text: header.
+                    - generic [ref=e435]:
+                      - tablist [ref=e436]:
+                        - tab "Example Value" [selected] [ref=e437] [cursor=pointer]
+                        - tab "Schema" [ref=e438] [cursor=pointer]
+                      - tabpanel "Example Value" [ref=e439]:
+                        - code [ref=e443]: "\"string\""
+                  - cell "No links" [ref=e444]
+                - row [ref=e445]:
+                  - cell "422" [ref=e446]
+                  - cell "Validation Error Media type application/json Example Value" [ref=e447]:
+                    - paragraph [ref=e450]: Validation Error
+                    - generic [ref=e452]:
+                      - generic [ref=e453]: Media type
+                      - combobox "Media Type" [ref=e455]:
+                        - option "application/json" [selected]
+                    - generic [ref=e456]:
+                      - tablist [ref=e457]:
+                        - tab "Example Value" [selected] [ref=e458] [cursor=pointer]
+                        - tab "Schema" [ref=e459] [cursor=pointer]
+                      - tabpanel "Example Value" [ref=e460]:
+                        - code [ref=e464]: "{ \"detail\": [ { \"loc\": [ \"string\", 0 ], \"msg\": \"string\", \"type\": \"string\" } ] }"
+                  - cell "No links" [ref=e465]
+  - generic [ref=e267]:
+    - heading [level=4] [ref=e268] [cursor=pointer]:
+      - button "Schemas" [expanded] [ref=e269]
+    - generic [ref=e273]:
+      - article [ref=e274]:
+        - generic [ref=e275]:
+          - button "AskRequest" [ref=e276] [cursor=pointer]
+          - button "Expand all" [ref=e282] [cursor=pointer]
+          - strong [ref=e283]: object
+      - article [ref=e284]:
+        - generic [ref=e285]:
+          - button "Body_demo_upload_v1_demo_upload_post" [ref=e286] [cursor=pointer]
+          - button "Expand all" [ref=e292] [cursor=pointer]
+          - strong [ref=e293]: object
+      - article [ref=e294]:
+        - generic [ref=e295]:
+          - button "Body_upload_v1_upload_post" [ref=e296] [cursor=pointer]
+          - button "Expand all" [ref=e302] [cursor=pointer]
+          - strong [ref=e303]: object
+      - article [ref=e304]:
+        - generic [ref=e305]:
+          - button "CreateUserRequest" [ref=e306] [cursor=pointer]
+          - button "Expand all" [ref=e312] [cursor=pointer]
+          - strong [ref=e313]: object
+      - article [ref=e314]:
+        - generic [ref=e315]:
+          - button "HTTPValidationError" [ref=e316] [cursor=pointer]
+          - button "Expand all" [ref=e322] [cursor=pointer]
+          - strong [ref=e323]: object
+      - article [ref=e324]:
+        - generic [ref=e325]:
+          - button "IngestRequest" [ref=e326] [cursor=pointer]
+          - button "Expand all" [ref=e332] [cursor=pointer]
+          - strong [ref=e333]: object
+      - article [ref=e334]:
+        - generic [ref=e335]:
+          - button "LoginRequest" [ref=e336] [cursor=pointer]
+          - button "Expand all" [ref=e342] [cursor=pointer]
+          - strong [ref=e343]: object
+      - article [ref=e344]:
+        - generic [ref=e345]:
+          - button "RegisterRequest" [ref=e346] [cursor=pointer]
+          - button "Expand all" [ref=e352] [cursor=pointer]
+          - strong [ref=e353]: object
+      - article [ref=e354]:
+        - generic [ref=e355]:
+          - button "TokenResponse" [ref=e356] [cursor=pointer]
+          - button "Expand all" [ref=e362] [cursor=pointer]
+          - strong [ref=e363]: object
+      - article [ref=e364]:
+        - generic [ref=e365]:
+          - button "ValidationError" [ref=e366] [cursor=pointer]
+          - button "Expand all" [ref=e372] [cursor=pointer]
+          - strong [ref=e373]: object

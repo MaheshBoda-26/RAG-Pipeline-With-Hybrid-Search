@@ -1,23 +1,274 @@
 INFO:     Will watch for changes in these directories: ['/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search']
 INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
-INFO:     Started reloader process [51336] using WatchFiles
+INFO:     Started reloader process [68784] using WatchFiles
 /opt/homebrew/lib/python3.14/site-packages/pypdf/_crypt_providers/_cryptography.py:32: CryptographyDeprecationWarning: ARC4 has been moved to cryptography.hazmat.decrepit.ciphers.algorithms.ARC4 and will be removed from cryptography.hazmat.primitives.ciphers.algorithms in 48.0.0.
   from cryptography.hazmat.primitives.ciphers.algorithms import AES, ARC4
-INFO:     Started server process [51470]
+INFO:     Started server process [68914]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
-INFO:     127.0.0.1:63811 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64126 - "GET /v1/documents HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64137 - "GET /docs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65128 - "GET /health HTTP/1.1" 200 OK
 Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
 API embedding failed, using local model: Error code: 404 - {'status': 404, 'title': 'Not Found', 'detail': "Function '1528a0ad-205a-46ac-a783-94e2372586a9': Not found for account 'SZ9KOUceR1X04dvQORa9swcan4pzm308PoufuozCVpU'"}
-Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 5491.01it/s]
-INFO:     127.0.0.1:64149 - "POST /v1/upload HTTP/1.1" 200 OK
-API embedding failed, using local model: Error code: 404 - {'status': 404, 'title': 'Not Found', 'detail': "Function '1528a0ad-205a-46ac-a783-94e2372586a9': Not found for account 'SZ9KOUceR1X04dvQORa9swcan4pzm308PoufuozCVpU'"}
-INFO:     127.0.0.1:64169 - "POST /v1/demo/upload HTTP/1.1" 200 OK
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 6431.15it/s]
+INFO:     127.0.0.1:65132 - "POST /v1/demo/upload HTTP/1.1" 200 OK
 WARNING: RPC match_vectors failed ({'message': 'Could not find the function public.match_vectors(match_collection_id, match_count, query_embedding) in the schema cache', 'code': 'PGRST202', 'hint': None, 'details': 'Searched for the function public.match_vectors with parameters match_collection_id, match_count, query_embedding or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.'}), using fallback
-INFO:     127.0.0.1:64194 - "POST /v1/ask HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65143 - "POST /v1/demo/ask HTTP/1.1" 200 OK
 WARNING: RPC match_vectors failed ({'message': 'Could not find the function public.match_vectors(match_collection_id, match_count, query_embedding) in the schema cache', 'code': 'PGRST202', 'hint': None, 'details': 'Searched for the function public.match_vectors with parameters match_collection_id, match_count, query_embedding or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.'}), using fallback
-INFO:     127.0.0.1:64244 - "POST /v1/demo/ask HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65164 - "POST /v1/demo/ask HTTP/1.1" 200 OK
 API embedding failed, using local model: Error code: 404 - {'status': 404, 'title': 'Not Found', 'detail': "Function '1528a0ad-205a-46ac-a783-94e2372586a9': Not found for account 'SZ9KOUceR1X04dvQORa9swcan4pzm308PoufuozCVpU'"}
-INFO:     127.0.0.1:64306 - "POST /v1/demo/upload HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65170 - "POST /v1/demo/upload HTTP/1.1" 200 OK
+WARNING: RPC match_vectors failed ({'message': 'Could not find the function public.match_vectors(match_collection_id, match_count, query_embedding) in the schema cache', 'code': 'PGRST202', 'hint': None, 'details': 'Searched for the function public.match_vectors with parameters match_collection_id, match_count, query_embedding or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.'}), using fallback
+INFO:     127.0.0.1:65174 - "POST /v1/demo/ask HTTP/1.1" 200 OK
+API embedding failed, using local model: Error code: 404 - {'status': 404, 'title': 'Not Found', 'detail': "Function '1528a0ad-205a-46ac-a783-94e2372586a9': Not found for account 'SZ9KOUceR1X04dvQORa9swcan4pzm308PoufuozCVpU'"}
+INFO:     127.0.0.1:65179 - "POST /v1/demo/upload HTTP/1.1" 200 OK
+WARNING: RPC match_vectors failed ({'message': 'Could not find the function public.match_vectors(match_collection_id, match_count, query_embedding) in the schema cache', 'code': 'PGRST202', 'hint': None, 'details': 'Searched for the function public.match_vectors with parameters match_collection_id, match_count, query_embedding or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.'}), using fallback
+INFO:     127.0.0.1:65188 - "POST /v1/demo/ask HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65311 - "GET /v1/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65322 - "GET /v1/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65348 - "GET /v1/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65351 - "GET /v1/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65355 - "GET /v1/documents HTTP/1.1" 200 OK
+API embedding failed, using local model: Error code: 404 - {'status': 404, 'title': 'Not Found', 'detail': "Function '1528a0ad-205a-46ac-a783-94e2372586a9': Not found for account 'SZ9KOUceR1X04dvQORa9swcan4pzm308PoufuozCVpU'"}
+INFO:     127.0.0.1:65367 - "POST /v1/demo/upload HTTP/1.1" 200 OK
+WARNING: RPC match_vectors failed ({'message': 'Could not find the function public.match_vectors(match_collection_id, match_count, query_embedding) in the schema cache', 'code': 'PGRST202', 'hint': None, 'details': 'Searched for the function public.match_vectors with parameters match_collection_id, match_count, query_embedding or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.'}), using fallback
+INFO:     127.0.0.1:65373 - "POST /v1/demo/ask HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65383 - "GET /docs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65383 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65385 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65385 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65405 - "GET /docs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65405 - "GET /openapi.json HTTP/1.1" 200 OK
+API embedding failed, using local model: Error code: 404 - {'status': 404, 'title': 'Not Found', 'detail': "Function '1528a0ad-205a-46ac-a783-94e2372586a9': Not found for account 'SZ9KOUceR1X04dvQORa9swcan4pzm308PoufuozCVpU'"}
+INFO:     127.0.0.1:65437 - "POST /v1/demo/upload HTTP/1.1" 200 OK
+WARNING: RPC match_vectors failed ({'message': 'Could not find the function public.match_vectors(match_collection_id, match_count, query_embedding) in the schema cache', 'code': 'PGRST202', 'hint': None, 'details': 'Searched for the function public.match_vectors with parameters match_collection_id, match_count, query_embedding or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.'}), using fallback
+INFO:     127.0.0.1:65473 - "POST /v1/demo/ask HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65505 - "GET /v1/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65512 - "GET /v1/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65528 - "GET /v1/documents HTTP/1.1" 200 OK
+WARNING: RPC match_vectors failed ({'message': 'Could not find the function public.match_vectors(match_collection_id, match_count, query_embedding) in the schema cache', 'code': 'PGRST202', 'hint': None, 'details': 'Searched for the function public.match_vectors with parameters match_collection_id, match_count, query_embedding or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.'}), using fallback
+INFO:     127.0.0.1:65531 - "POST /v1/ask HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49166 - "GET /v1/documents HTTP/1.1" 200 OK
+WARNING: RPC match_vectors failed ({'message': 'Could not find the function public.match_vectors(match_collection_id, match_count, query_embedding) in the schema cache', 'code': 'PGRST202', 'hint': None, 'details': 'Searched for the function public.match_vectors with parameters match_collection_id, match_count, query_embedding or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.'}), using fallback
+INFO:     127.0.0.1:49173 - "POST /v1/demo/ask HTTP/1.1" 200 OK
+API embedding failed, using local model: Error code: 404 - {'status': 404, 'title': 'Not Found', 'detail': "Function '1528a0ad-205a-46ac-a783-94e2372586a9': Not found for account 'SZ9KOUceR1X04dvQORa9swcan4pzm308PoufuozCVpU'"}
+INFO:     127.0.0.1:49214 - "POST /v1/demo/upload HTTP/1.1" 200 OK
+WARNING: RPC match_vectors failed ({'message': 'Could not find the function public.match_vectors(match_collection_id, match_count, query_embedding) in the schema cache', 'code': 'PGRST202', 'hint': None, 'details': 'Searched for the function public.match_vectors with parameters match_collection_id, match_count, query_embedding or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.'}), using fallback
+INFO:     127.0.0.1:49223 - "POST /v1/demo/ask HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49234 - "DELETE /v1/demo/documents/gen_ai.txt HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49239 - "GET /v1/demo/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49246 - "DELETE /v1/demo/documents/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/default/uploads/16922459_gen_ai.txt HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49250 - "GET /v1/demo/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49255 - "GET /v1/demo/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49260 - "DELETE /v1/documents/gen_ai.txt HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49271 - "GET /v1/demo/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49282 - "POST /v1/auth/register HTTP/1.1" 400 Bad Request
+INFO:     127.0.0.1:49288 - "POST /v1/auth/login HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+  + Exception Group Traceback (most recent call last):
+  |   File "/opt/homebrew/lib/python3.14/site-packages/starlette/_utils.py", line 87, in collapse_excgroups
+  |     yield
+  |   File "/opt/homebrew/lib/python3.14/site-packages/starlette/middleware/base.py", line 190, in __call__
+  |     async with anyio.create_task_group() as task_group:
+  |                ~~~~~~~~~~~~~~~~~~~~~~~^^
+  |   File "/opt/homebrew/lib/python3.14/site-packages/anyio/_backends/_asyncio.py", line 815, in __aexit__
+  |     raise BaseExceptionGroup(
+  |         "unhandled errors in a TaskGroup", self._exceptions
+  |     ) from None
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "/opt/homebrew/lib/python3.14/site-packages/uvicorn/protocols/http/httptools_impl.py", line 399, in run_asgi
+    |     result = await app(  # type: ignore[func-returns-value]
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |         self.scope, self.receive, self.send
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |     )
+    |     ^
+    |   File "/opt/homebrew/lib/python3.14/site-packages/uvicorn/middleware/proxy_headers.py", line 70, in __call__
+    |     return await self.app(scope, receive, send)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/opt/homebrew/lib/python3.14/site-packages/fastapi/applications.py", line 1054, in __call__
+    |     await super().__call__(scope, receive, send)
+    |   File "/opt/homebrew/lib/python3.14/site-packages/starlette/applications.py", line 123, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "/opt/homebrew/lib/python3.14/site-packages/starlette/middleware/errors.py", line 186, in __call__
+    |     raise exc
+    |   File "/opt/homebrew/lib/python3.14/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    |     await self.app(scope, receive, _send)
+    |   File "/opt/homebrew/lib/python3.14/site-packages/starlette/middleware/base.py", line 189, in __call__
+    |     with collapse_excgroups():
+    |          ~~~~~~~~~~~~~~~~~~^^
+    |   File "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/contextlib.py", line 162, in __exit__
+    |     self.gen.throw(value)
+    |     ~~~~~~~~~~~~~~^^^^^^^
+    |   File "/opt/homebrew/lib/python3.14/site-packages/starlette/_utils.py", line 93, in collapse_excgroups
+    |     raise exc
+    |   File "/opt/homebrew/lib/python3.14/site-packages/starlette/middleware/base.py", line 191, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/api.py", line 86, in dispatch
+    |     response: StarletteResponse = await call_next(request)
+    |                                   ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/opt/homebrew/lib/python3.14/site-packages/starlette/middleware/base.py", line 165, in call_next
+    |     raise app_exc
+    |   File "/opt/homebrew/lib/python3.14/site-packages/starlette/middleware/base.py", line 151, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "/opt/homebrew/lib/python3.14/site-packages/starlette/middleware/base.py", line 189, in __call__
+    |     with collapse_excgroups():
+    |          ~~~~~~~~~~~~~~~~~~^^
+    |   File "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/contextlib.py", line 162, in __exit__
+    |     self.gen.throw(value)
+    |     ~~~~~~~~~~~~~~^^^^^^^
+    |   File "/opt/homebrew/lib/python3.14/site-packages/starlette/_utils.py", line 93, in collapse_excgroups
+    |     raise exc
+    |   File "/opt/homebrew/lib/python3.14/site-packages/starlette/middleware/base.py", line 191, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/api.py", line 76, in dispatch
+    |     return await call_next(request)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/opt/homebrew/lib/python3.14/site-packages/starlette/middleware/base.py", line 165, in call_next
+    |     raise app_exc
+    |   File "/opt/homebrew/lib/python3.14/site-packages/starlette/middleware/base.py", line 151, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "/opt/homebrew/lib/python3.14/site-packages/starlette/middleware/cors.py", line 85, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "/opt/homebrew/lib/python3.14/site-packages/starlette/middleware/exceptions.py", line 65, in __call__
+    |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+    |   File "/opt/homebrew/lib/python3.14/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    |     raise exc
+    |   File "/opt/homebrew/lib/python3.14/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "/opt/homebrew/lib/python3.14/site-packages/starlette/routing.py", line 756, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "/opt/homebrew/lib/python3.14/site-packages/starlette/routing.py", line 776, in app
+    |     await route.handle(scope, receive, send)
+    |   File "/opt/homebrew/lib/python3.14/site-packages/starlette/routing.py", line 297, in handle
+    |     await self.app(scope, receive, send)
+    |   File "/opt/homebrew/lib/python3.14/site-packages/starlette/routing.py", line 77, in app
+    |     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+    |   File "/opt/homebrew/lib/python3.14/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    |     raise exc
+    |   File "/opt/homebrew/lib/python3.14/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "/opt/homebrew/lib/python3.14/site-packages/starlette/routing.py", line 72, in app
+    |     response = await func(request)
+    |                ^^^^^^^^^^^^^^^^^^^
+    |   File "/opt/homebrew/lib/python3.14/site-packages/fastapi/routing.py", line 278, in app
+    |     raw_response = await run_endpoint_function(
+    |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |         dependant=dependant, values=values, is_coroutine=is_coroutine
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |     )
+    |     ^
+    |   File "/opt/homebrew/lib/python3.14/site-packages/fastapi/routing.py", line 191, in run_endpoint_function
+    |     return await dependant.call(**values)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/api.py", line 579, in login
+    |     if not verify_user_password(user_id, req.password):
+    |            ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/config.py", line 72, in verify_user_password
+    |     return bcrypt.checkpw(password.encode(), user["password_hash"].encode())
+    |            ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    | ValueError: Invalid salt
+    +------------------------------------
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/opt/homebrew/lib/python3.14/site-packages/uvicorn/protocols/http/httptools_impl.py", line 399, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        self.scope, self.receive, self.send
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/opt/homebrew/lib/python3.14/site-packages/uvicorn/middleware/proxy_headers.py", line 70, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/lib/python3.14/site-packages/fastapi/applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+  File "/opt/homebrew/lib/python3.14/site-packages/starlette/applications.py", line 123, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/opt/homebrew/lib/python3.14/site-packages/starlette/middleware/errors.py", line 186, in __call__
+    raise exc
+  File "/opt/homebrew/lib/python3.14/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/opt/homebrew/lib/python3.14/site-packages/starlette/middleware/base.py", line 189, in __call__
+    with collapse_excgroups():
+         ~~~~~~~~~~~~~~~~~~^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/contextlib.py", line 162, in __exit__
+    self.gen.throw(value)
+    ~~~~~~~~~~~~~~^^^^^^^
+  File "/opt/homebrew/lib/python3.14/site-packages/starlette/_utils.py", line 93, in collapse_excgroups
+    raise exc
+  File "/opt/homebrew/lib/python3.14/site-packages/starlette/middleware/base.py", line 191, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/api.py", line 86, in dispatch
+    response: StarletteResponse = await call_next(request)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/lib/python3.14/site-packages/starlette/middleware/base.py", line 165, in call_next
+    raise app_exc
+  File "/opt/homebrew/lib/python3.14/site-packages/starlette/middleware/base.py", line 151, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/opt/homebrew/lib/python3.14/site-packages/starlette/middleware/base.py", line 189, in __call__
+    with collapse_excgroups():
+         ~~~~~~~~~~~~~~~~~~^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/contextlib.py", line 162, in __exit__
+    self.gen.throw(value)
+    ~~~~~~~~~~~~~~^^^^^^^
+  File "/opt/homebrew/lib/python3.14/site-packages/starlette/_utils.py", line 93, in collapse_excgroups
+    raise exc
+  File "/opt/homebrew/lib/python3.14/site-packages/starlette/middleware/base.py", line 191, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/api.py", line 76, in dispatch
+    return await call_next(request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/lib/python3.14/site-packages/starlette/middleware/base.py", line 165, in call_next
+    raise app_exc
+  File "/opt/homebrew/lib/python3.14/site-packages/starlette/middleware/base.py", line 151, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/opt/homebrew/lib/python3.14/site-packages/starlette/middleware/cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "/opt/homebrew/lib/python3.14/site-packages/starlette/middleware/exceptions.py", line 65, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/opt/homebrew/lib/python3.14/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/opt/homebrew/lib/python3.14/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/opt/homebrew/lib/python3.14/site-packages/starlette/routing.py", line 756, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/opt/homebrew/lib/python3.14/site-packages/starlette/routing.py", line 776, in app
+    await route.handle(scope, receive, send)
+  File "/opt/homebrew/lib/python3.14/site-packages/starlette/routing.py", line 297, in handle
+    await self.app(scope, receive, send)
+  File "/opt/homebrew/lib/python3.14/site-packages/starlette/routing.py", line 77, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/opt/homebrew/lib/python3.14/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/opt/homebrew/lib/python3.14/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/opt/homebrew/lib/python3.14/site-packages/starlette/routing.py", line 72, in app
+    response = await func(request)
+               ^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/lib/python3.14/site-packages/fastapi/routing.py", line 278, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        dependant=dependant, values=values, is_coroutine=is_coroutine
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/opt/homebrew/lib/python3.14/site-packages/fastapi/routing.py", line 191, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/api.py", line 579, in login
+    if not verify_user_password(user_id, req.password):
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/config.py", line 72, in verify_user_password
+    return bcrypt.checkpw(password.encode(), user["password_hash"].encode())
+           ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: Invalid salt
+WARNING: RPC match_vectors failed ({'message': 'Could not find the function public.match_vectors(match_collection_id, match_count, query_embedding) in the schema cache', 'code': 'PGRST202', 'hint': None, 'details': 'Searched for the function public.match_vectors with parameters match_collection_id, match_count, query_embedding or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.'}), using fallback
+INFO:     127.0.0.1:49300 - "POST /v1/demo/ask HTTP/1.1" 200 OK
