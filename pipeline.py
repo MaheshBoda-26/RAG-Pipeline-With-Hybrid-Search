@@ -51,7 +51,7 @@ class RAGPipeline:
             api_key=self.settings.nvidia_api_key,
             base_url=self.settings.nvidia_base_url,
         )
-        self.embedder = Embedder(self.client, self.settings.embedding_model)
+        self.embedder = Embedder(self.client, self.settings.embedding_model, self.settings.embedding_dim)
 
         # Get user-specific collection name
         collection_name = self.settings.get_collection_name(self.user_id)

@@ -8,9 +8,10 @@ BATCH_SIZE = 128
 
 
 class Embedder:
-    def __init__(self, client: OpenAI, model: str):
+    def __init__(self, client: OpenAI, model: str, expected_dim: int | None = None):
         self.client = client
         self.model = model
+        self.expected_dim = expected_dim
         # NVIDIA asymmetric embedding models require input_type
         self.is_nvidia_asymmetric = "nvidia/nv-embedqa" in model or "nvidia/llama-nemotron-embed" in model
         self._local_model = None
@@ -40,7 +41,10 @@ class Embedder:
             return out
         except Exception as e:
             print(f"API embedding failed, using local model: {e}")
-            return self._embed_local(texts)
+            local_embeddings = self._embed_local(texts)
+            if self.expected_dim and local_embeddings and len(local_embeddings[0]) != self.expected_dim:
+                print(f"WARNING: Local model dim {len(local_embeddings[0])} != expected {self.expected_dim}. Queries may fail.")
+            return local_embeddings
 
     def _embed_local(self, texts: list[str]) -> list[list[float]]:
         """Embed using local sentence-transformers model."""
@@ -60,7 +64,10 @@ class Embedder:
                 return resp.data[0].embedding
             except Exception as e:
                 print(f"API query embedding failed, using local model: {e}")
-        return self._embed_local([text])[0]
+        local_emb = self._embed_local([text])[0]
+        if self.expected_dim and len(local_emb) != self.expected_dim:
+            print(f"WARNING: Local model dim {len(local_emb)} != expected {self.expected_dim}. Queries may fail.")
+        return local_emb
 
 
 def create_openai_client(api_key: str | None = None, base_url: str | None = None) -> OpenAI:

@@ -375,13 +375,13 @@ async def _process_file_upload(file: UploadFile, user_id: str) -> dict:
     if mime not in allowed_mimes:
         raise HTTPException(400, f"Invalid file type: {mime}. Allowed: PDF, TXT, MD, DOCX, DOC")
 
-    # Check extension matches MIME
+    # Check extension matches MIME (python-magic returns text/plain for .md, application/zip for .doc)
     ext_mime_map = {
         ".pdf": "application/pdf",
         ".txt": "text/plain",
-        ".md": "text/markdown",
+        ".md": "text/plain",        # libmagic returns text/plain for markdown
         ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        ".doc": "application/msword",
+        ".doc": "application/zip",  # older libmagic returns zip for .doc
     }
     ext = Path(safe_filename).suffix.lower()
     if ext in ext_mime_map and mime != ext_mime_map[ext]:
