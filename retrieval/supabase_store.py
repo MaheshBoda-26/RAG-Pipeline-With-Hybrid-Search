@@ -100,7 +100,7 @@ class SupabaseVectorStore:
                     "payload": row["payload"],
                 } for row in result.data]
         except Exception as e:
-            print(f"WARNING: RPC match_vectors failed ({e}), using fallback")
+            print(f"WARNING: RPC match_vectors failed for collection {self.collection_id} ({e}). Falling back to O(n) Python similarity computation — this will be slow for large datasets. Run supabase_migration.sql to create the RPC function.")
             # Fallback: fetch all and compute locally (for small datasets)
 
         # Fallback: fetch all vectors and compute similarity in Python

@@ -89,3 +89,26 @@ GRANT EXECUTE ON FUNCTION set_current_user_id(TEXT) TO anon, authenticated, serv
 -- (Run after app creates users, or manually insert)
 -- INSERT INTO collections (name, user_id, embedding_dim)
 -- VALUES ('docs', 'default', 1024);
+
+-- 13. Create match_vectors function for similarity search
+CREATE OR REPLACE FUNCTION match_vectors (
+    query_embedding vector,
+    match_collection_id uuid,
+    match_count int
+)
+RETURNS TABLE (
+    id uuid,
+    similarity float,
+    payload jsonb
+)
+LANGUAGE sql
+AS $$
+    SELECT
+        v.id,
+        1 - (v.embedding <=> query_embedding) AS similarity,
+        v.payload
+    FROM vectors v
+    WHERE v.collection_id = match_collection_id
+    ORDER BY v.embedding <=> query_embedding
+    LIMIT match_count;
+$$;
