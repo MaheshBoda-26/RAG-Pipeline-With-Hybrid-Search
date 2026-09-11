@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "File too large. Maximum size: 10MB" }, { status: 413 });
     }
 
-    // Validate file type
+    // Validate file type (accept MIME type OR file extension - browsers often send empty type for .md/.doc)
     const allowedTypes = [
       "application/pdf",
       "text/plain",
@@ -28,7 +28,9 @@ export async function POST(req: NextRequest) {
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
       "application/msword",
     ];
-    if (!allowedTypes.includes(file.type)) {
+    const allowedExtensions = [".pdf", ".docx", ".doc", ".txt", ".md"];
+    const ext = "." + file.name.toLowerCase().split(".").pop();
+    if (!allowedTypes.includes(file.type) && !allowedExtensions.includes(ext)) {
       return NextResponse.json({ error: "Unsupported file type" }, { status: 400 });
     }
 
@@ -54,11 +56,11 @@ export async function POST(req: NextRequest) {
 
     clearTimeout(timeoutId);
 
-    const data = await upstream.json();
+    const data = await upstream.json().catch(() => ({}));
 
     if (!upstream.ok) {
       return NextResponse.json(
-        { error: "Upstream pipeline error" },
+        { error: data.detail || data.error || "Upstream pipeline error" },
         { status: upstream.status }
       );
     }

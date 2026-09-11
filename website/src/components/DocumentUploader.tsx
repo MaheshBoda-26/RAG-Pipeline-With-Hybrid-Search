@@ -92,7 +92,7 @@ export function DocumentUploader() {
       const formData = new FormData();
       formData.append("file", fileData);
 
-      const res = await fetch("/api/upload", {
+      const res = await fetch("/api/demo/upload", {
         method: "POST",
         body: formData,
       });
