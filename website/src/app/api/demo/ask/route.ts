@@ -13,13 +13,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const { question } = body as { question?: string };
+  const { question, source } = body as { question?: string; source?: string };
   if (!question || typeof question !== "string" || question.trim() === "") {
     return NextResponse.json({ error: "question is required" }, { status: 400 });
   }
 
   // Sanitize input - limit length and remove potential injection chars
   const sanitizedQuestion = question.slice(0, 2000).replace(/[<>]/g, "");
+  const sanitizedSource = source?.slice(0, 500).replace(/[<>]/g, "") || null;
 
   try {
     // No auth required for demo, but add rate limiting awareness
