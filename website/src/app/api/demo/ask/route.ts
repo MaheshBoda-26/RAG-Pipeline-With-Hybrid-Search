@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
   try {
     // No auth required for demo, but add rate limiting awareness
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
+    const timeoutId = setTimeout(() => controller.abort(), 120000); // 120s timeout (local embeddings can be slow)
 
     const upstreamBody: Record<string, string> = { question: sanitizedQuestion };
     if (sanitizedSource) {
