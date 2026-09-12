@@ -1,18 +1,8 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
 import { ArrowRight, Zap, Shield, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-const VectorSpace3D = dynamic(() => import("@/components/vector-space-3d").then((m) => m.VectorSpace3D), {
-  ssr: false,
-  loading: () => (
-    <div className="aspect-square w-full rounded-lg bg-surface-dark-soft flex items-center justify-center" role="status" aria-label="Loading visualization">
-      <div className="w-8 h-8 border-2 border-accent-teal border-t-transparent rounded-full animate-spin" />
-    </div>
-  ),
-});
 
 const sampleChunks = [
   { id: "1", x: -2.1, y: 0.5, z: -1.2, source: "authentication.md", strategy: "recursive", text: "API authentication uses Bearer tokens with JWT validation...", role: "dense" as const },
@@ -128,15 +118,6 @@ export function Hero() {
             transition={{ delay: 0.3, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
             className="flex flex-col gap-6 lg:-ml-4"
           >
-            <div className="relative overflow-hidden rounded-2xl border border-white/5 bg-surface-dark shadow-[0_32px_90px_-56px_rgba(20,20,19,0.9)]" style={{ backgroundColor: 'var(--color-surface-dark)' }}>
-              <VectorSpace3D
-                chunks={sampleChunks}
-                query="How do I authenticate?"
-                interactive={false}
-                className="min-h-[360px] h-[clamp(360px,42vw,560px)] w-full"
-              />
-            </div>
-
             <div className="rounded-2xl overflow-hidden" style={{ backgroundColor: 'var(--color-surface-dark)' }}>
               <div className="flex items-center gap-3 px-4 sm:px-5 pt-4 pb-3" style={{ backgroundColor: 'var(--color-surface-dark-elevated)' }}>
                 <div className="flex gap-1.5">
