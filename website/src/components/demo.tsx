@@ -322,21 +322,6 @@ export function Demo() {
                   </div>
 
                   <div className="p-6 space-y-6">
-                    <div className="grid sm:grid-cols-3 gap-4">
-                      <div className="rounded-lg p-4 text-center" style={{ backgroundColor: 'color-mix(in srgb, var(--color-primary) 10%, transparent)' }}>
-                        <div className="text-3xl font-bold text-primary">{Math.round(response.confidence * 100)}%</div>
-                        <div className="text-sm text-muted-foreground">Composite Confidence</div>
-                      </div>
-                      <div className="rounded-lg p-4 text-center" style={{ backgroundColor: 'color-mix(in srgb, var(--color-accent) 10%, transparent)' }}>
-                        <div className="text-3xl font-bold text-accent">{response.retrieval.reranked}</div>
-                        <div className="text-sm text-muted-foreground">Reranked Finalists</div>
-                      </div>
-                      <div className="rounded-lg p-4 text-center" style={{ backgroundColor: 'color-mix(in srgb, var(--color-success) 10%, transparent)' }}>
-                        <div className="text-3xl font-bold text-success-500">{response.sources.length}</div>
-                        <div className="text-sm text-muted-foreground">Verified Citations</div>
-                      </div>
-                    </div>
-
                     <div>
                       <h4 className="font-semibold mb-3 flex items-center gap-2" style={{ color: 'var(--color-foreground)' }}>
                         <Info className="w-4 h-4" />
@@ -368,31 +353,6 @@ export function Demo() {
                             </div>
                           </motion.div>
                         ))}
-                      </div>
-                    </div>
-
-                    <div className="pt-4 border-t" style={{ borderColor: 'var(--color-border)' }}>
-                      <h4 className="font-semibold mb-3 flex items-center gap-2" style={{ color: 'var(--color-foreground)' }}>
-                        <Info className="w-4 h-4" />
-                        Retrieval Breakdown
-                      </h4>
-                      <div className="grid sm:grid-cols-4 gap-3 text-center">
-                        <div className="p-3 rounded-lg" style={{ backgroundColor: 'color-mix(in srgb, var(--color-primary) 10%, transparent)' }}>
-                          <div className="text-2xl font-bold text-primary">{response.retrieval.dense}</div>
-                          <div className="text-xs text-muted-foreground">Dense Matches</div>
-                        </div>
-                        <div className="p-3 rounded-lg" style={{ backgroundColor: 'color-mix(in srgb, var(--color-secondary) 10%, transparent)' }}>
-                          <div className="text-2xl font-bold text-secondary">{response.retrieval.sparse}</div>
-                          <div className="text-xs text-muted-foreground">Sparse Matches</div>
-                        </div>
-                        <div className="p-3 rounded-lg" style={{ backgroundColor: 'color-mix(in srgb, var(--color-accent) 10%, transparent)' }}>
-                          <div className="text-2xl font-bold text-accent">{response.retrieval.fused}</div>
-                          <div className="text-xs text-muted-foreground">After RRF Fusion</div>
-                        </div>
-                        <div className="p-3 rounded-lg" style={{ backgroundColor: 'color-mix(in srgb, var(--color-success) 10%, transparent)' }}>
-                          <div className="text-2xl font-bold text-success-500">{response.retrieval.reranked}</div>
-                          <div className="text-xs text-muted-foreground">After LLM Rerank</div>
-                        </div>
                       </div>
                     </div>
                   </div>
