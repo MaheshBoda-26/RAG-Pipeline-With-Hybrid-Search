@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Loader2, Copy, Check, AlertCircle, Info, Sparkles, Upload } from "lucide-react";
+import { Loader2, Copy, Check, AlertCircle, Info, Sparkles, Upload, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { VectorSpace3D } from "@/components/vector-space-3d";
@@ -17,20 +17,30 @@ const sampleQuestions = [
   "What chunking strategies are available?",
 ];
 
-const sampleResponse = {
-  answer: "To authenticate with the API, include a Bearer token in the Authorization header:\n\n```bash\ncurl -H \"Authorization: Bearer YOUR_TOKEN\" \\\n  http://localhost:8000/v1/ask\n```\n\nThe token must be a valid JWT issued by your authentication provider. Tokens expire after 1 hour and can be refreshed using the `/v1/auth/refresh` endpoint with a valid refresh token.",
-  confidence: 0.94,
-  sources: [
-    { id: "auth-1", source: "authentication.md", text: "API authentication uses Bearer tokens with JWT validation...", score: 0.96 },
-    { id: "auth-2", source: "authentication.md", text: "Token refresh endpoint accepts valid refresh tokens...", score: 0.89 },
-  ],
-  retrieval: { dense: 3, sparse: 2, fused: 5, reranked: 2 },
-};
+interface AskResponse {
+  answer: string;
+  confidence: number;
+  sources: Array<{
+    id: string;
+    source: string;
+    text: string;
+    score: number;
+  }>;
+  retrieval: {
+    dense: number;
+    sparse: number;
+    fused: number;
+    reranked: number;
+  };
+  refused?: boolean;
+  refusal_reason?: string;
+}
 
 export function Demo() {
   const [query, setQuery] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(false);
-  const [response, setResponse] = React.useState<typeof sampleResponse | null>(null);
+  const [response, setResponse] = React.useState<AskResponse | null>(null);
+  const [error, setError] = React.useState<string | null>(null);
   const [config, setConfig] = React.useState({ denseWeight: 0.7, sparseWeight: 0.3 });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -39,14 +49,46 @@ export function Demo() {
 
     setIsLoading(true);
     setResponse(null);
+    setError(null);
 
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    try {
+      const res = await fetch("/api/demo/ask", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question: query.trim() }),
+      });
 
-    setResponse({
-      ...sampleResponse,
-      answer: sampleResponse.answer.replace("YOUR_TOKEN", "dev-secret-key"),
-    });
-    setIsLoading(false);
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || data.detail || "Query failed");
+      }
+
+      // Transform API response to match expected format
+      setResponse({
+        answer: data.answer,
+        confidence: data.confidence?.composite ?? 0,
+        sources: (data.sources || []).map((s: any, i: number) => ({
+          id: s.block ? `block-${s.block}` : `source-${i}`,
+          source: s.source,
+          text: s.text || s.payload?.text || "",
+          score: s.rerank_score || s.fused_score || 0,
+        })),
+        retrieval: {
+          dense: 0,
+          sparse: 0,
+          fused: data.sources?.length || 0,
+          reranked: data.sources?.length || 0,
+        },
+        refused: data.refused,
+        refusal_reason: data.refusal_reason,
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Query failed");
+      setResponse(null);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleSampleClick = (q: string) => {
@@ -370,7 +412,52 @@ export function Demo() {
                   <p className="text-muted-foreground" style={{ color: 'var(--color-muted-foreground)' }}>Enter a question above or click a sample to see the grounded answer with citations</p>
                 </motion.div>
               )}
-            </AnimatePresence>
+            {error ? (
+                <motion.div
+                  key="error"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  className="bg-destructive/10 border border-destructive/30 rounded-xl p-6 text-center"
+                >
+                  <AlertCircle className="w-8 h-8 mx-auto mb-3 text-destructive" />
+                  <h3 className="text-lg font-semibold text-destructive mb-2">Query Failed</h3>
+                  <p className="text-muted-foreground">{error}</p>
+                  <Button variant="outline" size="sm" onClick={() => setError(null)} className="mt-4">
+                    Dismiss
+                  </Button>
+                </motion.div>
+              ) : response?.refused ? (
+                <motion.div
+                  key="refused"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  className="bg-warning/10 border border-warning/30 rounded-xl p-6 text-center"
+                >
+                  <AlertTriangle className="w-8 h-8 mx-auto mb-3 text-warning" />
+                  <h3 className="text-lg font-semibold text-warning mb-2">Could not find enough information</h3>
+                  <p className="text-muted-foreground">{response.answer}</p>
+                  {response.refusal_reason && (
+                    <p className="text-sm text-muted-foreground mt-2 font-mono">{response.refusal_reason}</p>
+                  )}
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="empty"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="bg-surface border border-border rounded-xl p-12 text-center"
+                  style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}
+                >
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--color-surface-soft)' }}>
+                    <Info className="w-8 h-8 text-muted-foreground" />
+                  </div>
+                  <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--color-foreground)' }}>Ready to query</h3>
+                  <p className="text-muted-foreground" style={{ color: 'var(--color-muted-foreground)' }}>Enter a question above or click a sample to see the grounded answer with citations</p>
+                </motion.div>
+              )}
+          </AnimatePresence>
           </motion.div>
         </div>
       </div>

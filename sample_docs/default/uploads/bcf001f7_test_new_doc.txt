@@ -1,0 +1,10 @@
+# New Test Document
+
+This is a brand new test document about quantum computing.
+Quantum computers use qubits instead of classical bits.
+They can solve certain problems exponentially faster than classical computers.
+
+Key concepts:
+- Superposition
+- Entanglement
+- Quantum interference
