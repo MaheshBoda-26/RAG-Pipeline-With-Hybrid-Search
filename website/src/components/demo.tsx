@@ -357,22 +357,7 @@ export function Demo() {
                     </div>
                   </div>
                 </motion.div>
-              ) : (
-                <motion.div
-                  key="empty"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="bg-surface border border-border rounded-xl p-12 text-center"
-                  style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}
-                >
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--color-surface-soft)' }}>
-                    <Info className="w-8 h-8 text-muted-foreground" />
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--color-foreground)' }}>Ready to query</h3>
-                  <p className="text-muted-foreground" style={{ color: 'var(--color-muted-foreground)' }}>Enter a question above or click a sample to see the grounded answer with citations</p>
-                </motion.div>
-              )}
-            {error ? (
+              ) : error ? (
                 <motion.div
                   key="error"
                   initial={{ opacity: 0, y: 20 }}
