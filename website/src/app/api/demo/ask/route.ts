@@ -27,10 +27,15 @@ export async function POST(req: NextRequest) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
 
+    const upstreamBody: Record<string, string> = { question: sanitizedQuestion };
+    if (sanitizedSource) {
+      upstreamBody.source = sanitizedSource;
+    }
+
     const upstream = await fetch(`${BACKEND_URL}/v1/demo/ask`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ question: sanitizedQuestion }),
+      body: JSON.stringify(upstreamBody),
       cache: "no-store",
       signal: controller.signal,
     });
