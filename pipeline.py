@@ -29,6 +29,7 @@ from retrieval.reranker import rerank
 from retrieval.sparse import BM25Index
 from retrieval.vector_store import QdrantVectorStore
 from retrieval.supabase_store import SupabaseVectorStore, create_supabase_store
+from retrieval.query_cache import QueryCache
 
 
 @dataclass
@@ -71,6 +72,18 @@ class RAGPipeline:
             )
         self.bm25 = BM25Index(user_id=self.user_id)
         self._rebuild_sparse_index()  # picks up anything already in vector store from a prior run
+
+        # Query cache (Redis semantic cache)
+        self.query_cache = None
+        if self.settings.redis_url:
+            try:
+                self.query_cache = QueryCache(
+                    redis_url=self.settings.redis_url,
+                    name=f"rag_query_cache_{self.user_id}",
+                )
+            except Exception:
+                # Cache is optional; continue without it if Redis unavailable
+                self.query_cache = None
 
     # ------------------------------------------------------------------
     # Ingestion
@@ -188,6 +201,16 @@ class RAGPipeline:
     def ask(self, question: str, source: str | None = None) -> AskResponse:
         query_embedding = self.embedder.embed_one(question)
 
+        # Check query cache first
+        if self.query_cache:
+            cached = self.query_cache.lookup(
+                query_embedding=query_embedding,
+                user_id=self.user_id,
+                source_filter=source,
+            )
+            if cached:
+                return AskResponse(**cached)
+
         # If a specific source is targeted, query a larger initial pool to ensure chunks are captured
         dense_k = max(self.settings.dense_top_k * 3, 50) if (source and source.lower() != "all") else self.settings.dense_top_k
         sparse_k = max(self.settings.sparse_top_k * 3, 50) if (source and source.lower() != "all") else self.settings.sparse_top_k
@@ -261,7 +284,7 @@ class RAGPipeline:
 
         composite = composite_confidence(retr_conf, coverage, completeness)
 
-        return AskResponse(
+        response = AskResponse(
             question=question,
             answer=answer,
             sources=[
@@ -282,6 +305,22 @@ class RAGPipeline:
                 "composite": composite,
             },
         )
+
+        # Store in cache for future queries
+        if self.query_cache:
+            try:
+                self.query_cache.store(
+                    query=question,
+                    response=asdict(response),
+                    query_embedding=query_embedding,
+                    user_id=self.user_id,
+                    source_filter=source,
+                )
+            except Exception:
+                # Cache failures shouldn't break the main flow
+                pass
+
+        return response
 
     def delete_document(self, source: str) -> int:
         """Delete all chunks for a given source document. Returns count deleted."""

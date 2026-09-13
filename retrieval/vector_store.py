@@ -48,10 +48,11 @@ class QdrantVectorStore:
                     "default": qmodels.VectorParams(
                         size=self.embedding_dim,
                         distance=qmodels.Distance.COSINE,
-                        quantization_config=qmodels.TurboQuantization(
-                            turbo=qmodels.TurboQuantQuantizationConfig(
-                                bits=qmodels.TurboQuantBitSize.BITS1,
-                                memory=qmodels.Memory.PINNED
+                        quantization_config=qmodels.ScalarQuantization(
+                            scalar=qmodels.ScalarQuantizationConfig(
+                                type=qmodels.ScalarType.INT8,
+                                quantile=0.99,
+                                always_ram=False
                             )
                         )
                     )
@@ -87,10 +88,11 @@ class QdrantVectorStore:
                         "default": qmodels.VectorParams(
                             size=self.embedding_dim,
                             distance=qmodels.Distance.COSINE,
-                            quantization_config=qmodels.TurboQuantization(
-                                turbo=qmodels.TurboQuantQuantizationConfig(
-                                    bits=qmodels.TurboQuantBitSize.BITS1,
-                                    memory=qmodels.Memory.PINNED
+                            quantization_config=qmodels.ScalarQuantization(
+                                scalar=qmodels.ScalarQuantizationConfig(
+                                    type=qmodels.ScalarType.INT8,
+                                    quantile=0.99,
+                                    always_ram=False
                                 )
                             )
                         )
