@@ -130,6 +130,7 @@ class Settings:
     # --- Storage ---
     qdrant_path: str = os.getenv("QDRANT_PATH", "./qdrant_data")
     qdrant_url: str = os.getenv("QDRANT_URL", "")  # if set, use remote server instead of embedded
+    redis_url: str = os.getenv("REDIS_URL", "")  # if set, enable semantic query cache
     collection_name: str = os.getenv("COLLECTION_NAME", "docs")
     embedding_dim: int = int(os.getenv("EMBEDDING_DIM", "1536"))
 
