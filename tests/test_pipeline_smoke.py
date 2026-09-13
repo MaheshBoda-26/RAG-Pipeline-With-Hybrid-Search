@@ -106,7 +106,7 @@ def run():
     qdrant_tmp = tempfile.mkdtemp(prefix="qdrant_test_")
     os.environ["QDRANT_PATH"] = qdrant_tmp
 
-    with mock.patch("pipeline.OpenAI", FakeOpenAI), mock.patch("retrieval.embeddings.OpenAI", FakeOpenAI):
+    with mock.patch("pipeline.OpenAI", FakeOpenAI), mock.patch("retrieval.embeddings.OpenAI", FakeOpenAI), mock.patch("retrieval.cross_encoder_reranker.CrossEncoderReranker", FakeCrossEncoder):
         from config import Settings
         from pipeline import RAGPipeline
 
