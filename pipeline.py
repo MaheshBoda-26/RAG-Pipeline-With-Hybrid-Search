@@ -80,6 +80,9 @@ class RAGPipeline:
             try:
                 self.query_cache = QueryCache(
                     redis_url=self.settings.redis_url,
+                    exact_ttl=self.settings.cache_exact_ttl,
+                    semantic_ttl=self.settings.cache_semantic_ttl,
+                    distance_threshold=self.settings.cache_distance_threshold,
                     name=f"rag_query_cache_{self.user_id}",
                 )
             except Exception:
