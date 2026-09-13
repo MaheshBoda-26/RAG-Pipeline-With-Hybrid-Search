@@ -46,8 +46,18 @@ class QdrantVectorStore:
                 collection_name=self.collection_name,
                 vectors_config={
                     "default": qmodels.VectorParams(
-                        size=self.embedding_dim, distance=qmodels.Distance.COSINE
+                        size=self.embedding_dim,
+                        distance=qmodels.Distance.COSINE,
+                        quantization_config=qmodels.TurboQuantization(
+                            turbo=qmodels.TurboQuantQuantizationConfig(
+                                bits=qmodels.TurboQuantBitSize.BITS1,
+                                memory=qmodels.Memory.PINNED
+                            )
+                        )
                     )
+                },
+                sparse_vectors_config={
+                    "bm25": qmodels.SparseVectorParams(modifier=qmodels.Modifier.IDF)
                 },
             )
         else:
@@ -75,8 +85,18 @@ class QdrantVectorStore:
                     collection_name=self.collection_name,
                     vectors_config={
                         "default": qmodels.VectorParams(
-                            size=self.embedding_dim, distance=qmodels.Distance.COSINE
+                            size=self.embedding_dim,
+                            distance=qmodels.Distance.COSINE,
+                            quantization_config=qmodels.TurboQuantization(
+                                turbo=qmodels.TurboQuantQuantizationConfig(
+                                    bits=qmodels.TurboQuantBitSize.BITS1,
+                                    memory=qmodels.Memory.PINNED
+                                )
+                            )
                         )
+                    },
+                    sparse_vectors_config={
+                        "bm25": qmodels.SparseVectorParams(modifier=qmodels.Modifier.IDF)
                     },
                 )
 
@@ -109,6 +129,54 @@ class QdrantVectorStore:
             limit=top_k,
             with_payload=True,
         ).points
+        return [{"id": r.id, "score": r.score, "payload": r.payload} for r in results]
+
+    def hybrid_query(
+        self,
+        query_embedding: list[float],
+        question: str,
+        top_k: int,
+        source_filter: str | None = None,
+    ) -> list[dict]:
+        """Hybrid search using Qdrant Query API with RRF fusion.
+
+        Args:
+            query_embedding: Dense vector for semantic search
+            question: Query text for BM25 sparse search
+            top_k: Number of results to return
+            source_filter: Optional source filter to apply at Qdrant level
+
+        Returns:
+            List of {id, score, payload} ranked by RRF fusion
+        """
+        scroll_filter = None
+        if source_filter:
+            scroll_filter = qmodels.Filter(
+                must=[qmodels.FieldCondition(key="source", match=qmodels.MatchValue(value=source_filter))]
+            )
+
+        prefetch = [
+            qmodels.Prefetch(
+                query=query_embedding,
+                using="default",
+                limit=top_k * 2,
+            ),
+            qmodels.Prefetch(
+                query=qmodels.Document(text=question, model="Qdrant/bm25"),
+                using="bm25",
+                limit=top_k * 2,
+            ),
+        ]
+
+        results = self.client.query_points(
+            collection_name=self.collection_name,
+            prefetch=prefetch,
+            query=qmodels.FusionQuery(fusion=qmodels.Fusion.RRF),
+            limit=top_k,
+            with_payload=True,
+            scroll_filter=scroll_filter,
+        ).points
+
         return [{"id": r.id, "score": r.score, "payload": r.payload} for r in results]
 
     def count(self) -> int:
