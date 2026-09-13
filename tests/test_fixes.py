@@ -90,7 +90,6 @@ class FakeOpenAI:
 @pytest.fixture(scope="module")
 def mock_openai_module():
     with mock.patch("pipeline.OpenAI", FakeOpenAI), \
-         mock.patch("retrieval.reranker.OpenAI", FakeOpenAI), \
          mock.patch("generation.generate.OpenAI", FakeOpenAI), \
          mock.patch("generation.citations.OpenAI", FakeOpenAI), \
          mock.patch("retrieval.embeddings.OpenAI", FakeOpenAI):

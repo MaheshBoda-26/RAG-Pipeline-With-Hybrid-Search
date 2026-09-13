@@ -80,6 +80,21 @@ class FakeChatAPI:
         return mock.Mock(choices=[mock.Mock(message=mock.Mock(content=content))])
 
 
+class FakeCrossEncoder:
+    def __init__(self, model_name, device="cpu", max_length=512):
+        self.model_name = model_name
+
+    def predict(self, pairs, show_progress_bar=False):
+        import numpy as np
+        # Crude rerank: count how many query words appear in each passage
+        scores = []
+        for question, passage in pairs:
+            q_words = set(question.lower().split())
+            overlap = sum(1 for w in q_words if w in passage.lower())
+            scores.append(min(10, overlap * 3))
+        return np.array(scores)
+
+
 class FakeOpenAI:
     def __init__(self, api_key=None, base_url=None):
         self.embeddings = FakeEmbeddingsAPI()
@@ -91,7 +106,7 @@ def run():
     qdrant_tmp = tempfile.mkdtemp(prefix="qdrant_test_")
     os.environ["QDRANT_PATH"] = qdrant_tmp
 
-    with mock.patch("pipeline.OpenAI", FakeOpenAI), mock.patch("retrieval.reranker.OpenAI", FakeOpenAI), mock.patch("retrieval.embeddings.OpenAI", FakeOpenAI):
+    with mock.patch("pipeline.OpenAI", FakeOpenAI), mock.patch("retrieval.cross_encoder_reranker.CrossEncoder", FakeCrossEncoder), mock.patch("retrieval.embeddings.OpenAI", FakeOpenAI):
         from config import Settings
         from pipeline import RAGPipeline
 

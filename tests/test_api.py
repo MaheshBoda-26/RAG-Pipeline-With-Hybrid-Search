@@ -87,7 +87,6 @@ class FakeOpenAI:
 def mock_openai():
     """Patch OpenAI for all tests."""
     with mock.patch("pipeline.OpenAI", FakeOpenAI), \
-         mock.patch("retrieval.reranker.OpenAI", FakeOpenAI), \
          mock.patch("generation.generate.OpenAI", FakeOpenAI), \
          mock.patch("generation.citations.OpenAI", FakeOpenAI), \
          mock.patch("retrieval.embeddings.OpenAI", FakeOpenAI):
