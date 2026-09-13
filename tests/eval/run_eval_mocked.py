@@ -338,7 +338,7 @@ if __name__ == "__main__":
     qdrant_tmp = tempfile.mkdtemp(prefix="qdrant_test_")
     os.environ["QDRANT_PATH"] = qdrant_tmp
 
-    with mock.patch("pipeline.OpenAI", FakeOpenAI), mock.patch("retrieval.reranker.OpenAI", FakeOpenAI), mock.patch("generation.generate.OpenAI", FakeOpenAI), mock.patch("generation.citations.OpenAI", FakeOpenAI), mock.patch("retrieval.embeddings.OpenAI", FakeOpenAI):
+    with mock.patch("pipeline.OpenAI", FakeOpenAI), mock.patch("generation.generate.OpenAI", FakeOpenAI), mock.patch("generation.citations.OpenAI", FakeOpenAI), mock.patch("retrieval.embeddings.OpenAI", FakeOpenAI):
         from config import Settings
         from pipeline import RAGPipeline
 

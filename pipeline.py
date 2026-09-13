@@ -17,6 +17,7 @@ from generation.citations import (
     retrieval_confidence,
     score_completeness,
     verify_citations,
+    verify_citations_and_completeness_sync,
 )
 from generation.generate import generate_answer
 from generation.prompts import build_context_block
@@ -204,6 +205,7 @@ class RAGPipeline:
         # Check query cache first
         if self.query_cache:
             cached = self.query_cache.lookup(
+                query=question,
                 query_embedding=query_embedding,
                 user_id=self.user_id,
                 source_filter=source,
@@ -276,11 +278,19 @@ class RAGPipeline:
         answer = generate_answer(self.client, self.settings.chat_model, question, ranked)
 
         claims = extract_claims(answer)
-        claims = verify_citations(self.client, self.settings.chat_model, claims, ranked)
-        coverage = citation_coverage(claims)
-
         context_str = "\n\n".join(build_context_block(i + 1, c["payload"]) for i, c in enumerate(ranked))
-        completeness = score_completeness(self.client, self.settings.chat_model, question, answer, context_str)
+
+        # Run citation verification and completeness scoring in parallel
+        claims, completeness = verify_citations_and_completeness_sync(
+            self.client,
+            self.settings.chat_model,
+            claims,
+            ranked,
+            question,
+            answer,
+            context_str,
+        )
+        coverage = citation_coverage(claims)
 
         composite = composite_confidence(retr_conf, coverage, completeness)
 

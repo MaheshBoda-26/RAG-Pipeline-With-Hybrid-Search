@@ -154,11 +154,22 @@ class Settings:
     rrf_k: int = int(os.getenv("RRF_K", "60"))
     dense_weight: float = float(os.getenv("DENSE_WEIGHT", "0.7"))
     sparse_weight: float = float(os.getenv("SPARSE_WEIGHT", "0.3"))
-    rerank_candidate_pool: int = int(os.getenv("RERANK_CANDIDATE_POOL", "20"))
+    rerank_candidate_pool: int = int(os.getenv("RERANK_CANDIDATE_POOL", "15"))
     final_top_k: int = int(os.getenv("FINAL_TOP_K", "5"))
 
     # --- Confidence / fallback ---
     min_retrieval_confidence: float = float(os.getenv("MIN_RETRIEVAL_CONFIDENCE", "0.35"))
+
+    # --- Cross-encoder reranker ---
+    cross_encoder_model: str = os.getenv("CROSS_ENCODER_MODEL", "cross-encoder/ms-marco-MiniLM-L-6-v2")
+    cross_encoder_device: str = os.getenv("CROSS_ENCODER_DEVICE", "cpu")
+    cross_encoder_max_length: int = int(os.getenv("CROSS_ENCODER_MAX_LENGTH", "512"))
+
+    # --- Query cache ---
+    redis_url: str = os.getenv("REDIS_URL", "")
+    cache_exact_ttl: int = int(os.getenv("CACHE_EXACT_TTL", "3600"))
+    cache_semantic_ttl: int = int(os.getenv("CACHE_SEMANTIC_TTL", "14400"))
+    cache_distance_threshold: float = float(os.getenv("CACHE_DISTANCE_THRESHOLD", "0.1"))
 
     # --- Auth ---
     api_key: str = os.getenv("API_KEY", "dev-secret-key")

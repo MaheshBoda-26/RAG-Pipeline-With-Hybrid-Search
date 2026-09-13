@@ -5,8 +5,10 @@ refuse to answer).
 """
 from __future__ import annotations
 
+import asyncio
 import json
 import re
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 
 from openai import OpenAI
@@ -145,3 +147,71 @@ def retrieval_confidence(ranked_chunks: list[dict]) -> float:
 
 def composite_confidence(retrieval_conf: float, coverage: float, completeness: float) -> float:
     return round((retrieval_conf + coverage + completeness) / 3.0, 3)
+
+
+async def verify_citations_and_completeness_parallel(
+    client: OpenAI,
+    model: str,
+    claims: list[ClaimCitation],
+    ranked_chunks: list[dict],
+    question: str,
+    answer: str,
+    context: str,
+) -> tuple[list[ClaimCitation], float]:
+    """Run verify_citations and score_completeness in parallel using asyncio.
+
+    This reduces latency by ~50% compared to sequential execution since both
+    LLM calls can run simultaneously.
+
+    Args:
+        client: OpenAI client
+        model: Chat model name
+        claims: List of claims to verify
+        ranked_chunks: Ranked chunks for citation verification
+        question: Original question
+        answer: Generated answer
+        context: Context string for completeness scoring
+
+    Returns:
+        Tuple of (verified_claims, completeness_score)
+    """
+    loop = asyncio.get_event_loop()
+    executor = ThreadPoolExecutor(max_workers=2)
+
+    def run_verify():
+        return verify_citations(client, model, claims, ranked_chunks)
+
+    def run_completeness():
+        return score_completeness(client, model, question, answer, context)
+
+    # Run both in parallel
+    verify_task = loop.run_in_executor(executor, run_verify)
+    completeness_task = loop.run_in_executor(executor, run_completeness)
+
+    verified_claims, completeness = await asyncio.gather(verify_task, completeness_task)
+    executor.shutdown(wait=False)
+
+    return verified_claims, completeness
+
+
+def verify_citations_and_completeness_sync(
+    client: OpenAI,
+    model: str,
+    claims: list[ClaimCitation],
+    ranked_chunks: list[dict],
+    question: str,
+    answer: str,
+    context: str,
+) -> tuple[list[ClaimCitation], float]:
+    """Synchronous wrapper for parallel verification and completeness scoring.
+
+    Uses ThreadPoolExecutor to run both LLM calls concurrently.
+    """
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        verify_future = executor.submit(verify_citations, client, model, claims, ranked_chunks)
+        completeness_future = executor.submit(score_completeness, client, model, question, answer, context)
+
+        verified_claims = verify_future.result()
+        completeness = completeness_future.result()
+
+    return verified_claims, completeness

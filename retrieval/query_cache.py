@@ -66,6 +66,7 @@ class QueryCache:
 
     def lookup(
         self,
+        query: str,
         query_embedding: list[float],
         user_id: str,
         source_filter: str | None = None,
@@ -77,7 +78,7 @@ class QueryCache:
         Returns deserialized AskResponse dict or None if no hit.
         """
         # 1. Exact match via hash key
-        exact_key = self._make_exact_key(query_embedding, user_id, source_filter)
+        exact_key = self._make_exact_key(query, user_id, source_filter)
         exact_data = self._redis.get(exact_key)
         if exact_data:
             try:
