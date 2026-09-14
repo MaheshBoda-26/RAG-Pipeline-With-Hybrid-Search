@@ -372,6 +372,12 @@ class RAGPipeline:
         deleted = self.vector_store.delete_by_source(source)
         if deleted:
             self._rebuild_sparse_index()
+        # Invalidate query cache since documents have changed
+        if self.query_cache:
+            try:
+                self.query_cache.clear_user(self.user_id)
+            except Exception:
+                pass
         return deleted
 
     def list_documents(self) -> list[dict]:
