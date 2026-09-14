@@ -67,7 +67,11 @@ class Embedder:
                 # FastEmbed returns a generator, convert to list
                 embeddings = list(fastembed.embed(texts))
                 if self.expected_dim and embeddings and len(embeddings[0]) != self.expected_dim:
-                    print(f"WARNING: FastEmbed dim {len(embeddings[0])} != expected {self.expected_dim}. Queries may fail.")
+                    raise ValueError(
+                        f"FastEmbed dim {len(embeddings[0])} != expected {self.expected_dim}. "
+                        f"This will cause Qdrant vector dimension mismatch. "
+                        f"Ensure embedding model dimensions match Qdrant collection config."
+                    )
                 return embeddings
             except Exception as e:
                 print(f"FastEmbed failed, falling back to sentence-transformers: {e}")
@@ -76,7 +80,11 @@ class Embedder:
         model = self._get_local_model()
         embeddings = model.encode(texts, batch_size=32, show_progress_bar=False, convert_to_numpy=True)
         if self.expected_dim and embeddings.size > 0 and len(embeddings[0]) != self.expected_dim:
-            print(f"WARNING: Local model dim {len(embeddings[0])} != expected {self.expected_dim}. Queries may fail.")
+            raise ValueError(
+                f"Local model dim {len(embeddings[0])} != expected {self.expected_dim}. "
+                f"This will cause Qdrant vector dimension mismatch. "
+                f"Ensure embedding model dimensions match Qdrant collection config."
+            )
         return embeddings.tolist()
 
     @lru_cache(maxsize=1000)
