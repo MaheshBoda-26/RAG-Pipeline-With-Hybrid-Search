@@ -256,6 +256,7 @@ class RAGPipeline:
             question=question,
             top_k=self.settings.rerank_candidate_pool,
             source_filter=source,
+            bm25=self.bm25,
         )
 
         ranked = rerank(

@@ -11,8 +11,6 @@ DELETE /v1/documents/{source}  delete a document
 POST /v1/auth/register    register new user
 POST /v1/auth/login       login user (returns JWT cookies)
 """
-from __future__ import annotations
-
 import asyncio
 import os
 from pathlib import Path
@@ -22,12 +20,13 @@ import json
 
 from fastapi import (
     FastAPI, HTTPException, Security, Depends, UploadFile, File, Form,
-    Response, Request, Cookie, EventSourceResponse
+    Response, Request, Cookie, Body
 )
+from fastapi.responses import StreamingResponse
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.responses import Response as StarletteResponse, SSEResponse
+from starlette.responses import Response as StarletteResponse
 from pydantic import BaseModel
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
@@ -187,10 +186,26 @@ async def verify_auth(
         if user_id:
             return user_id
 
+    raise HTTPException(
+        status_code=401,
+        detail="Invalid or missing authentication. Please provide a valid Bearer token or login cookie."
+    )
+
+
+async def verify_admin(
+    request: Request,
+    access_token: str | None = Cookie(default=None, alias="access_token")
+) -> str:
+    """Verify that the caller is authenticated and has the 'admin' role."""
+    user_id = await verify_auth(request, access_token)
+    registry = load_user_registry()
+    user = registry.get(user_id, {})
+    if user.get("role") != "admin":
         raise HTTPException(
-            status_code=401,
-            detail="Invalid or expired token/API key."
+            status_code=403,
+            detail="Admin privileges required."
         )
+    return user_id
 
 
 class AskRequest(BaseModel):
@@ -209,38 +224,34 @@ class CreateUserRequest(BaseModel):
 
 @app.post("/v1/ask")
 @limiter.limit("30/minute")
-async def ask(request: Request, req: AskRequest, user_id: str = Depends(verify_auth)):
+async def ask(request: Request, req: AskRequest = Body(...), user_id: str = Depends(verify_auth)):
     pipeline = get_pipeline(user_id)
-    response = await pipeline.ask(req.question, source=req.source)
+    response = pipeline.ask(req.question, source=req.source)
     return response.__dict__
 
 
 @app.post("/v1/ask/stream")
 @limiter.limit("30/minute")
-async def ask_stream(request: Request, req: AskRequest, user_id: str = Depends(verify_auth)):
+async def ask_stream(request: Request, req: AskRequest = Body(...), user_id: str = Depends(verify_auth)):
     """SSE streaming endpoint for token-by-token generation."""
     pipeline = get_pipeline(user_id)
 
-    async def event_generator() -> AsyncGenerator[dict, None]:
+    async def event_generator():
         try:
             async for chunk in pipeline.ask_stream(req.question, source=req.source):
                 # Yield each token as it comes
-                yield {
-                    "event": "token",
-                    "data": json.dumps({"token": chunk["delta"]})
-                }
+                data = json.dumps({"token": chunk["delta"]})
+                yield f"event: token\ndata: {data}\n\n"
         except Exception as e:
-            yield {
-                "event": "error",
-                "data": json.dumps({"error": str(e)})
-            }
+            data = json.dumps({"error": str(e)})
+            yield f"event: error\ndata: {data}\n\n"
 
-    return SSEResponse(event_generator())
+    return StreamingResponse(event_generator(), media_type="text/event-stream")
 
 
 @app.post("/v1/ingest")
 @limiter.limit("10/minute")
-async def ingest(request: Request, req: IngestRequest, user_id: str = Depends(verify_auth)):
+async def ingest(request: Request, req: IngestRequest = Body(...), user_id: str = Depends(verify_auth)):
     pipeline = get_pipeline(user_id)
     try:
         return pipeline.ingest_directory(req.path)
@@ -284,9 +295,6 @@ async def _process_file_upload(file: UploadFile, user_id: str) -> dict:
         )
 
     # Validate MIME type from content
-    mime = json.loads(content).get("mime", "") if False else __import__("magic").from_buffer(content, mime=True)
-    Actually let me just use python-magic properly:
-
     import magic
     mime = magic.from_buffer(content, mime=True)
     allowed_mimes = {
@@ -409,7 +417,7 @@ async def delete_document(source: str, user_id: str = Depends(verify_auth)):
 # Admin endpoint to create users (requires authenticated admin user)
 @app.post("/v1/admin/users")
 async def admin_create_user(
-    req: CreateUserRequest,
+    req: CreateUserRequest = Body(...),
     user_id: str = Depends(verify_admin)
 ):
     """Create a new user. Requires authenticated admin user."""
@@ -422,3 +430,168 @@ async def admin_list_users(user_id: str = Depends(verify_admin)):
     """List all users. Requires authenticated admin user."""
     registry = load_user_registry()
     return {"users": registry}
+
+
+class RegisterRequest(BaseModel):
+    email: str
+    password: str
+    name: str | None = None
+
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+
+class TokenResponse(BaseModel):
+    access_token: str
+    refresh_token: str
+    token_type: str = "bearer"
+
+
+def set_auth_cookies(response: Response, access_token: str, refresh_token: str):
+    """Set HttpOnly cookies for auth tokens."""
+    secure = settings.cookie_secure
+    domain = settings.cookie_domain or None
+    response.set_cookie(
+        key="access_token",
+        value=access_token,
+        httponly=True,
+        secure=secure,
+        samesite="lax",
+        max_age=settings.access_token_expire_minutes * 60,
+        path="/",
+        domain=domain,
+    )
+    response.set_cookie(
+        key="refresh_token",
+        value=refresh_token,
+        httponly=True,
+        secure=secure,
+        samesite="lax",
+        max_age=settings.refresh_token_expire_days * 24 * 60 * 60,
+        path="/",
+        domain=domain,
+    )
+
+
+def clear_auth_cookies(response: Response):
+    """Clear HttpOnly auth cookies."""
+    domain = settings.cookie_domain or None
+    response.delete_cookie(key="access_token", path="/", domain=domain)
+    response.delete_cookie(key="refresh_token", path="/", domain=domain)
+
+
+@limiter.limit("5/minute")
+@app.post("/v1/auth/register", response_model=TokenResponse)
+async def register(request: Request, req: RegisterRequest = Body(...), response: Response = Response()):
+    """Register a new user and return JWT tokens in HttpOnly cookies."""
+    existing_user_id = get_user_by_email(req.email)
+    if existing_user_id:
+        raise HTTPException(status_code=400, detail="User already exists")
+
+    user_id, api_key = create_user(req.name or req.email, req.email, req.password)
+
+    access_token = create_access_token(user_id)
+    refresh_token = create_refresh_token(user_id)
+
+    set_auth_cookies(response, access_token, refresh_token)
+
+    return TokenResponse(access_token=access_token, refresh_token=refresh_token)
+
+
+@limiter.limit("5/minute")
+@app.post("/v1/auth/login", response_model=TokenResponse)
+async def login(request: Request, req: LoginRequest = Body(...), response: Response = Response()):
+    """Login user and return JWT tokens in HttpOnly cookies."""
+    user_id = get_user_by_email(req.email)
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+
+    if not verify_user_password(user_id, req.password):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+
+    access_token = create_access_token(user_id)
+    refresh_token = create_refresh_token(user_id)
+
+    set_auth_cookies(response, access_token, refresh_token)
+
+    return TokenResponse(access_token=access_token, refresh_token=refresh_token)
+
+
+@app.post("/v1/auth/refresh", response_model=TokenResponse)
+async def refresh_token(
+    response: Response,
+    refresh_token: str | None = Cookie(default=None, alias="refresh_token")
+):
+    """Refresh access token using refresh token."""
+    from config import decode_token
+    if not refresh_token:
+        raise HTTPException(status_code=401, detail="Refresh token not found")
+
+    payload = decode_token(refresh_token)
+    if not payload or payload.get("type") != "refresh":
+        raise HTTPException(status_code=401, detail="Invalid refresh token")
+
+    user_id = payload.get("sub")
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Invalid refresh token")
+
+    new_access_token = create_access_token(user_id)
+    new_refresh_token = create_refresh_token(user_id)
+
+    set_auth_cookies(response, new_access_token, new_refresh_token)
+
+    return TokenResponse(access_token=new_access_token, refresh_token=new_refresh_token)
+
+
+@app.post("/v1/auth/logout")
+async def logout(response: Response):
+    """Logout user by clearing cookies."""
+    clear_auth_cookies(response)
+    return {"message": "Logged out successfully"}
+
+
+@app.get("/v1/auth/me")
+async def get_current_user(user_id: str = Depends(verify_auth)):
+    """Get current authenticated user info."""
+    registry = load_user_registry()
+    user = registry.get(user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return {
+        "user_id": user_id,
+        "email": user.get("email", user.get("name", "")),
+        "name": user.get("name", ""),
+    }
+
+
+# --- Demo mode endpoint (uses global 'docs' collection) ---
+@limiter.limit("10/minute")
+@app.post("/v1/demo/ask")
+async def demo_ask(request: Request, req: AskRequest = Body(...)):
+    """Ask question using demo/global collection (no auth required)."""
+    pipeline = get_pipeline(settings.default_user_id)
+    response = pipeline.ask(req.question, source=req.source)
+    return response.__dict__
+
+
+@app.get("/v1/demo/documents")
+async def demo_documents():
+    """List demo documents (no auth required)."""
+    pipeline = get_pipeline(settings.default_user_id)
+    docs = pipeline.list_documents()
+    total_chunks = sum(d.get("chunk_count", 0) for d in docs)
+    return {"documents": docs, "total_documents": len(docs), "total_chunks": total_chunks}
+
+
+@limiter.limit("5/minute")
+@app.post("/v1/demo/upload")
+async def demo_upload(
+    request: Request,
+    file: UploadFile = File(...),
+):
+    """Upload a document file and ingest it using demo/global collection (no auth required)."""
+    import logging
+    logging.getLogger(__name__).info("Demo upload by anonymous user")
+    return await _process_file_upload(file, settings.default_user_id)
