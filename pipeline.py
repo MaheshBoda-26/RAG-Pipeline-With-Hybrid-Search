@@ -116,6 +116,12 @@ class RAGPipeline:
             all_chunks.extend(self._chunk_document(doc))
 
         if not all_chunks:
+            # Invalidate query cache since documents may have changed
+            if self.query_cache:
+                try:
+                    self.query_cache.clear_user(self.user_id)
+                except Exception:
+                    pass
             return {"documents": len(docs), "chunks_indexed": 0, "duplicates_skipped": 0}
 
         embeddings = self.embedder.embed([c.text for c in all_chunks])
@@ -134,6 +140,13 @@ class RAGPipeline:
 
         self.vector_store.upsert(kept_chunks, kept_embeddings)
         self._rebuild_sparse_index()
+
+        # Invalidate query cache since documents have changed
+        if self.query_cache:
+            try:
+                self.query_cache.clear_user(self.user_id)
+            except Exception:
+                pass
 
         return {
             "documents": len(docs),
