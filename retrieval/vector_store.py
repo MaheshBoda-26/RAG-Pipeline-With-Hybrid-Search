@@ -158,8 +158,26 @@ class QdrantVectorStore:
         # Step 1: Dense vector search via Qdrant
         dense_results = self.query(query_embedding, top_k * 2)
 
-        # Step 2: Sparse BM25 keyword search via Python index
-        bm25_results = self.bm25.query(question, top_k * 2)
+        # Step 2: Sparse BM25 keyword search
+        # Use the pipeline's BM25 index if available, otherwise rebuild from stored chunks
+        if hasattr(self, 'bm25') and self.bm25 is not None and self.bm25.bm25 is not None:
+            bm25_results = self.bm25.query(question, top_k * 2)
+        else:
+            # Fallback: rebuild BM25 from stored chunks and query
+            records = self.all_chunks(with_vectors=False)
+            from ingestion.chunking import tokenize
+            from rank_bm25 import BM25Okapi
+            corpus = [tokenize(r["payload"]["text"]) for r in records]
+            bm25 = BM25Okapi(corpus) if corpus else None
+            if bm25 is not None:
+                scores = bm25.get_scores(tokenize(question))
+                ranked = sorted(range(len(scores)), key=lambda i: scores[i], reverse=True)[:top_k * 2]
+                bm25_results = [
+                    {"id": records[i]["id"], "payload": records[i]["payload"], "score": float(scores[i])}
+                    for i in ranked if scores[i] > 0
+                ]
+            else:
+                bm25_results = []
 
         # Step 3: Fuse results using reciprocal rank fusion
         from retrieval.fusion import reciprocal_rank_fusion
