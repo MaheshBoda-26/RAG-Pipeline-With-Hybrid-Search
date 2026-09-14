@@ -140,7 +140,11 @@ class QdrantVectorStore:
         top_k: int,
         source_filter: str | None = None,
     ) -> list[dict]:
-        """Hybrid search using Qdrant Query API with RRF fusion.
+        """Hybrid search using dense vector query + Python BM25 + RRF fusion.
+
+        Falls back to Python-level combination of dense Qdrant results and
+        BM25 keyword search when Qdrant's native hybrid RRF is unavailable
+        (e.g., embedded mode without BM25 support in prefetch).
 
         Args:
             query_embedding: Dense vector for semantic search
@@ -151,35 +155,25 @@ class QdrantVectorStore:
         Returns:
             List of {id, score, payload} ranked by RRF fusion
         """
-        scroll_filter = None
+        # Step 1: Dense vector search via Qdrant
+        dense_results = self.query(query_embedding, top_k * 2)
+
+        # Step 2: Sparse BM25 keyword search via Python index
+        bm25_results = self.bm25.query(question, top_k * 2)
+
+        # Step 3: Fuse results using reciprocal rank fusion
+        from retrieval.fusion import reciprocal_rank_fusion
+
+        fused = reciprocal_rank_fusion(dense_results, bm25_results)
+
+        # Step 4: Apply source filter if specified and return top_k
         if source_filter:
-            scroll_filter = qmodels.Filter(
-                must=[qmodels.FieldCondition(key="source", match=qmodels.MatchValue(value=source_filter))]
-            )
-
-        prefetch = [
-            qmodels.Prefetch(
-                query=query_embedding,
-                using="default",
-                limit=top_k * 2,
-            ),
-            qmodels.Prefetch(
-                query=qmodels.Document(text=question, model="Qdrant/bm25"),
-                using="bm25",
-                limit=top_k * 2,
-            ),
-        ]
-
-        results = self.client.query_points(
-            collection_name=self.collection_name,
-            prefetch=prefetch,
-            query=qmodels.FusionQuery(fusion=qmodels.Fusion.RRF),
-            limit=top_k,
-            with_payload=True,
-            scroll_filter=scroll_filter,
-        ).points
-
-        return [{"id": r.id, "score": r.score, "payload": r.payload} for r in results]
+            filtered = [
+                r for r in fused
+                if r["payload"].get("source") == source_filter
+            ]
+            return filtered[:top_k]
+        return fused[:top_k]
 
     def count(self) -> int:
         return self.client.count(collection_name=self.collection_name).count
