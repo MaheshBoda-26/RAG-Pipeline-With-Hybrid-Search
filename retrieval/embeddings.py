@@ -43,7 +43,9 @@ class Embedder:
         if not texts:
             return []
 
-        # Try API first, fall back to FastEmbed, then sentence-transformers
+        # Try API first, fall back to local model on failure
+        # Note: For non-NVIDIA asymmetric models, the OpenAI-compatible client
+        # will use the model name directly. Fallback to local only if API fails.
         try:
             out: list[list[float]] = []
             for i in range(0, len(texts), BATCH_SIZE):
@@ -56,6 +58,14 @@ class Embedder:
             return out
         except Exception as e:
             print(f"API embedding failed, using local model: {e}")
+            # Raise if expected_dim is set and local model would mismatch;
+            # this prevents silent dimension mismatches in Qdrant
+            if self.expected_dim:
+                raise RuntimeError(
+                    f"Embedding API failed and expected_dim={self.expected_dim} is configured. "
+                    f"Cannot insert vectors of unknown dimension into Qdrant. "
+                    f"Set expected_dim=None or ensure the local fallback model matches."
+                )
             return self._embed_local(texts)
 
     def _embed_local(self, texts: list[str]) -> list[list[float]]:
