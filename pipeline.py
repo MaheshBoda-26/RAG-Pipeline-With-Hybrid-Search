@@ -248,29 +248,15 @@ class RAGPipeline:
             if cached:
                 return AskResponse(**cached)
 
-        # If a specific source is targeted, query a larger initial pool to ensure chunks are captured
-        dense_k = max(self.settings.dense_top_k * 3, 50) if (source and source.lower() != "all") else self.settings.dense_top_k
-        sparse_k = max(self.settings.sparse_top_k * 3, 50) if (source and source.lower() != "all") else self.settings.sparse_top_k
-
-        dense = self.vector_store.query(query_embedding, dense_k)
-        sparse = self.bm25.query(question, sparse_k)
-
-        if source and source.strip() and source.lower() != "all":
-            src_target = source.strip()
-            def _matches_source(item: dict) -> bool:
-                p_src = item.get("payload", {}).get("source", "")
-                return p_src == src_target or Path(p_src).name == Path(src_target).name
-
-            dense = [c for c in dense if _matches_source(c)]
-            sparse = [c for c in sparse if _matches_source(c)]
-
-        fused = reciprocal_rank_fusion(
-            dense, sparse,
-            dense_weight=self.settings.dense_weight,
-            sparse_weight=self.settings.sparse_weight,
-            k=self.settings.rrf_k,
+        # Use Qdrant's native hybrid search (dense + sparse + server-side RRF)
+        # This replaces the previous pipeline of: dense query + Python BM25 + manual RRF
+        # Qdrant handles sparse vector search, RRF fusion, and filtering server-side
+        candidate_pool = self.vector_store.hybrid_query(
+            query_embedding=query_embedding,
+            question=question,
+            top_k=self.settings.rerank_candidate_pool,
+            source_filter=source,
         )
-        candidate_pool = fused[: self.settings.rerank_candidate_pool]
 
         ranked = rerank(
             self.client, self.settings.chat_model, question, candidate_pool,
