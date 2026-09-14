@@ -90,9 +90,10 @@ class CrossEncoderReranker:
 
         except Exception as e:
             logger.warning("Cross-encoder reranker failed, falling back to fusion scores: %s", e)
-            # Fallback: use fused_score as rerank_score
+            # Fallback: use fused_score scaled to 0-10 range
+            # RRF fused_score is typically 0.005-0.025; scale by 400 to map to 0-10
             for i, c in enumerate(candidates):
-                c["rerank_score"] = c.get("fused_score", 0.0)
+                c["rerank_score"] = min(10.0, c.get("fused_score", 0.0) * 400.0)
             ranked = sorted(candidates, key=lambda c: c["rerank_score"], reverse=True)
             return ranked[:top_n]
 
