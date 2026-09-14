@@ -119,16 +119,24 @@ def score_completeness(client: OpenAI, model: str, question: str, answer: str, c
 
 
 def citation_coverage(claims: list[ClaimCitation]) -> float:
-    """Fraction of claims that cite something AND are verified as supported,
-    out of all claims that cite something at all. A claim with zero
-    citations isn't counted against coverage here -- that's a prompt-
-    compliance issue (rule 3: say when info is missing), not a citation
-    accuracy issue; look at those sentences separately if needed."""
-    citing = [c for c in claims if c.cited_blocks]
-    if not citing:
-        return 1.0  # nothing was cited to be wrong about
-    supported = sum(1 for c in citing if c.supported)
-    return supported / len(citing)
+    """Fraction of ALL claims that are verified as supported,
+    out of all claims in the answer.
+
+    Previously, only claims with citations were counted in the denominator,
+    which allowed uncited hallucinations to receive 100% confidence even
+    when they contained unsupported factual claims. Now uncited claims are
+    treated as unsupported (no evidence was provided), properly penalizing
+    answers that contain claims without citation.
+
+    A claim with zero citations is counted as unsupported in the denominator,
+    since they have no source evidence to verify against."""
+    if not claims:
+        return 1.0  # no claims to evaluate
+    total = len(claims)
+    supported = sum(1 for c in claims if c.cited_blocks and c.supported)
+    # Uncited claims (cited_blocks is empty) are treated as unsupported
+    # since they have no source evidence to verify against.
+    return supported / total
 
 
 def retrieval_confidence(ranked_chunks: list[dict]) -> float:
