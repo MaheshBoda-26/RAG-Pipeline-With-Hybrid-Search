@@ -115,7 +115,9 @@ def run_evaluation(
     settings: Settings,
     dense_only: bool = False,
 ) -> tuple[list[EvalResult], EvalSummary]:
-    client = OpenAI(api_key=settings.openai_api_key)
+    # Use the pipeline's client (which is configured with NVIDIA API key)
+    # or fall back to settings.nvidia_api_key
+    client = pipeline.client if pipeline else OpenAI(api_key=settings.nvidia_api_key)
     model = settings.chat_model
     results = []
 
