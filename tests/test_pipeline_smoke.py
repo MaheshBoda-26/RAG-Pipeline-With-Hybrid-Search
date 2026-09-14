@@ -94,6 +94,18 @@ class FakeCrossEncoder:
             scores.append(min(10, overlap * 3))
         return np.array(scores)
 
+    def rerank(self, question, candidates, top_n):
+        """Mock rerank method matching CrossEncoderReranker interface."""
+        # Use the same crude logic as predict but return in the expected format
+        pairs = [(question, c["payload"]["text"]) for c in candidates]
+        scores = self.predict(pairs)
+        # Attach scores to candidates
+        for i, c in enumerate(candidates):
+            c["rerank_score"] = float(scores[i])
+        # Sort by rerank_score descending and return top_n
+        ranked = sorted(candidates, key=lambda c: c["rerank_score"], reverse=True)
+        return ranked[:top_n]
+
 
 class FakeOpenAI:
     def __init__(self, api_key=None, base_url=None):
