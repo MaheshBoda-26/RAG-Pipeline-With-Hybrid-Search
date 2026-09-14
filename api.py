@@ -464,9 +464,18 @@ async def delete_document(source: str, user_id: str = Depends(verify_auth)):
     if deleted == 0:
         raise HTTPException(status_code=404, detail=f"Document not found: {source}")
 
-    # Also try to delete the physical file
+    # Also try to delete the physical file - with path traversal protection
     upload_dir = settings.get_user_upload_dir(user_id)
-    file_path = upload_dir / source
+    allowed_root = Path(upload_dir).resolve()
+    file_path = (allowed_root / source).resolve()
+
+    # Validate that the resolved path is within the upload directory
+    if not file_path.is_relative_to(allowed_root):
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid document path: {source} is outside the allowed upload directory"
+        )
+
     if file_path.exists():
         file_path.unlink()
 
