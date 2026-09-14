@@ -171,6 +171,12 @@ class RAGPipeline:
 
         doc = load_file(requested_path)
         if not doc:
+            # Invalidate query cache since this may have changed document state
+            if self.query_cache:
+                try:
+                    self.query_cache.clear_user(self.user_id)
+                except Exception:
+                    pass
             return {"documents": 0, "chunks_created": 0, "chunks_indexed": 0, "duplicates_skipped": 0}
 
         # Override the document source with the original filename for better UX
@@ -179,6 +185,12 @@ class RAGPipeline:
 
         chunks = self._chunk_document(doc)
         if not chunks:
+            # Invalidate query cache since documents may have changed
+            if self.query_cache:
+                try:
+                    self.query_cache.clear_user(self.user_id)
+                except Exception:
+                    pass
             return {"documents": 1, "chunks_created": 0, "chunks_indexed": 0, "duplicates_skipped": 0}
 
         try:
@@ -198,6 +210,13 @@ class RAGPipeline:
 
         self.vector_store.upsert(kept_chunks, kept_embeddings)
         self._rebuild_sparse_index()
+
+        # Invalidate query cache since documents have changed
+        if self.query_cache:
+            try:
+                self.query_cache.clear_user(self.user_id)
+            except Exception:
+                pass
 
         return {
             "documents": 1,
