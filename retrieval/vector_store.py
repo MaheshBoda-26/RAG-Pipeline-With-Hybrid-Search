@@ -14,6 +14,7 @@ from qdrant_client import QdrantClient
 from qdrant_client.http import models as qmodels
 
 from ingestion.chunking import Chunk
+from retrieval.sparse import tokenize as stokenize
 
 
 # Singleton client for embedded mode to avoid concurrent access conflicts
@@ -160,17 +161,17 @@ class QdrantVectorStore:
 
         # Step 2: Sparse BM25 keyword search
         # Use the pipeline's BM25 index if available, otherwise rebuild from stored chunks
+        from rank_bm25 import BM25Okapi
+
         if hasattr(self, 'bm25') and self.bm25 is not None and self.bm25.bm25 is not None:
             bm25_results = self.bm25.query(question, top_k * 2)
         else:
             # Fallback: rebuild BM25 from stored chunks and query
             records = self.all_chunks(with_vectors=False)
-            from ingestion.chunking import tokenize
-            from rank_bm25 import BM25Okapi
-            corpus = [tokenize(r["payload"]["text"]) for r in records]
+            corpus = [stokenize(r["payload"]["text"]) for r in records]
             bm25 = BM25Okapi(corpus) if corpus else None
             if bm25 is not None:
-                scores = bm25.get_scores(tokenize(question))
+                scores = bm25.get_scores(stokenize(question))
                 ranked = sorted(range(len(scores)), key=lambda i: scores[i], reverse=True)[:top_k * 2]
                 bm25_results = [
                     {"id": records[i]["id"], "payload": records[i]["payload"], "score": float(scores[i])}
