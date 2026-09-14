@@ -101,6 +101,27 @@ class FakeOpenAI:
         self.chat = mock.Mock(completions=FakeChatAPI())
 
 
+class FakeCrossEncoder:
+    def __init__(self, model_name="cross-encoder/ms-marco-MiniLM-L-6-v2", device="cpu", max_length=512):
+        self.model_name = model_name
+
+    def predict(self, pairs, show_progress_bar=False):
+        scores = []
+        for question, passage in pairs:
+            q_words = set(question.lower().split())
+            overlap = sum(1 for w in q_words if w in passage.lower())
+            scores.append(min(10, max(4, overlap * 3)))
+        return np.array(scores)
+
+    def rerank(self, question, candidates, top_n):
+        pairs = [(question, c["payload"]["text"]) for c in candidates]
+        scores = self.predict(pairs)
+        for i, c in enumerate(candidates):
+            c["rerank_score"] = float(scores[i])
+        ranked = sorted(candidates, key=lambda c: c["rerank_score"], reverse=True)
+        return ranked[:top_n]
+
+
 @dataclass
 class EvalResult:
     question: str
@@ -338,12 +359,17 @@ if __name__ == "__main__":
     qdrant_tmp = tempfile.mkdtemp(prefix="qdrant_test_")
     os.environ["QDRANT_PATH"] = qdrant_tmp
 
-    with mock.patch("pipeline.OpenAI", FakeOpenAI), mock.patch("generation.generate.OpenAI", FakeOpenAI), mock.patch("generation.citations.OpenAI", FakeOpenAI), mock.patch("retrieval.embeddings.OpenAI", FakeOpenAI):
+    with mock.patch("pipeline.OpenAI", FakeOpenAI), \
+         mock.patch("generation.generate.OpenAI", FakeOpenAI), \
+         mock.patch("generation.citations.OpenAI", FakeOpenAI), \
+         mock.patch("retrieval.embeddings.OpenAI", FakeOpenAI), \
+         mock.patch("retrieval.cross_encoder_reranker.CrossEncoderReranker", FakeCrossEncoder):
         from config import Settings
         from pipeline import RAGPipeline
 
         settings = Settings()
         settings.qdrant_path = qdrant_tmp
+        settings.use_supabase = False
         settings.chunking_strategy = "recursive"
 
         golden_set = load_golden_set("tests/eval/golden_set.json")

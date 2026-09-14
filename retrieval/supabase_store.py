@@ -160,6 +160,45 @@ class SupabaseVectorStore:
             })
         return results
 
+    def hybrid_query(
+        self,
+        query_embedding: List[float],
+        question: str,
+        top_k: int,
+        source_filter: Optional[str] = None,
+        bm25: Optional[Any] = None,
+    ) -> List[dict]:
+        """Hybrid search combining Supabase dense vector query + BM25 + RRF fusion."""
+        # Dense search via Supabase
+        dense_results = self.query(query_embedding, top_k * 2)
+
+        # Sparse search via BM25
+        if bm25 is not None:
+            bm25_results = bm25.query(question, top_k * 2)
+        else:
+            from retrieval.sparse import tokenize as stokenize
+            from rank_bm25 import BM25Okapi
+            records = self.all_chunks(with_vectors=False)
+            corpus = [stokenize(r["payload"]["text"]) for r in records]
+            built_bm25 = BM25Okapi(corpus) if corpus else None
+            if built_bm25 is not None:
+                scores = built_bm25.get_scores(stokenize(question))
+                ranked = sorted(range(len(scores)), key=lambda i: scores[i], reverse=True)[:top_k * 2]
+                bm25_results = [
+                    {"id": records[i]["id"], "payload": records[i]["payload"], "score": float(scores[i])}
+                    for i in ranked if scores[i] > 0
+                ]
+            else:
+                bm25_results = []
+
+        from retrieval.fusion import reciprocal_rank_fusion
+        fused = reciprocal_rank_fusion(dense_results, bm25_results)
+
+        if source_filter:
+            fused = [r for r in fused if r["payload"].get("source") == source_filter]
+
+        return fused[:top_k]
+
     def delete_by_source(self, source: str) -> int:
         """Delete all vectors for a source document."""
         result = self.client.table("vectors").delete().eq("collection_id", self.collection_id).eq("payload->>source", source).execute()
