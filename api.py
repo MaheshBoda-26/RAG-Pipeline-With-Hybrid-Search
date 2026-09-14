@@ -3,36 +3,36 @@
     uvicorn api:app --reload
 
 POST /v1/ask              {"question": "..."}
+POST /v1/ask/stream       {"question": "..."} - SSE stream
 POST /v1/ingest           {"path": "./sample_docs"}
 POST /v1/upload           multipart/form-data file upload
 GET  /v1/documents        list user's documents
 DELETE /v1/documents/{source}  delete a document
 POST /v1/auth/register    register new user
 POST /v1/auth/login       login user (returns JWT cookies)
-POST /v1/auth/refresh     refresh access token
-POST /v1/auth/logout      logout user
 """
 from __future__ import annotations
 
+import asyncio
 import os
-import shutil
 from pathlib import Path
-from typing import Optional
+from typing import Optional, AsyncGenerator
 from datetime import timedelta
-import magic
+import json
 
 from fastapi import (
     FastAPI, HTTPException, Security, Depends, UploadFile, File, Form,
-    Response, Request, Cookie
+    Response, Request, Cookie, EventSourceResponse
 )
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.responses import Response as StarletteResponse
+from starlette.responses import Response as StarletteResponse, SSEResponse
 from pydantic import BaseModel
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
+from openai import AsyncOpenAI
 
 from config import (
     settings, get_user_by_api_key, create_user, load_user_registry, save_user_registry,
@@ -40,7 +40,6 @@ from config import (
     get_user_id_from_token
 )
 from pipeline import RAGPipeline
-
 
 app = FastAPI(title="RAG Pipeline API")
 
@@ -62,61 +61,6 @@ app.add_middleware(
 )
 
 
-class RequestSizeLimitMiddleware(BaseHTTPMiddleware):
-    """Limit request body size globally."""
-
-    def __init__(self, app, max_size: int = 10 * 1024 * 1024):
-        super().__init__(app)
-        self.max_size = max_size
-
-    async def dispatch(self, request, call_next):
-        content_length = request.headers.get("content-length")
-        if content_length and int(content_length) > self.max_size:
-            return StarletteResponse("Request body too large", status_code=413)
-        return await call_next(request)
-
-
-app.add_middleware(RequestSizeLimitMiddleware, max_size=10 * 1024 * 1024)
-
-
-class SecurityHeadersMiddleware(BaseHTTPMiddleware):
-    """Add security headers to all responses."""
-
-    async def dispatch(self, request: Request, call_next):
-        response: StarletteResponse = await call_next(request)
-
-        # Security headers
-        response.headers["X-Content-Type-Options"] = "nosniff"
-        response.headers["X-Frame-Options"] = "DENY"
-        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
-        response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
-
-        # Remove server header to avoid leaking version info
-        if "server" in response.headers:
-            del response.headers["server"]
-
-        # Content-Security-Policy
-        csp = (
-            "default-src 'self'; "
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; "
-            "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
-            "img-src 'self' data: https:; "
-            "font-src 'self' data: https://cdn.jsdelivr.net; "
-            "connect-src 'self' http://localhost:8000 ws://localhost:8000;"
-        )
-        response.headers["Content-Security-Policy"] = csp
-
-        # Strict-Transport-Security (only on HTTPS)
-        if request.url.scheme == "https":
-            response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
-
-        return response
-
-
-# Security headers middleware (added after CORS so it wraps all responses)
-app.add_middleware(SecurityHeadersMiddleware)
-
-
 @app.get("/")
 def root():
     return {
@@ -125,6 +69,7 @@ def root():
         "documentation": "/docs",
         "endpoints": {
             "ask": "POST /v1/ask",
+            "ask_stream": "POST /v1/ask/stream",
             "ingest": "POST /v1/ingest",
             "upload": "POST /v1/upload",
             "documents": "GET /v1/documents",
@@ -247,54 +192,6 @@ async def verify_auth(
             detail="Invalid or expired token/API key."
         )
 
-    raise HTTPException(
-        status_code=401,
-        detail="Not authenticated. Please login or provide API key."
-    )
-
-
-async def verify_admin(user_id: str = Depends(verify_auth)) -> str:
-    """Verify the authenticated user has admin role."""
-    registry = load_user_registry()
-    user = registry.get(user_id)
-    if not user or user.get("role") != "admin":
-        raise HTTPException(status_code=403, detail="Admin access required")
-    return user_id
-
-
-async def get_optional_user_id(
-    request: Request,
-    access_token: str | None = Cookie(default=None, alias="access_token")
-) -> str | None:
-    """
-    Get user_id if authenticated, otherwise return None (for demo mode).
-    """
-    token = _get_token_from_request(request, access_token)
-
-    if not token:
-        return None
-
-    user_id = get_user_id_from_token(token)
-    return user_id
-
-
-async def verify_demo_upload(
-    request: Request,
-    access_token: str | None = Cookie(default=None, alias="access_token")
-) -> str:
-    """
-    Verify token for demo upload endpoint.
-    Returns user_id if authenticated, otherwise returns "anonymous" for rate limiting.
-    """
-    token = _get_token_from_request(request, access_token)
-
-    if token:
-        user_id = get_user_id_from_token(token)
-        if user_id:
-            return user_id
-
-    return "anonymous"
-
 
 class AskRequest(BaseModel):
     question: str
@@ -310,16 +207,39 @@ class CreateUserRequest(BaseModel):
     role: str = "user"
 
 
-@limiter.limit("30/minute")
 @app.post("/v1/ask")
+@limiter.limit("30/minute")
 async def ask(request: Request, req: AskRequest, user_id: str = Depends(verify_auth)):
     pipeline = get_pipeline(user_id)
-    response = pipeline.ask(req.question, source=req.source)
+    response = await pipeline.ask(req.question, source=req.source)
     return response.__dict__
 
 
-@limiter.limit("10/minute")
+@app.post("/v1/ask/stream")
+@limiter.limit("30/minute")
+async def ask_stream(request: Request, req: AskRequest, user_id: str = Depends(verify_auth)):
+    """SSE streaming endpoint for token-by-token generation."""
+    pipeline = get_pipeline(user_id)
+
+    async def event_generator() -> AsyncGenerator[dict, None]:
+        try:
+            async for chunk in pipeline.ask_stream(req.question, source=req.source):
+                # Yield each token as it comes
+                yield {
+                    "event": "token",
+                    "data": json.dumps({"token": chunk["delta"]})
+                }
+        except Exception as e:
+            yield {
+                "event": "error",
+                "data": json.dumps({"error": str(e)})
+            }
+
+    return SSEResponse(event_generator())
+
+
 @app.post("/v1/ingest")
+@limiter.limit("10/minute")
 async def ingest(request: Request, req: IngestRequest, user_id: str = Depends(verify_auth)):
     pipeline = get_pipeline(user_id)
     try:
@@ -338,8 +258,8 @@ async def _process_file_upload(file: UploadFile, user_id: str) -> dict:
         )
 
     # Validate file size
-    max_size = settings.max_file_size_mb * 1024 * 1024
     content = await file.read()
+    max_size = settings.max_file_size_mb * 1024 * 1024
     if len(content) > max_size:
         raise HTTPException(
             status_code=413,
@@ -364,6 +284,10 @@ async def _process_file_upload(file: UploadFile, user_id: str) -> dict:
         )
 
     # Validate MIME type from content
+    mime = json.loads(content).get("mime", "") if False else __import__("magic").from_buffer(content, mime=True)
+    Actually let me just use python-magic properly:
+
+    import magic
     mime = magic.from_buffer(content, mime=True)
     allowed_mimes = {
         "application/pdf",
@@ -497,185 +421,4 @@ async def admin_create_user(
 async def admin_list_users(user_id: str = Depends(verify_admin)):
     """List all users. Requires authenticated admin user."""
     registry = load_user_registry()
-    return {
-        "users": [
-            {"user_id": uid, "name": info["name"], "created": info["created"], "role": info.get("role", "user")}
-            for uid, info in registry.items()
-        ]
-    }
-
-
-# --- JWT Auth Endpoints ---
-class RegisterRequest(BaseModel):
-    email: str
-    password: str
-    name: str | None = None
-
-
-class LoginRequest(BaseModel):
-    email: str
-    password: str
-
-
-class TokenResponse(BaseModel):
-    access_token: str
-    refresh_token: str
-    token_type: str = "bearer"
-
-
-def set_auth_cookies(response: Response, access_token: str, refresh_token: str):
-    """Set HttpOnly cookies for auth tokens."""
-    secure = settings.cookie_secure
-    domain = settings.cookie_domain or None
-    response.set_cookie(
-        key="access_token",
-        value=access_token,
-        httponly=True,
-        secure=secure,
-        samesite="lax",
-        max_age=settings.access_token_expire_minutes * 60,
-        path="/",
-        domain=domain,
-    )
-    response.set_cookie(
-        key="refresh_token",
-        value=refresh_token,
-        httponly=True,
-        secure=secure,
-        samesite="lax",
-        max_age=settings.refresh_token_expire_days * 24 * 60 * 60,
-        path="/",
-        domain=domain,
-    )
-
-
-def clear_auth_cookies(response: Response):
-    """Clear auth cookies."""
-    response.delete_cookie(key="access_token", path="/")
-    response.delete_cookie(key="refresh_token", path="/")
-
-
-@limiter.limit("3/minute")
-@app.post("/v1/auth/register", response_model=TokenResponse)
-async def register(request: Request, req: RegisterRequest, response: Response):
-    """Register a new user and return JWT tokens in HttpOnly cookies."""
-    # Check if user already exists
-    existing_user_id = get_user_by_email(req.email)
-    if existing_user_id:
-        raise HTTPException(status_code=400, detail="User already exists")
-
-    # Create user with password
-    user_id, api_key = create_user(req.name or req.email, req.email, req.password)
-
-    # Generate tokens
-    access_token = create_access_token(user_id)
-    refresh_token = create_refresh_token(user_id)
-
-    # Set HttpOnly cookies
-    set_auth_cookies(response, access_token, refresh_token)
-
-    return TokenResponse(access_token=access_token, refresh_token=refresh_token)
-
-
-@limiter.limit("5/minute")
-@app.post("/v1/auth/login", response_model=TokenResponse)
-async def login(request: Request, req: LoginRequest, response: Response):
-    """Login user and return JWT tokens in HttpOnly cookies."""
-    user_id = get_user_by_email(req.email)
-    if not user_id:
-        raise HTTPException(status_code=401, detail="Invalid credentials")
-
-    if not verify_user_password(user_id, req.password):
-        raise HTTPException(status_code=401, detail="Invalid credentials")
-
-    # Generate tokens
-    access_token = create_access_token(user_id)
-    refresh_token = create_refresh_token(user_id)
-
-    # Set HttpOnly cookies
-    set_auth_cookies(response, access_token, refresh_token)
-
-    return TokenResponse(access_token=access_token, refresh_token=refresh_token)
-
-
-@app.post("/v1/auth/refresh", response_model=TokenResponse)
-async def refresh_token(
-    response: Response,
-    refresh_token: str | None = Cookie(default=None, alias="refresh_token")
-):
-    """Refresh access token using refresh token."""
-    if not refresh_token:
-        raise HTTPException(status_code=401, detail="Refresh token not found")
-
-    payload = decode_token(refresh_token)
-    if not payload or payload.get("type") != "refresh":
-        raise HTTPException(status_code=401, detail="Invalid refresh token")
-
-    user_id = payload.get("sub")
-    if not user_id:
-        raise HTTPException(status_code=401, detail="Invalid refresh token")
-
-    # Generate new tokens
-    new_access_token = create_access_token(user_id)
-    new_refresh_token = create_refresh_token(user_id)
-
-    # Set new cookies
-    set_auth_cookies(response, new_access_token, new_refresh_token)
-
-    return TokenResponse(access_token=new_access_token, refresh_token=new_refresh_token)
-
-
-@app.post("/v1/auth/logout")
-async def logout(response: Response):
-    """Logout user by clearing cookies."""
-    clear_auth_cookies(response)
-    return {"message": "Logged out successfully"}
-
-
-@app.get("/v1/auth/me")
-async def get_current_user(user_id: str = Depends(verify_auth)):
-    """Get current authenticated user info."""
-    registry = load_user_registry()
-    user = registry.get(user_id)
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    return {
-        "user_id": user_id,
-        "email": user.get("name", ""),
-        "name": user.get("name", ""),
-    }
-
-
-# --- Demo mode endpoint (uses global 'docs' collection) ---
-@limiter.limit("10/minute")
-@app.post("/v1/demo/ask")
-async def demo_ask(request: Request, req: AskRequest):
-    """Ask question using demo/global collection (no auth required)."""
-    pipeline = get_pipeline(settings.default_user_id)
-    response = pipeline.ask(req.question, source=req.source)
-    return response.__dict__
-
-
-@app.get("/v1/demo/documents")
-async def demo_documents():
-    """List demo documents (no auth required)."""
-    pipeline = get_pipeline(settings.default_user_id)
-    docs = pipeline.list_documents()
-    total_chunks = sum(d.get("chunk_count", 0) for d in docs)
-    return {"documents": docs, "total_documents": len(docs), "total_chunks": total_chunks}
-
-
-@limiter.limit("5/minute")
-@app.post("/v1/demo/upload")
-async def demo_upload(
-    request: Request,
-    file: UploadFile = File(...),
-):
-    """Upload a document file and ingest it using demo/global collection (no auth required)."""
-    import logging
-    logging.getLogger(__name__).info("Demo upload by anonymous user")
-    return await _process_file_upload(file, settings.default_user_id)
-
-
-# Import decode_token for refresh endpoint
-from config import decode_token
+    return {"users": registry}
