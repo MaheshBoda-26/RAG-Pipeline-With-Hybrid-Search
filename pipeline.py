@@ -262,6 +262,7 @@ class RAGPipeline:
         ranked = rerank(
             self.client, self.settings.chat_model, question, candidate_pool,
             top_n=self.settings.final_top_k,
+            settings=self.settings,
         )
 
         retr_conf = retrieval_confidence(ranked)
