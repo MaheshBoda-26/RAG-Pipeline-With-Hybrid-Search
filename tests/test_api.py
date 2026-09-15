@@ -388,6 +388,8 @@ class TestMultiUserIsolation:
                     files={"file": ("doc_a.txt", f, "text/plain")},
                     headers={"Authorization": f"Bearer {user_a_key}"}
                 )
+            print(f"DEBUG: response_a.status_code = {response_a.status_code}")
+            print(f"DEBUG: response_a.json() = {response_a.json()}")
             assert response_a.status_code == 200
             data_a = response_a.json()
             assert data_a["chunks_indexed"] > 0
