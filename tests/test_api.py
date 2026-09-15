@@ -307,7 +307,7 @@ class TestDocumentsEndpoint:
 
 
 class TestMultiUserIsolation:
-"""Tests for multi-user document isolation."""
+    """Tests for multi-user document isolation."""
 
     def test_users_see_only_own_documents(self, temp_qdrant):
         """Test that user A cannot see user B's documents."""
