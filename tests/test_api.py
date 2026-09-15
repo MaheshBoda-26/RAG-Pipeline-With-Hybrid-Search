@@ -307,18 +307,17 @@ class TestDocumentsEndpoint:
 
 
 class TestMultiUserIsolation:
-    """Tests for multi-user document isolation."""
+"""Tests for multi-user document isolation."""
 
     def test_users_see_only_own_documents(self, temp_qdrant):
         """Test that user A cannot see user B's documents."""
         import api
-        from config import Settings, create_user, load_user_registry, save_user_registry
+        from config import settings, Settings, create_user, load_user_registry, save_user_registry
         from pipeline import RAGPipeline
         import tempfile
         import shutil
-
-        # Set up multi-tenant mode
-        settings = Settings()
+    
+        # Set up multi-tenant mode on GLOBAL settings
         settings.use_supabase = False
         settings.chunking_strategy = "recursive"
         settings.enable_multi_tenant = True
