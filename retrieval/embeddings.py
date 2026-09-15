@@ -15,6 +15,8 @@ class Embedder:
         self.expected_dim = expected_dim
         # NVIDIA asymmetric embedding models require input_type
         self.is_nvidia_asymmetric = "nvidia/nv-embedqa" in model or "nvidia/llama-nemotron-embed" in model
+        # BGE models don't need input_type
+        self.is_bge_model = "bge-" in model.lower()
         self._local_model = None
         self._fastembed_model = None
 
@@ -31,8 +33,7 @@ class Embedder:
         if self._fastembed_model is None:
             try:
                 from fastembed import TextEmbedding
-                # BGE-base-en-v1.5 is 768 dims; NVIDIA model is 1536 dims
-                # Keep FastEmbed as fallback only when API fails
+                # BGE-base-en-v1.5 is 768 dims - matches our default config
                 self._fastembed_model = TextEmbedding(model_name="BAAI/bge-base-en-v1.5")
             except Exception as e:
                 print(f"FastEmbed not available, falling back to sentence-transformers: {e}")
@@ -44,8 +45,6 @@ class Embedder:
             return []
 
         # Try API first, fall back to local model on failure
-        # Note: For non-NVIDIA asymmetric models, the OpenAI-compatible client
-        # will use the model name directly. Fallback to local only if API fails.
         try:
             out: list[list[float]] = []
             for i in range(0, len(texts), BATCH_SIZE):
@@ -53,6 +52,7 @@ class Embedder:
                 kwargs = {"model": self.model, "input": batch}
                 if self.is_nvidia_asymmetric:
                     kwargs["extra_body"] = {"input_type": "passage"}
+                # BGE models don't need input_type
                 resp = self.client.embeddings.create(**kwargs)
                 out.extend([d.embedding for d in resp.data])
             return out
@@ -98,6 +98,15 @@ class Embedder:
                     model=self.model,
                     input=[text],
                     extra_body={"input_type": "query"},
+                )
+                return tuple(resp.data[0].embedding)
+            except Exception as e:
+                print(f"API query embedding failed, using local model: {e}")
+        elif self.is_bge_model:
+            try:
+                resp = self.client.embeddings.create(
+                    model=self.model,
+                    input=[text],
                 )
                 return tuple(resp.data[0].embedding)
             except Exception as e:

@@ -34,11 +34,11 @@ services:
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - CHAT_MODEL=${CHAT_MODEL:-gpt-4o}
-      - EMBEDDING_MODEL=${EMBEDDING_MODEL:-text-embedding-3-small}
+      - EMBEDDING_MODEL=${EMBEDDING_MODEL:-BAAI/bge-base-en-v1.5}
       - QDRANT_URL=http://qdrant:6333
       - QDRANT_PATH=
       - COLLECTION_NAME=docs
-      - EMBEDDING_DIM=1536
+      - EMBEDDING_DIM=768
       - CHUNK_STRATEGY=recursive
       - FIXED_CHUNK_SIZE=800
       - FIXED_CHUNK_OVERLAP=120
