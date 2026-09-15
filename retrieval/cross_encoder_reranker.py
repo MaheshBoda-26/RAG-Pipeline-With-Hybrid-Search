@@ -131,15 +131,16 @@ def get_reranker(
     """Get or create the singleton cross-encoder reranker instance."""
     global _reranker_instance
     # Check if we need to recreate with different settings
+    # Use getattr with defaults to handle mock objects in tests
     if _reranker_instance is None:
         _reranker_instance = CrossEncoderReranker(
             model_name=model_name,
             device=device,
             max_length=max_length,
         )
-    elif (_reranker_instance.model_name != model_name or
-          _reranker_instance.device != device or
-          _reranker_instance.max_length != max_length):
+    elif (getattr(_reranker_instance, 'model_name', None) != model_name or
+          getattr(_reranker_instance, 'device', None) != device or
+          getattr(_reranker_instance, 'max_length', None) != max_length):
         # Settings changed, recreate
         _reranker_instance = CrossEncoderReranker(
             model_name=model_name,
