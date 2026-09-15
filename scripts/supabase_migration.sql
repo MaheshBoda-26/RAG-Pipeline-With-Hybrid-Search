@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS collections (
 CREATE TABLE IF NOT EXISTS vectors (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     collection_id UUID REFERENCES collections(id) ON DELETE CASCADE,
-    embedding vector(1024),  -- Match EMBEDDING_DIM from config
+    embedding vector(768),  -- Match EMBEDDING_DIM from config (BAAI/bge-base-en-v1.5 = 768)
     payload JSONB NOT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
