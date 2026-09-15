@@ -130,13 +130,23 @@ def get_reranker(
 ) -> CrossEncoderReranker:
     """Get or create the singleton cross-encoder reranker instance."""
     global _reranker_instance
+    # Check if we need to recreate with different settings
     if _reranker_instance is None:
         _reranker_instance = CrossEncoderReranker(
             model_name=model_name,
             device=device,
             max_length=max_length,
         )
-    return _reranker_instance
+    elif (_reranker_instance.model_name != model_name or
+          _reranker_instance.device != device or
+          _reranker_instance.max_length != max_length):
+        # Settings changed, recreate
+        _reranker_instance = CrossEncoderReranker(
+            model_name=model_name,
+            device=device,
+            max_length=max_length,
+        )
+    return _rereranker_instance
 
 
 def rerank(
