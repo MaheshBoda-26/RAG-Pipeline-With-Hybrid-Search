@@ -9,7 +9,7 @@ from starlette.testclient import TestClient
 
 # Set test environment variables before importing app
 os.environ.setdefault("ENVIRONMENT", "development")
-os.environ.setdefault("NVIDIA_API_KEY", "test-key")
+os.environ.setdefault("NVIDIA_API_KEY", "nvapi-test-key-for-testing-12345")
 os.environ.setdefault("API_KEY", "test-api-key")
 os.environ.setdefault("JWT_SECRET", "test-jwt-secret-for-testing-only")
 os.environ.setdefault("ENABLE_MULTI_TENANT", "false")
