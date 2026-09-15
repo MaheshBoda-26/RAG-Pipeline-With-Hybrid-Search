@@ -53,3 +53,59 @@ INFO:     127.0.0.1:56038 - "OPTIONS /health HTTP/1.1" 200 OK
 INFO:     127.0.0.1:56040 - "OPTIONS /health HTTP/1.1" 200 OK
 INFO:     127.0.0.1:56042 - "OPTIONS /health HTTP/1.1" 400 Bad Request
 INFO:     127.0.0.1:56044 - "OPTIONS /health HTTP/1.1" 200 OK
+WARNING: RPC match_vectors failed for collection 5f3a8fbe-e650-454a-ba93-87ebaba7a3a7 ({'message': 'Could not find the function public.match_vectors(match_collection_id, match_count, query_embedding) in the schema cache', 'code': 'PGRST202', 'hint': None, 'details': 'Searched for the function public.match_vectors with parameters match_collection_id, match_count, query_embedding or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.'}). Falling back to O(n) Python similarity computation — this will be slow for large datasets. Run supabase_migration.sql to create the RPC function.
+INFO:     127.0.0.1:56046 - "POST /v1/demo/ask HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56052 - "POST /v1/demo/upload HTTP/1.1" 400 Bad Request
+INFO:     127.0.0.1:56054 - "POST /v1/demo/upload HTTP/1.1" 400 Bad Request
+INFO:     127.0.0.1:56056 - "POST /v1/demo/upload HTTP/1.1" 400 Bad Request
+INFO:     127.0.0.1:56058 - "POST /v1/demo/upload HTTP/1.1" 400 Bad Request
+INFO:     127.0.0.1:56060 - "POST /v1/demo/upload HTTP/1.1" 400 Bad Request
+INFO:     127.0.0.1:56062 - "POST /v1/demo/upload HTTP/1.1" 400 Bad Request
+INFO:     127.0.0.1:56064 - "POST /v1/demo/upload HTTP/1.1" 400 Bad Request
+INFO:     127.0.0.1:56066 - "POST /v1/demo/upload HTTP/1.1" 400 Bad Request
+EOF marker not found
+INFO:     127.0.0.1:56068 - "POST /v1/demo/upload HTTP/1.1" 500 Internal Server Error
+API embedding failed, using local model: Error code: 404 - {'status': 404, 'title': 'Not Found', 'detail': "Function '1528a0ad-205a-46ac-a783-94e2372586a9': Not found for account 'SZ9KOUceR1X04dvQORa9swcan4pzm308PoufuozCVpU'"}
+INFO:     127.0.0.1:56070 - "POST /v1/demo/upload HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56073 - "POST /v1/demo/upload HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56075 - "POST /v1/demo/upload HTTP/1.1" 400 Bad Request
+INFO:     127.0.0.1:56077 - "POST /v1/demo/upload HTTP/1.1" 400 Bad Request
+INFO:     127.0.0.1:56079 - "POST /v1/demo/upload HTTP/1.1" 400 Bad Request
+INFO:     127.0.0.1:56081 - "POST /v1/demo/upload HTTP/1.1" 400 Bad Request
+INFO:     127.0.0.1:56083 - "POST /v1/demo/upload HTTP/1.1" 413 Request Entity Too Large
+WARNING: RPC match_vectors failed for collection 5f3a8fbe-e650-454a-ba93-87ebaba7a3a7 ({'message': 'Could not find the function public.match_vectors(match_collection_id, match_count, query_embedding) in the schema cache', 'code': 'PGRST202', 'hint': None, 'details': 'Searched for the function public.match_vectors with parameters match_collection_id, match_count, query_embedding or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.'}). Falling back to O(n) Python similarity computation — this will be slow for large datasets. Run supabase_migration.sql to create the RPC function.
+INFO:     127.0.0.1:56085 - "POST /v1/demo/ask HTTP/1.1" 200 OK
+WARNING: RPC match_vectors failed for collection 5f3a8fbe-e650-454a-ba93-87ebaba7a3a7 ({'message': 'Could not find the function public.match_vectors(match_collection_id, match_count, query_embedding) in the schema cache', 'code': 'PGRST202', 'hint': None, 'details': 'Searched for the function public.match_vectors with parameters match_collection_id, match_count, query_embedding or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.'}). Falling back to O(n) Python similarity computation — this will be slow for large datasets. Run supabase_migration.sql to create the RPC function.
+INFO:     127.0.0.1:56088 - "POST /v1/demo/ask HTTP/1.1" 200 OK
+API embedding failed, using local model: Error code: 404 - {'status': 404, 'title': 'Not Found', 'detail': "Function '1528a0ad-205a-46ac-a783-94e2372586a9': Not found for account 'SZ9KOUceR1X04dvQORa9swcan4pzm308PoufuozCVpU'"}
+INFO:     127.0.0.1:56091 - "POST /v1/demo/upload HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56094 - "POST /v1/ask HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56097 - "POST /v1/upload HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56099 - "POST /v1/ingest HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56101 - "POST /v1/auth/login HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56103 - "POST /v1/auth/login HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56105 - "POST /v1/auth/login HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56107 - "POST /v1/auth/login HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56109 - "POST /v1/auth/login HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56111 - "POST /v1/auth/login HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56113 - "POST /v1/auth/register HTTP/1.1" 400 Bad Request
+INFO:     127.0.0.1:56115 - "POST /v1/auth/register HTTP/1.1" 400 Bad Request
+INFO:     127.0.0.1:56117 - "POST /v1/auth/register HTTP/1.1" 400 Bad Request
+INFO:     127.0.0.1:56119 - "POST /v1/auth/register HTTP/1.1" 400 Bad Request
+WARNING: RPC match_vectors failed for collection 5f3a8fbe-e650-454a-ba93-87ebaba7a3a7 ({'message': 'Could not find the function public.match_vectors(match_collection_id, match_count, query_embedding) in the schema cache', 'code': 'PGRST202', 'hint': None, 'details': 'Searched for the function public.match_vectors with parameters match_collection_id, match_count, query_embedding or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.'}). Falling back to O(n) Python similarity computation — this will be slow for large datasets. Run supabase_migration.sql to create the RPC function.
+INFO:     127.0.0.1:56121 - "POST /v1/demo/ask HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56128 - "GET /v1/demo/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56139 - "GET /v1/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56141 - "GET /v1/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56125 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56130 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56154 - "GET /v1/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56156 - "GET /v1/demo/ask HTTP/1.1" 405 Method Not Allowed
+INFO:     127.0.0.1:56158 - "GET /v1/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56160 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56162 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56164 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56166 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56176 - "POST /v1/demo/upload HTTP/1.1" 200 OK
+WARNING: RPC match_vectors failed for collection 5f3a8fbe-e650-454a-ba93-87ebaba7a3a7 ({'message': 'Could not find the function public.match_vectors(match_collection_id, match_count, query_embedding) in the schema cache', 'code': 'PGRST202', 'hint': None, 'details': 'Searched for the function public.match_vectors with parameters match_collection_id, match_count, query_embedding or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.'}). Falling back to O(n) Python similarity computation — this will be slow for large datasets. Run supabase_migration.sql to create the RPC function.
+INFO:     127.0.0.1:56180 - "POST /v1/demo/ask HTTP/1.1" 200 OK
