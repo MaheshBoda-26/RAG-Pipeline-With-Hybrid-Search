@@ -100,21 +100,23 @@ class CrossEncoderReranker:
     def _normalize_scores(self, raw_scores) -> list[float]:
         """Normalize raw cross-encoder scores to 0-10 scale.
 
-        Cross-encoder outputs are typically logits in range [-10, 10] or similar.
-        We use a simple approach: clip to reasonable range and linearly map.
+        Cross-encoder outputs are logits that can vary widely. We use min-max
+        normalization within the batch so the best candidate gets ~10 and
+        worst gets ~0, preserving relative ranking.
         """
         import numpy as np
 
         scores = np.array(raw_scores, dtype=np.float32)
 
-        # Clip extreme outliers
-        scores = np.clip(scores, -10, 10)
+        # Min-max normalization within the batch
+        min_score = scores.min()
+        max_score = scores.max()
 
-        # Map [-10, 10] to [0, 10]
-        normalized = (scores + 10) / 2
-
-        # Ensure 0-10 bounds
-        normalized = np.clip(normalized, 0, 10)
+        if max_score > min_score:
+            normalized = (scores - min_score) / (max_score - min_score) * 10.0
+        else:
+            # All scores equal
+            normalized = np.full_like(scores, 5.0)
 
         return normalized.tolist()
 
