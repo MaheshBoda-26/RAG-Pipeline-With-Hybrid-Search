@@ -146,7 +146,7 @@ def get_reranker(
             device=device,
             max_length=max_length,
         )
-    return _rereranker_instance
+    return _reranker_instance
 
 
 def rerank(
