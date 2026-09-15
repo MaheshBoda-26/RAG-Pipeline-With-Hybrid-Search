@@ -7,6 +7,7 @@ if cross-encoder is unavailable or fails.
 from __future__ import annotations
 
 from retrieval.cross_encoder_reranker import rerank as cross_encoder_rerank
+from config import Settings
 
 
 def rerank(
@@ -15,6 +16,7 @@ def rerank(
     question: str,
     candidates: list[dict],
     top_n: int,
+    settings: Settings | None = None,
 ) -> list[dict]:
     """Rerank candidates using cross-encoder.
 
@@ -22,6 +24,13 @@ def rerank(
     Returns the top_n candidates re-sorted by cross-encoder relevance score,
     each with a `rerank_score` field added (0-10 scale).
     """
-    # Use cross-encoder reranker with default settings
-    # Model and device can be configured via environment variables if needed
+    # Use cross-encoder reranker with settings if provided, otherwise defaults
+    if settings:
+        return cross_encoder_rerank(
+            question, candidates, top_n,
+            model_name=settings.cross_encoder_model,
+            device=settings.cross_encoder_device,
+            max_length=settings.cross_encoder_max_length,
+        )
+    # Backward compatibility: use defaults
     return cross_encoder_rerank(question, candidates, top_n)

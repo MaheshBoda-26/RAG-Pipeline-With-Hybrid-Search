@@ -124,7 +124,7 @@ class Settings:
     # --- Providers ---
     nvidia_api_key: str = field(default_factory=lambda: os.getenv("NVIDIA_API_KEY", ""))
     nvidia_base_url: str = field(default_factory=lambda: os.getenv("NVIDIA_BASE_URL", "https://integrate.api.nvidia.com/v1"))
-    embedding_model: str = os.getenv("EMBEDDING_MODEL", "nvidia/nv-embedqa-e5-v5")
+    embedding_model: str = os.getenv("EMBEDDING_MODEL", "BAAI/bge-base-en-v1.5")
     chat_model: str = os.getenv("CHAT_MODEL", "meta/llama-3.1-70b-instruct")
 
     # --- Storage ---
@@ -132,7 +132,7 @@ class Settings:
     qdrant_url: str = os.getenv("QDRANT_URL", "")  # if set, use remote server instead of embedded
     redis_url: str = os.getenv("REDIS_URL", "")  # if set, enable semantic query cache
     collection_name: str = os.getenv("COLLECTION_NAME", "docs")
-    embedding_dim: int = int(os.getenv("EMBEDDING_DIM", "1536"))
+    embedding_dim: int = int(os.getenv("EMBEDDING_DIM", "768"))
 
     # --- Multi-tenant ---
     enable_multi_tenant: bool = os.getenv("ENABLE_MULTI_TENANT", "false").lower() == "true"
