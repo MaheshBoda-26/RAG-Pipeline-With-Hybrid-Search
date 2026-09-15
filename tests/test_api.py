@@ -309,7 +309,7 @@ class TestDocumentsEndpoint:
 class TestMultiUserIsolation:
     """Tests for multi-user document isolation."""
 
-    def test_users_see_only_own_documents(self, mock_openai, temp_qdrant):
+    def test_users_see_only_own_documents(self, temp_qdrant):
         """Test that user A cannot see user B's documents."""
         import api
         from config import Settings, create_user, load_user_registry, save_user_registry
