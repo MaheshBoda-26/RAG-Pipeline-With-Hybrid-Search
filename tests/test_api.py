@@ -316,12 +316,92 @@ class TestMultiUserIsolation:
         from pipeline import RAGPipeline
         import tempfile
         import shutil
-    
+        from unittest import mock
+        import json
+        import numpy as np
+        import hashlib
+        
         # Set up multi-tenant mode on GLOBAL settings
         settings.use_supabase = False
         settings.chunking_strategy = "recursive"
         settings.enable_multi_tenant = True
         settings.default_user_id = "default"
+        
+        # Create a mock OpenAI client with real local embeddings but mocked chat
+        EMBED_DIM = 768
+        
+        def fake_embedding(text: str) -> list[float]:
+            seed = int(hashlib.sha256(text.encode()).hexdigest(), 16) % (2**32)
+            rng = np.random.default_rng(seed)
+            vec = rng.normal(size=EMBED_DIM)
+            keyword_axes = {
+                "auth": 0, "oauth": 0, "api key": 0, "token": 0,
+                "rate limit": 1, "429": 1, "retry": 1,
+                "deploy": 2, "kubernetes": 2, "helm": 2, "docker": 2,
+                "error": 3, "error_code": 3, "validation": 3,
+            }
+            lowered = text.lower()
+            for kw, axis in keyword_axes.items():
+                if kw in lowered:
+                    vec[axis] += 5.0
+            return (vec / np.linalg.norm(vec)).tolist()
+        
+        class FakeEmbeddingsAPI:
+            def create(self, model, input, extra_body=None):
+                data = [mock.Mock(embedding=fake_embedding(t)) for t in input]
+                return mock.Mock(data=data)
+        
+        class FakeChatAPI:
+            def create(self, model, messages, temperature=0):
+                system = messages[0]["content"]
+                user = messages[1]["content"]
+                if "relevance-scoring assistant" in system:
+                    question = user.split("Question:")[1].split("\n")[0].lower()
+                    q_words = set(question.split())
+                    passages = user.split("Candidate passages:")[1].strip().split("\n\n")
+                    scores = []
+                    for i, p in enumerate(passages):
+                        overlap = sum(1 for w in q_words if w in p.lower())
+                        scores.append({"index": i + 1, "score": min(10, overlap * 3)})
+                    content = json.dumps(scores)
+                elif "fact-checking assistant" in system:
+                    claims_blocks = user.strip().split("\n\n")
+                    results = []
+                    for block in claims_blocks:
+                        idx = int(block.split("Claim ")[1].split(":")[0])
+                        results.append({"claim_index": idx, "supported": True})
+                    content = json.dumps(results)
+                elif "grading whether an answer" in system:
+                    content = json.dumps({"completeness": 0.9})
+                elif "documentation assistant" in system:
+                    question = user.split("Question:")[1].split("\n")[0].lower()
+                    q_words = set(question.split())
+                    context = user.split("Context:")[1].strip()
+                    overlap = sum(1 for w in q_words if w in context.lower())
+                    if overlap > 0:
+                        content = f"Based on the context, {question.split('?')[0]}. The answer mentions relevant details from the documentation [1]."
+                    else:
+                        content = "Based on the documentation, this is answered in the context [1]."
+                else:
+                    content = "Based on the documentation, this is answered in the context [1]."
+                return mock.Mock(choices=[mock.Mock(message=mock.Mock(content=content))])
+        
+        class FakeOpenAI:
+            def __init__(self, api_key=None, base_url=None):
+                self.embeddings = FakeEmbeddingsAPI()
+                self.chat = mock.Mock(completions=FakeChatAPI())
+        
+        # Patch OpenAI for the test's pipelines
+        with mock.patch("pipeline.OpenAI", FakeOpenAI), \
+             mock.patch("generation.generate.OpenAI", FakeOpenAI), \
+             mock.patch("generation.citations.OpenAI", FakeOpenAI), \
+             mock.patch("retrieval.embeddings.OpenAI", FakeOpenAI):
+            
+            # Set up multi-tenant mode on GLOBAL settings
+            settings.use_supabase = False
+            settings.chunking_strategy = "recursive"
+            settings.enable_multi_tenant = True
+            settings.default_user_id = "default"
 
         # Create two users with different API keys
         registry = load_user_registry()
