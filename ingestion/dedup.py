@@ -1,6 +1,10 @@
 """Skip inserting a chunk if it's a near-duplicate of one already indexed.
 Prevents the same boilerplate/paragraph appearing in multiple source docs
 from eating multiple context-window slots at retrieval time.
+
+SCALING NOTE: Current implementation is O(n) per check with all vectors in memory.
+For corpus >100k chunks, see docs/architecture/DEDUP_SCALING.md for MinHash+LSH
+migration plan to achieve sub-linear query time with disk persistence.
 """
 from __future__ import annotations
 
@@ -11,7 +15,11 @@ class DuplicateIndex:
     """Incremental near-duplicate checker. Keeps all accepted embeddings in
     memory and checks new ones against them with cosine similarity. O(n) per
     check, which is fine for the corpus sizes this project targets; swap for
-    an ANN index if the corpus grows past ~100k chunks."""
+    an ANN index if the corpus grows past ~100k chunks.
+    
+    TODO: Replace with ScalableDuplicateIndex (MinHash+LSH) for production scale.
+    See docs/architecture/DEDUP_SCALING.md for implementation details.
+    """
 
     def __init__(self, threshold: float = 0.95):
         self.threshold = threshold
