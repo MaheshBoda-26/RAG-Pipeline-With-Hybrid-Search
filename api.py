@@ -62,7 +62,11 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
             "Content-Security-Policy",
             "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; object-src 'none'; frame-ancestors 'none'",
         )
-        response.headers["server"] = "rag-api"
+        # Uvicorn appends its own Server header AFTER middleware runs, so a
+        # plain set() leaves "server: uvicorn, rag-api". Del works because
+        # uvicorn's raw Server header is only ADDED if not already present.
+        response.headers.pop("server", None)
+        response.headers["Server"] = "rag-api"
         return response
 
 
@@ -325,22 +329,27 @@ async def _process_file_upload(file: UploadFile, user_id: str) -> dict:
         "text/x-markdown",
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         "application/msword",
-        "application/zip",  # older libmagic reports legacy .doc as zip
+        "application/zip",       # minimal docx archives
+        "application/x-ole-storage",  # legacy CDF .doc
     }
     if mime not in allowed_mimes:
         raise HTTPException(400, f"Invalid file type: {mime}. Allowed: PDF, TXT, MD, DOCX, DOC")
 
     # Check extension matches MIME.
-    # .docx MUST be the OOXML MIME (python-docx also rejects non-zip anyway).
-    # .doc: libmagic historically reports older .doc files as application/zip,
-    # so both are accepted — but anything else (e.g. octet-stream from a
-    # spoofed 4-byte header) is rejected.
+    # ZIP-based formats: libmagic reports a minimal/valid docx as
+    # application/zip (unless it sniffs the OOXML content types), so accept
+    # zip for both .docx and .doc — python-docx/pypdf will reject corrupted
+    # archives at parse time anyway. Legacy CDF .doc files may report
+    # application/x-ole-storage or octet-stream on short files.
     ext_mime_map = {
         ".pdf": {"application/pdf"},
         ".txt": {"text/plain"},
-        ".md": {"text/plain", "text/markdown"},
-        ".docx": {"application/vnd.openxmlformats-officedocument.wordprocessingml.document"},
-        ".doc": {"application/msword", "application/zip", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"},
+        ".md": {"text/plain", "text/markdown", "text/x-markdown"},
+        ".docx": {
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "application/zip",
+        },
+        ".doc": {"application/msword", "application/zip", "application/x-ole-storage"},
     }
     if mime not in ext_mime_map.get(ext, set()):
         raise HTTPException(400, f"File extension does not match content type")
