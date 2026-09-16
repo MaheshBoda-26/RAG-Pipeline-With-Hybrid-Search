@@ -34,6 +34,12 @@ class Chunk:
     char_count: int
     section_heading: str | None = None
     embedding: list[float] | None = field(default=None, repr=False)
+    # Name of the embedding model that produced this chunk's vector, stamped
+    # at ingest time and stored in the vector-store payload. Query-time drift
+    # detection compares this against the current EMBEDDING_MODEL: mixing
+    # vectors from different embedding models in one collection silently
+    # destroys dense retrieval, so a mismatch must be loud, not silent.
+    embedding_model: str | None = None
 
 
 def _make_chunk(text: str, source: str, index: int, strategy: str, heading: str | None) -> Chunk:
