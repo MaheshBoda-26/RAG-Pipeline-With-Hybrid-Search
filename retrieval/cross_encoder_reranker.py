@@ -7,9 +7,18 @@ Replaces the LLM-based reranker with a local cross-encoder model for
 from __future__ import annotations
 
 import logging
+import math
 from typing import Any
 
 logger = logging.getLogger(__name__)
+
+
+def _sigmoid(x: float) -> float:
+    """Numerically stable logistic sigmoid."""
+    if x >= 0:
+        return 1.0 / (1.0 + math.exp(-x))
+    z = math.exp(x)
+    return z / (1.0 + z)
 
 
 class CrossEncoderReranker:
@@ -71,13 +80,17 @@ class CrossEncoderReranker:
             # Prepare pairs: (question, passage_text) for each candidate
             pairs = [(question, c["payload"]["text"]) for c in candidates]
 
-            # Get scores from cross-encoder (returns raw logits, typically -10 to 10)
-            # We'll normalize to 0-10 scale
+            # Get scores from cross-encoder (raw logits, unbounded range)
             raw_scores = self._model.predict(pairs, show_progress_bar=False)
 
-            # Normalize scores to 0-10 range
-            # Cross-encoder outputs are typically logits; we'll use a sigmoid-like scaling
-            # or simple min-max normalization
+            # Calibrate to 0-10 via the model-native sigmoid: for ms-marco
+            # cross-encoders, sigmoid(logit) is the trained relevance
+            # probability, so scores carry ABSOLUTE meaning (a great match is
+            # ~9-10, garbage is ~0-1 regardless of what else is in the batch).
+            # Never min-max within a batch: that forces the best candidate to
+            # 10 even when every candidate is irrelevant, which both corrupts
+            # ranking-blind trust in the score and breaks the
+            # MIN_RETRIEVAL_CONFIDENCE refusal gate in pipeline.ask().
             rerank_scores = self._normalize_scores(raw_scores)
 
             # Attach scores to candidates
@@ -90,35 +103,26 @@ class CrossEncoderReranker:
 
         except Exception as e:
             logger.warning("Cross-encoder reranker failed, falling back to fusion scores: %s", e)
-            # Fallback: use fused_score scaled to 0-10 range
-            # RRF fused_score is typically 0.005-0.025; scale by 400 to map to 0-10
+            # Fallback: keep fusion ORDER but cap the reported confidence.
+            # RRF fused_score is typically 0.005-0.025; scale by 400 to map to
+            # 0-10, then cap at 5.0 (neutral) — fusion rank carries no absolute
+            # relevance signal, so reporting >5 would let the pipeline claim
+            # confidence it doesn't have and bypass the refusal gate.
             for i, c in enumerate(candidates):
-                c["rerank_score"] = min(10.0, c.get("fused_score", 0.0) * 400.0)
+                c["rerank_score"] = min(5.0, c.get("fused_score", 0.0) * 400.0)
             ranked = sorted(candidates, key=lambda c: c["rerank_score"], reverse=True)
             return ranked[:top_n]
 
     def _normalize_scores(self, raw_scores) -> list[float]:
-        """Normalize raw cross-encoder scores to 0-10 scale.
+        """Map raw cross-encoder logits to a calibrated 0-10 relevance scale.
 
-        Cross-encoder outputs are logits that can vary widely. We use min-max
-        normalization within the batch so the best candidate gets ~10 and
-        worst gets ~0, preserving relative ranking.
+        Uses the model-native sigmoid: score = sigmoid(logit) * 10. Unlike
+        batch min-max normalization, this is query-independent and batch-
+        independent — a chunk scoring 2.0 is genuinely weak evidence no matter
+        what else was retrieved, which is exactly what the downstream
+        retrieval-confidence / refusal logic assumes.
         """
-        import numpy as np
-
-        scores = np.array(raw_scores, dtype=np.float32)
-
-        # Min-max normalization within the batch
-        min_score = scores.min()
-        max_score = scores.max()
-
-        if max_score > min_score:
-            normalized = (scores - min_score) / (max_score - min_score) * 10.0
-        else:
-            # All scores equal
-            normalized = np.full_like(scores, 5.0)
-
-        return normalized.tolist()
+        return [round(10.0 * _sigmoid(float(s)), 4) for s in raw_scores]
 
 
 # Singleton instance for reuse across calls
