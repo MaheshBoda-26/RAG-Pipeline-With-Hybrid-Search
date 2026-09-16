@@ -60,14 +60,14 @@ class SupabaseVectorStore:
         data = []
         for chunk, embedding in zip(chunks, embeddings):
             # Convert embedding to string format for pgvector
-            vec_str = "[" + ",".join(str(x) for x in embedding) + "]"
-            payload = {
+            vec_str = "[" + ",".join(str(x) for x in embedding) + "]"            payload = {
                 "text": chunk.text,
                 "source": chunk.source,
                 "chunk_index": chunk.chunk_index,
                 "strategy": chunk.strategy,
                 "char_count": chunk.char_count,
                 "section_heading": chunk.section_heading,
+                "embedding_model": chunk.embedding_model,
             }
             data.append({
                 "id": chunk.id,
