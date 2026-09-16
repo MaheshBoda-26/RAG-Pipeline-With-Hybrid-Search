@@ -113,8 +113,50 @@ def health():
 _user_pipelines: dict[str, RAGPipeline] = {}
 
 
+class _MockPipeline:
+    """Instant canned pipeline for security/rate-limit tests.
+
+    Activated with RAG_MOCK_PIPELINE=1. The real pipeline spends ~30s per ask
+    on LLM calls, which makes any test that hammers the API (rate limiting,
+    auth bypass sweeps) time out regardless of what it asserts. This stub
+    preserves the exact request/response contract with zero latency.
+    """
+
+    def __init__(self, user_id: str):
+        self.user_id = user_id
+
+    def ask(self, question: str, source: str | None = None):
+        from pipeline import AskResponse
+        return AskResponse(
+            question=question, answer="mock answer [1]",
+            sources=[{"block": 1, "source": "mock.txt", "section_heading": None,
+                      "text": "mock", "fused_score": 0.01, "rerank_score": 5.0,
+                      "dense_score": 0.5}],
+            confidence={"retrieval_confidence": 0.5, "citation_coverage": 1.0,
+                        "completeness": 0.5, "composite": 0.667},
+        )
+
+    def ingest_directory(self, path: str) -> dict:
+        return {"documents": 1, "chunks_created": 1, "chunks_indexed": 1,
+                "duplicates_skipped": 0, "strategy": "recursive"}
+
+    def ingest_file(self, file_path: str, original_filename: str | None = None,
+                    user_id: str | None = None) -> dict:
+        return {"documents": 1, "chunks_created": 1, "chunks_indexed": 1,
+                "duplicates_skipped": 0, "strategy": "recursive",
+                "source": original_filename or file_path}
+
+    def list_documents(self) -> list[dict]:
+        return [{"source": "mock.txt", "chunk_count": 1, "total_chars": 4}]
+
+    def delete_document(self, source: str) -> int:
+        return 1
+
+
 def get_pipeline(user_id: str) -> RAGPipeline:
     """Get or create a pipeline instance for a specific user."""
+    if os.getenv("RAG_MOCK_PIPELINE") == "1":
+        return _MockPipeline(user_id)
     if user_id not in _user_pipelines:
         _user_pipelines[user_id] = RAGPipeline(settings, user_id)
     return _user_pipelines[user_id]
