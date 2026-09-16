@@ -20,3 +20,4 @@
  POST /api/demo/upload 500 in 2928ms
  GET / 200 in 89ms
  POST /api/demo/upload 500 in 2582ms
+ GET / 200 in 91ms
