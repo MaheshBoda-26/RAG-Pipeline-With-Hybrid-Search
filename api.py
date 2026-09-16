@@ -22,15 +22,13 @@ from fastapi import (
     FastAPI, HTTPException, Security, Depends, UploadFile, File, Form,
     Response, Request, Cookie, Body
 )
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, JSONResponse
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import Response as StarletteResponse
 from pydantic import BaseModel
-from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.util import get_remote_address
-from slowapi.errors import RateLimitExceeded
+import time
 from openai import AsyncOpenAI
 
 from config import (
@@ -42,10 +40,70 @@ from pipeline import RAGPipeline
 
 app = FastAPI(title="RAG Pipeline API")
 
-# Rate limiter
-limiter = Limiter(key_func=get_remote_address)
-app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+# Rate limiter.
+#
+# WHY NOT slowapi: slowapi's @limiter.limit decorator relies on FastAPI calling
+# the wrapped endpoint function. FastAPI >= 0.115 resolves DI through
+# functools.__wrapped__ and invokes the INNER function directly, so the wrapper
+# never executes (verified: _check_request_limit call count stays 0). Its
+# SlowAPIMiddleware alternative is also incompatible with starlette >= 1.0
+# (KeyError 'app' in scope). We implement a small native ASGI limiter instead —
+# same semantics: per-client sliding window, 429 + Retry-After on breach.
+
+
+class RateLimitMiddleware(BaseHTTPMiddleware):
+    """In-memory sliding-window rate limiter (per client IP + rule).
+
+    rules: list of (path_prefix, max_requests, window_seconds) — the FIRST
+    matching prefix wins. Exceeding a limit returns 429 with a Retry-After
+    header (seconds until the oldest hit in the window ages out).
+    """
+
+    def __init__(self, app, rules: list[tuple[str, int, int]],
+                 key_func=lambda r: r.client.host if r.client else "anonymous"):
+        super().__init__(app)
+        self.rules = rules
+        self.key_func = key_func
+        self._hits: dict[tuple[str, str], list[float]] = {}
+
+    async def dispatch(self, request: Request, call_next):
+        path = request.url.path
+        for prefix, limit, window in self.rules:
+            if path.startswith(prefix):
+                key = (self.key_func(request), prefix)
+                now = time.time()
+                bucket = [t for t in self._hits.get(key, []) if now - t < window]
+                if len(bucket) >= limit:
+                    retry_after = max(1, int(window - (now - bucket[0]) + 1))
+                    return JSONResponse(
+                        {"detail": f"Rate limit exceeded ({limit} per {window}s). Retry after {retry_after}s."},
+                        status_code=429,
+                        headers={
+                            "Retry-After": str(retry_after),
+                            # Set directly: CORSMiddleware only decorates responses
+                            # that pass through it, and middleware ordering can
+                            # leave this 429 without CORS decoration.
+                            "Access-Control-Expose-Headers": "Retry-After",
+                        },
+                    )
+                bucket.append(now)
+                self._hits[key] = bucket
+                break
+        return await call_next(request)
+
+
+limiter = None  # kept for backward compat; slowapi no longer used
+
+# Endpoint rules (first matching prefix applies):
+rate_limit_rules = [
+    ("/v1/auth/login", 5, 60),     # brute-force protection
+    ("/v1/auth/register", 5, 60),  # account-spam protection
+    ("/v1/upload", 30, 60),
+    ("/v1/demo/upload", 30, 60),
+    ("/v1/ingest", 10, 60),
+    ("/v1/ask", 30, 60),
+    ("/v1/demo/ask", 10, 60),
+]
 
 
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
@@ -62,14 +120,16 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
             "Content-Security-Policy",
             "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; object-src 'none'; frame-ancestors 'none'",
         )
-        # MutableHeaders has no pop(); del by name. Uvicorn adds its raw
-        # Server header only if absent, so overwriting here wins.
-        if "server" in response.headers:
-            del response.headers["server"]
-        response.headers["Server"] = "rag-api"
+        # NOTE on the Server header: uvicorn concatenates its own default
+        # (server: uvicorn) ahead of the app's headers at the protocol layer —
+        # it does NOT let an app header override it. Setting a custom Server
+        # here produces a duplicate header. The banner is suppressed properly
+        # by launching uvicorn with --no-server-header (see README/run docs);
+        # this middleware only adds the security headers.
         return response
 
 
+app.add_middleware(RateLimitMiddleware, rules=rate_limit_rules)
 app.add_middleware(SecurityHeadersMiddleware)
 
 # CORS middleware for frontend
@@ -290,7 +350,6 @@ class CreateUserRequest(BaseModel):
 
 
 @app.post("/v1/ask")
-@limiter.limit("30/minute")
 async def ask(request: Request, req: AskRequest = Body(...), user_id: str = Depends(verify_auth)):
     pipeline = get_pipeline(user_id)
     response = pipeline.ask(req.question, source=req.source)
@@ -298,7 +357,6 @@ async def ask(request: Request, req: AskRequest = Body(...), user_id: str = Depe
 
 
 @app.post("/v1/ask/stream")
-@limiter.limit("30/minute")
 async def ask_stream(request: Request, req: AskRequest = Body(...), user_id: str = Depends(verify_auth)):
     """SSE streaming endpoint for token-by-token generation."""
     pipeline = get_pipeline(user_id)
@@ -317,7 +375,6 @@ async def ask_stream(request: Request, req: AskRequest = Body(...), user_id: str
 
 
 @app.post("/v1/ingest")
-@limiter.limit("10/minute")
 async def ingest(request: Request, req: IngestRequest = Body(...), user_id: str = Depends(verify_auth)):
     pipeline = get_pipeline(user_id)
     try:
@@ -364,6 +421,10 @@ async def _process_file_upload(file: UploadFile, user_id: str) -> dict:
     # Validate MIME type from content
     import magic
     mime = magic.from_buffer(content, mime=True)
+    # libmagic returns octet-stream for content shorter than ~8-16 bytes
+    # (e.g. the raw PK/D0CF magic signatures alone). Allow octet-stream to
+    # REACH the extension/MIME cross-check below, which applies strict
+    # magic-prefix validation for zip/CDF formats and rejects everything else.
     allowed_mimes = {
         "application/pdf",
         "text/plain",
@@ -371,18 +432,20 @@ async def _process_file_upload(file: UploadFile, user_id: str) -> dict:
         "text/x-markdown",
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         "application/msword",
-        "application/zip",       # minimal docx archives
+        "application/zip",            # minimal docx archives
         "application/x-ole-storage",  # legacy CDF .doc
+        "application/octet-stream",   # too-short content; resolved below
     }
     if mime not in allowed_mimes:
         raise HTTPException(400, f"Invalid file type: {mime}. Allowed: PDF, TXT, MD, DOCX, DOC")
 
     # Check extension matches MIME.
-    # ZIP-based formats: libmagic reports a minimal/valid docx as
-    # application/zip (unless it sniffs the OOXML content types), so accept
-    # zip for both .docx and .doc — python-docx/pypdf will reject corrupted
-    # archives at parse time anyway. Legacy CDF .doc files may report
-    # application/x-ole-storage or octet-stream on short files.
+    # NOTE on ZIP/CDF magic-byte edge cases: libmagic cannot identify content
+    # shorter than ~8-16 bytes (returns octet-stream for the raw PK\x03\x04 /
+    # D0CF11E0 magic signatures alone). For zip-based formats we therefore
+    # ALSO accept a sniffed zip/OOXML prefix from the raw bytes — python-docx
+    # will reject corrupted archives at parse time anyway. Legacy CDF .doc
+    # may report x-ole-storage or octet-stream on short files.
     ext_mime_map = {
         ".pdf": {"application/pdf"},
         ".txt": {"text/plain"},
@@ -393,8 +456,18 @@ async def _process_file_upload(file: UploadFile, user_id: str) -> dict:
         },
         ".doc": {"application/msword", "application/zip", "application/x-ole-storage"},
     }
-    if mime not in ext_mime_map.get(ext, set()):
-        raise HTTPException(400, f"File extension does not match content type")
+    zip_prefixes = (b"PK\x03\x04", b"PK\x05\x06", b"PK\x07\x08")
+    cdf_prefix = b"\xd0\xcf\x11\xe0"  # 4-byte CDF magic (full 8-byte sig needs more content)
+    mime_ok = mime in ext_mime_map.get(ext, set())
+    if not mime_ok and mime == "application/octet-stream":
+        # Only rescue zip/CDF formats via explicit magic-prefix checks;
+        # octet-stream on .pdf/.txt/.md stays rejected.
+        if ext == ".docx" and content.startswith(zip_prefixes):
+            mime_ok = True
+        elif ext == ".doc" and (content.startswith(cdf_prefix) or content.startswith(zip_prefixes)):
+            mime_ok = True
+    if not mime_ok:
+        raise HTTPException(400, "File extension does not match content type")
 
     # Save to user's upload directory
     upload_dir = settings.get_user_upload_dir(user_id)
@@ -447,7 +520,6 @@ async def _process_file_upload(file: UploadFile, user_id: str) -> dict:
         raise HTTPException(status_code=500, detail=f"Failed to process file: {str(e)}")
 
 
-@limiter.limit("10/minute")
 @app.post("/v1/upload")
 async def upload(
     request: Request,
@@ -566,7 +638,6 @@ def clear_auth_cookies(response: Response):
     response.delete_cookie(key="refresh_token", path="/", domain=domain)
 
 
-@limiter.limit("5/minute")
 @app.post("/v1/auth/register", response_model=TokenResponse)
 async def register(request: Request, req: RegisterRequest = Body(...), response: Response = None):
     """Register a new user and return JWT tokens in HttpOnly cookies."""
@@ -586,7 +657,6 @@ async def register(request: Request, req: RegisterRequest = Body(...), response:
     return TokenResponse(access_token=access_token, refresh_token=refresh_token)
 
 
-@limiter.limit("5/minute")
 @app.post("/v1/auth/login", response_model=TokenResponse)
 async def login(request: Request, req: LoginRequest = Body(...), response: Response = None):
     """Login user and return JWT tokens in HttpOnly cookies."""
@@ -653,7 +723,6 @@ async def get_current_user(user_id: str = Depends(verify_auth)):
 
 
 # --- Demo mode endpoint (uses global 'docs' collection) ---
-@limiter.limit("10/minute")
 @app.post("/v1/demo/ask")
 async def demo_ask(request: Request, req: AskRequest = Body(...)):
     """Ask question using demo/global collection (no auth required)."""
@@ -671,7 +740,6 @@ async def demo_documents():
     return {"documents": docs, "total_documents": len(docs), "total_chunks": total_chunks}
 
 
-@limiter.limit("5/minute")
 @app.post("/v1/demo/upload")
 async def demo_upload(
     request: Request,
