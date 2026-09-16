@@ -40,6 +40,16 @@ class Embedder:
                 self._fastembed_model = False  # Mark as unavailable
         return self._fastembed_model
 
+    @staticmethod
+    def _is_config_error(e: Exception) -> bool:
+        """Config errors (bad key / nonexistent model) must NOT silently fall
+        back to a local model: the local model produces embeddings in a
+        different vector space than the API, so mixing them corrupts dense
+        retrieval (documents embedded locally, queries via API, or vice versa
+        will never match). Surface the misconfiguration instead."""
+        msg = str(e)
+        return any(code in msg for code in ("401", "403", "404", "AuthenticationError", "PermissionDenied", "NotFound"))
+
     def embed(self, texts: list[str]) -> list[list[float]]:
         if not texts:
             return []
@@ -57,7 +67,16 @@ class Embedder:
                 out.extend([d.embedding for d in resp.data])
             return out
         except Exception as e:
-            print(f"API embedding failed, using local model: {e}")
+            if self._is_config_error(e):
+                # Misconfiguration: re-raise so the caller (and operator) sees it
+                # instead of silently corrupting the vector space with a local model.
+                raise RuntimeError(
+                    f"Embedding API misconfiguration (model={self.model!r}): {e}. "
+                    f"Fix EMBEDDING_MODEL/EMBEDDING_DIM or the provider API key. "
+                    f"Refusing to silently fall back to a local model because it would "
+                    f"produce embeddings in a different vector space than already-indexed documents."
+                ) from e
+            print(f"API embedding failed (transient), using local model: {e}")
             return self._embed_local(texts)
 
     def _embed_local(self, texts: list[str]) -> list[list[float]]:
