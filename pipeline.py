@@ -318,6 +318,7 @@ class RAGPipeline:
                         "text": c["payload"].get("text", ""),
                         "fused_score": c.get("fused_score"),
                         "rerank_score": c.get("rerank_score"),
+                        "dense_score": c.get("dense_score"),
                     }
                     for i, c in enumerate(ranked)
                 ],
@@ -359,6 +360,7 @@ class RAGPipeline:
                     "text": c["payload"].get("text", ""),
                     "fused_score": c.get("fused_score"),
                     "rerank_score": c.get("rerank_score"),
+                    "dense_score": c.get("dense_score"),
                 }
                 for i, c in enumerate(ranked)
             ],

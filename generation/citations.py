@@ -140,17 +140,37 @@ def citation_coverage(claims: list[ClaimCitation]) -> float:
 
 
 def retrieval_confidence(ranked_chunks: list[dict]) -> float:
-    """Normalized average of the top chunks' rerank scores (0-10 scale from
-    the reranker) as a proxy for "did we actually find relevant material."""
+    """Blend of cross-encoder relevance and dense-similarity signal.
+
+    Two independent views of "did we retrieve relevant material":
+
+    - rerank_score (calibrated 0-10 from the ms-marco cross-encoder):
+      excellent at detecting TRUE relevance, but lexically strict — a
+      meta-question like "who is in this document?" shares no vocabulary
+      with the document body and can score ~0 even when dense retrieval
+      nailed the right chunks.
+    - dense cosine similarity from the vector store (carried through as
+      'dense_score' on candidates by the retrieval layer): robust to
+      vocabulary mismatch, weaker at fine-grained relevance.
+
+    Taking the MAX of the two signals per chunk means neither view can
+    alone veto a good retrieval; both must agree the retrieval is BAD to
+    trigger refusal. This preserves the calibrated refusal gate (garbage
+    queries score ~0 on both signals) while not punishing queries whose
+    phrasing the cross-encoder dislikes.
+    """
     if not ranked_chunks:
         return 0.0
-    scores = [c.get("rerank_score", 0.0) for c in ranked_chunks]
-    # Use top-3 non-zero scores to avoid penalizing for irrelevant chunks in the pool
-    nonzero = [s for s in scores if s > 0]
-    if not nonzero:
-        return 0.0
-    top_scores = sorted(nonzero, reverse=True)[:3]
-    return max(0.0, min(1.0, (sum(top_scores) / len(top_scores)) / 10.0))
+
+    def _chunk_conf(c: dict) -> float:
+        rerank = (c.get("rerank_score") or 0.0) / 10.0
+        dense = c.get("dense_score")
+        dense = float(dense) if dense is not None else 0.0
+        return max(rerank, dense)
+
+    per_chunk = [_chunk_conf(c) for c in ranked_chunks]
+    top_scores = sorted(per_chunk, reverse=True)[:3]
+    return max(0.0, min(1.0, sum(top_scores) / len(top_scores)))
 
 
 def composite_confidence(retrieval_conf: float, coverage: float, completeness: float) -> float:
