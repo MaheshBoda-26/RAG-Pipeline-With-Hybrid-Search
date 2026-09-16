@@ -74,11 +74,36 @@ def test_all_irrelevant_batch_has_low_top_score():
     # sigmoid(-5) * 10 ~= 0.045; allow a bit of headroom but nothing near 10
     assert top < 1.0, f"all-irrelevant batch produced high top score: {top}"
 
-    # And therefore retrieval_confidence (avg of top-3, /10) stays far below
-    # any sane MIN_RETRIEVAL_CONFIDENCE -> refusal fires.
+    # With no dense_score on the candidates, retrieval_confidence (avg of
+    # top-3, /10) stays far below any sane MIN_RETRIEVAL_CONFIDENCE -> refusal.
     from generation.citations import retrieval_confidence
     conf = retrieval_confidence(ranked)
     assert conf < 0.35, f"refusal gate defeated: confidence={conf}"
+
+
+def test_refusal_when_both_signals_weak():
+    """Garbage retrieval is low on BOTH signals -> refusal must fire."""
+    from generation.citations import retrieval_confidence
+    chunks = [
+        {"rerank_score": 0.2, "dense_score": 0.31},
+        {"rerank_score": 0.1, "dense_score": 0.29},
+        {"rerank_score": 0.1, "dense_score": 0.28},
+    ]
+    assert retrieval_confidence(chunks) < 0.35
+
+
+def test_strong_dense_rescues_lexically_strict_metaquestion():
+    """Meta-questions share no vocabulary with the doc body, so the
+    cross-encoder scores ~0 even when dense retrieval found the right chunks
+    (cosine ~0.73). The MAX blend means the dense signal rescues these."""
+    from generation.citations import retrieval_confidence
+    chunks = [
+        {"rerank_score": 0.01, "dense_score": 0.7428},
+        {"rerank_score": 0.01, "dense_score": 0.7295},
+        {"rerank_score": 0.01, "dense_score": 0.7252},
+    ]
+    conf = retrieval_confidence(chunks)
+    assert conf >= 0.35, f"good dense retrieval vetoed by reranker: {conf}"
 
 
 def test_scores_are_query_independent():

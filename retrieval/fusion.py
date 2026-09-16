@@ -25,6 +25,11 @@ def reciprocal_rank_fusion(
         )
         entry["fused_score"] += dense_weight * (1.0 / (k + rank + 1))
         entry["dense_rank"] = rank + 1
+        # Carry the raw dense cosine similarity through so the downstream
+        # confidence blend can use it (cross-encoder scores are lexically
+        # strict and need this as an independent second signal).
+        if item.get("score") is not None:
+            entry["dense_score"] = float(item["score"])
 
     for rank, item in enumerate(sparse_results):
         entry = fused.setdefault(
