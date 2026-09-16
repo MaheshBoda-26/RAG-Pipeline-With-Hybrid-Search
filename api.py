@@ -447,8 +447,15 @@ async def admin_create_user(
     user_id: str = Depends(verify_admin)
 ):
     """Create a new user. Requires authenticated admin user."""
-    user_id, api_key = create_user(req.name, role=req.role)
-    return {"user_id": user_id, "api_key": api_key, "name": req.name, "role": req.role}
+    # Role whitelist: an unchecked role field would let an admin account be
+    # created with arbitrary role strings (or an operator typo silently grant
+    # privileges). Only these two roles exist in the authorization model.
+    if req.role not in ("user", "admin"):
+        raise HTTPException(status_code=400, detail="Role must be 'user' or 'admin'")
+    import logging
+    logging.getLogger(__name__).info("Admin %s creating user with role=%s", user_id, req.role)
+    new_user_id, api_key = create_user(req.name, role=req.role)
+    return {"user_id": new_user_id, "api_key": api_key, "name": req.name, "role": req.role}
 
 
 @app.get("/v1/admin/users")
