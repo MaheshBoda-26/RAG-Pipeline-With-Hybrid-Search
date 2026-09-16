@@ -62,10 +62,10 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
             "Content-Security-Policy",
             "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; object-src 'none'; frame-ancestors 'none'",
         )
-        # Uvicorn appends its own Server header AFTER middleware runs, so a
-        # plain set() leaves "server: uvicorn, rag-api". Del works because
-        # uvicorn's raw Server header is only ADDED if not already present.
-        response.headers.pop("server", None)
+        # MutableHeaders has no pop(); del by name. Uvicorn adds its raw
+        # Server header only if absent, so overwriting here wins.
+        if "server" in response.headers:
+            del response.headers["server"]
         response.headers["Server"] = "rag-api"
         return response
 
