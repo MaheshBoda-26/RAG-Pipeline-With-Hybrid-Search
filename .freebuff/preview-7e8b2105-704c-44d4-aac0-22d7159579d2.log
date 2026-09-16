@@ -14,3 +14,5 @@
  ✓ Compiled /api/demo/ask in 85ms (680 modules)
  POST /api/demo/ask 200 in 13037ms
  GET / 200 in 226ms
+ GET / 200 in 326ms
+ POST /api/demo/upload 500 in 3255ms
