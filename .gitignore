@@ -27,3 +27,10 @@ qdrant_data/
 
 # Test artifacts
 tests/eval/results*.json
+.jwt_secret
+user_registry.json
+*.log
+cookies*.txt
+bm25_data/
+.freebuff/
+.playwright-mcp/
