@@ -73,6 +73,7 @@ class RAGPipeline:
             )
         self.bm25 = BM25Index(user_id=self.user_id)
         self._rebuild_sparse_index()  # picks up anything already in vector store from a prior run
+        self._check_embedding_drift()
 
         # Query cache (Redis semantic cache)
         self.query_cache = None
@@ -94,13 +95,43 @@ class RAGPipeline:
     # ------------------------------------------------------------------
     def _chunk_document(self, doc) -> list[Chunk]:
         strategy = self.settings.chunking_strategy
+        chunks: list[Chunk]
         if strategy == "fixed":
-            return chunk_fixed(doc, self.settings.fixed_chunk_size, self.settings.fixed_chunk_overlap)
-        if strategy == "recursive":
-            return chunk_recursive(doc, self.settings.fixed_chunk_size, self.settings.fixed_chunk_overlap)
-        if strategy == "semantic":
-            return chunk_semantic(doc, self.embedder.embed, self.settings.semantic_similarity_threshold)
-        raise ValueError(f"Unknown chunking strategy: {strategy}")
+            chunks = chunk_fixed(doc, self.settings.fixed_chunk_size, self.settings.fixed_chunk_overlap)
+        elif strategy == "recursive":
+            chunks = chunk_recursive(doc, self.settings.fixed_chunk_size, self.settings.fixed_chunk_overlap)
+        elif strategy == "semantic":
+            chunks = chunk_semantic(doc, self.embedder.embed, self.settings.semantic_similarity_threshold)
+        else:
+            raise ValueError(f"Unknown chunking strategy: {strategy}")
+        # Stamp the embedding model on every chunk so the vector-store payload
+        # records WHICH model produced the vectors — enables query-time drift
+        # detection (mixing embedding spaces silently destroys dense search).
+        for c in chunks:
+            c.embedding_model = self.settings.embedding_model
+        return chunks
+
+    def _check_embedding_drift(self) -> None:
+        """Warn loudly if indexed chunks were embedded by a different model
+        than the one this pipeline is querying with."""
+        try:
+            records = self.vector_store.all_chunks(with_vectors=False)
+        except Exception:
+            return
+        for r in records[:10]:  # sample; enough to detect a mixed collection
+            stored = (r.get("payload") or {}).get("embedding_model")
+            if stored and stored != self.settings.embedding_model:
+                import logging
+                logging.getLogger(__name__).warning(
+                    "EMBEDDING MODEL DRIFT: collection '%s' contains chunks embedded by "
+                    "'%s' but queries will use '%s'. Dense retrieval scores will be "
+                    "meaningless until you DELETE the collection and RE-INGEST all "
+                    "documents with the current model.",
+                    self.settings.get_collection_name(self.user_id),
+                    stored,
+                    self.settings.embedding_model,
+                )
+                break
 
     def ingest_directory(self, path: str) -> dict:
         # Validate path to prevent path traversal

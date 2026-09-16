@@ -119,6 +119,7 @@ class QdrantVectorStore:
                     "strategy": chunk.strategy,
                     "char_count": chunk.char_count,
                     "section_heading": chunk.section_heading,
+                    "embedding_model": chunk.embedding_model,
                 },
             )
             for chunk, embedding in zip(chunks, embeddings)
