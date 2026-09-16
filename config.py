@@ -16,8 +16,44 @@ load_dotenv()
 # User registry file for persistence
 USER_REGISTRY_PATH = Path("./user_registry.json")
 
+# NOTE: the registry stores API keys and bcrypt password hashes in plaintext
+# JSON. Acceptable for local development ONLY — production deployments should
+# move to a real secret store / database with RLS.
+
 # JWT settings
-JWT_SECRET = os.getenv("JWT_SECRET", secrets.token_urlsafe(64))
+
+def _load_or_create_jwt_secret() -> str:
+    """JWT_SECRET from env, else a persisted auto-generated secret.
+
+    A per-process ephemeral secret (the previous behavior) silently invalidates
+    every session on server restart and, worse, gives each uvicorn worker a
+    DIFFERENT secret — tokens randomly fail depending on which worker serves
+    the request. If no secret is configured we generate one and persist it to
+    a gitignored file with 0600 perms so all workers and restarts share it.
+    """
+    env_secret = os.getenv("JWT_SECRET", "").strip()
+    if env_secret:
+        return env_secret
+
+    secret_file = Path("./.jwt_secret")
+    try:
+        if secret_file.exists():
+            secret = secret_file.read_text().strip()
+            if secret:
+                return secret
+        secret = secrets.token_urlsafe(64)
+        secret_file.write_text(secret)
+        try:
+            os.chmod(secret_file, 0o600)
+        except OSError:
+            pass
+        return secret
+    except OSError:
+        # Read-only FS etc: fall back to ephemeral (single-worker safe only)
+        return secrets.token_urlsafe(64)
+
+
+JWT_SECRET = _load_or_create_jwt_secret()
 JWT_ALGORITHM = "HS256"
 JWT_ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("JWT_ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
 JWT_REFRESH_TOKEN_EXPIRE_DAYS = int(os.getenv("JWT_REFRESH_TOKEN_EXPIRE_DAYS", "7"))
