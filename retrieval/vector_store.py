@@ -10,6 +10,8 @@ avoid file locking conflicts.
 """
 from __future__ import annotations
 
+from typing import Any
+
 from qdrant_client import QdrantClient
 from qdrant_client.http import models as qmodels
 
@@ -144,6 +146,11 @@ class QdrantVectorStore:
     ) -> list[dict]:
         """Hybrid search using dense vector query + Python BM25 + RRF fusion.
 
+        When `source_filter` is set, the dense search is filtered AT THE
+        DATABASE level (not after fusion) so scoped queries pull candidates
+        only from the requested document instead of being crowded out by the
+        rest of the corpus.
+
         Args:
             query_embedding: Dense vector for semantic search
             question: Query text for BM25 sparse search
@@ -154,18 +161,27 @@ class QdrantVectorStore:
         Returns:
             List of {id, score, payload} ranked by RRF fusion
         """
-        # Step 1: Dense vector search via Qdrant
-        dense_results = self.query(query_embedding, top_k * 2)
+        # Step 1: Dense vector search via Qdrant, filtered at the DB level
+        # when scoping to a single document.
+        if source_filter:
+            dense_results = self._filtered_query(query_embedding, source_filter, top_k * 2)
+        else:
+            dense_results = self.query(query_embedding, top_k * 2)
 
-        # Step 2: Sparse BM25 keyword search
+        # Step 2: Sparse BM25 keyword search, scoped to the same filter so
+        # both legs of the hybrid search agree on the candidate universe.
         from rank_bm25 import BM25Okapi
 
         active_bm25 = bm25 if bm25 is not None else getattr(self, "bm25", None)
         if active_bm25 is not None:
             bm25_results = active_bm25.query(question, top_k * 2)
+            if source_filter:
+                bm25_results = [r for r in bm25_results if r["payload"].get("source") == source_filter]
         else:
             # Fallback: rebuild BM25 from stored chunks and query
             records = self.all_chunks(with_vectors=False)
+            if source_filter:
+                records = [r for r in records if r["payload"].get("source") == source_filter]
             corpus = [stokenize(r["payload"]["text"]) for r in records]
             built_bm25 = BM25Okapi(corpus) if corpus else None
             if built_bm25 is not None:
@@ -183,14 +199,25 @@ class QdrantVectorStore:
 
         fused = reciprocal_rank_fusion(dense_results, bm25_results)
 
-        # Step 4: Apply source filter if specified and return top_k
+        # Step 4: Defensive post-filter (should be redundant now) and top_k
         if source_filter:
-            filtered = [
-                r for r in fused
-                if r["payload"].get("source") == source_filter
-            ]
-            return filtered[:top_k]
+            fused = [r for r in fused if r["payload"].get("source") == source_filter]
         return fused[:top_k]
+
+    def _filtered_query(self, query_embedding: list[float], source: str, top_k: int) -> list[dict]:
+        """Dense query restricted to a single source document via a Qdrant
+        payload filter. Returns the same shape as `query`."""
+        results = self.client.query_points(
+            collection_name=self.collection_name,
+            query=query_embedding,
+            using="default",
+            limit=top_k,
+            with_payload=True,
+            query_filter=qmodels.Filter(
+                must=[qmodels.FieldCondition(key="source", match=qmodels.MatchValue(value=source))]
+            ),
+        ).points
+        return [{"id": r.id, "score": r.score, "payload": r.payload} for r in results]
 
     def count(self) -> int:
         return self.client.count(collection_name=self.collection_name).count

@@ -19,6 +19,14 @@ class Embedder:
         self.is_bge_model = "bge-" in model.lower()
         self._local_model = None
         self._fastembed_model = None
+        # Sticky backend selection: once the API is found to be misconfigured
+        # (bad key / nonexistent model), pin ALL embeddings for this Embedder
+        # instance to the local model. Mixing API and local embeddings in the
+        # same vector space silently corrupts dense retrieval (documents and
+        # queries would live in different spaces and never match), so the
+        # first failure decides the backend for the process lifetime.
+        self._use_local_only = False
+        self._warned_local_only = False
 
     def _get_local_model(self):
         """Lazy-load local sentence-transformers model."""
@@ -42,42 +50,49 @@ class Embedder:
 
     @staticmethod
     def _is_config_error(e: Exception) -> bool:
-        """Config errors (bad key / nonexistent model) must NOT silently fall
-        back to a local model: the local model produces embeddings in a
-        different vector space than the API, so mixing them corrupts dense
-        retrieval (documents embedded locally, queries via API, or vice versa
-        will never match). Surface the misconfiguration instead."""
+        """Config errors (bad key / nonexistent model) mean every future API
+        call will fail too, so we must stick to one backend instead of
+        flapping between the API and a local model."""
         msg = str(e)
         return any(code in msg for code in ("401", "403", "404", "AuthenticationError", "PermissionDenied", "NotFound"))
+
+    def _warn_local_only(self, reason: str) -> None:
+        if not self._warned_local_only:
+            self._warned_local_only = True
+            import logging
+            logging.getLogger(__name__).warning(
+                "Embedding API misconfigured (%s). Pinning ALL embeddings for "
+                "this process to the LOCAL model to keep the vector space "
+                "consistent. Fix EMBEDDING_MODEL / the provider API key and "
+                "RE-INGEST all documents if you switch back — embeddings from "
+                "different models must never be mixed in one collection.", reason
+            )
 
     def embed(self, texts: list[str]) -> list[list[float]]:
         if not texts:
             return []
 
-        # Try API first, fall back to local model on failure
-        try:
-            out: list[list[float]] = []
-            for i in range(0, len(texts), BATCH_SIZE):
-                batch = texts[i : i + BATCH_SIZE]
-                kwargs = {"model": self.model, "input": batch}
-                if self.is_nvidia_asymmetric:
-                    kwargs["extra_body"] = {"input_type": "passage"}
-                # BGE models don't need input_type
-                resp = self.client.embeddings.create(**kwargs)
-                out.extend([d.embedding for d in resp.data])
-            return out
-        except Exception as e:
-            if self._is_config_error(e):
-                # Misconfiguration: re-raise so the caller (and operator) sees it
-                # instead of silently corrupting the vector space with a local model.
-                raise RuntimeError(
-                    f"Embedding API misconfiguration (model={self.model!r}): {e}. "
-                    f"Fix EMBEDDING_MODEL/EMBEDDING_DIM or the provider API key. "
-                    f"Refusing to silently fall back to a local model because it would "
-                    f"produce embeddings in a different vector space than already-indexed documents."
-                ) from e
-            print(f"API embedding failed (transient), using local model: {e}")
-            return self._embed_local(texts)
+        if not self._use_local_only:
+            try:
+                out: list[list[float]] = []
+                for i in range(0, len(texts), BATCH_SIZE):
+                    batch = texts[i : i + BATCH_SIZE]
+                    kwargs = {"model": self.model, "input": batch}
+                    if self.is_nvidia_asymmetric:
+                        kwargs["extra_body"] = {"input_type": "passage"}
+                    resp = self.client.embeddings.create(**kwargs)
+                    out.extend([d.embedding for d in resp.data])
+                return out
+            except Exception as e:
+                if self._is_config_error(e):
+                    # Misconfiguration will recur on every call: stick to the
+                    # local model so query and document embeddings always come
+                    # from the SAME model (mixed spaces break retrieval).
+                    self._use_local_only = True
+                    self._warn_local_only(str(e))
+                else:
+                    print(f"API embedding failed (transient), using local model: {e}")
+        return self._embed_local(texts)
 
     def _embed_local(self, texts: list[str]) -> list[list[float]]:
         """Embed using FastEmbed (preferred) or sentence-transformers fallback."""
@@ -111,25 +126,20 @@ class Embedder:
     @lru_cache(maxsize=1000)
     def _cached_embed_one(self, text: str) -> tuple[float, ...]:
         """Cached single query embedding - returns tuple for hashability."""
-        if self.is_nvidia_asymmetric:
+        # Respect the sticky backend so queries use the SAME model as documents.
+        if not self._use_local_only:
             try:
-                resp = self.client.embeddings.create(
-                    model=self.model,
-                    input=[text],
-                    extra_body={"input_type": "query"},
-                )
+                kwargs = {"model": self.model, "input": [text]}
+                if self.is_nvidia_asymmetric:
+                    kwargs["extra_body"] = {"input_type": "query"}
+                resp = self.client.embeddings.create(**kwargs)
                 return tuple(resp.data[0].embedding)
             except Exception as e:
-                print(f"API query embedding failed, using local model: {e}")
-        elif self.is_bge_model:
-            try:
-                resp = self.client.embeddings.create(
-                    model=self.model,
-                    input=[text],
-                )
-                return tuple(resp.data[0].embedding)
-            except Exception as e:
-                print(f"API query embedding failed, using local model: {e}")
+                if self._is_config_error(e):
+                    self._use_local_only = True
+                    self._warn_local_only(str(e))
+                else:
+                    print(f"API query embedding failed (transient), using local model: {e}")
         local_emb = self._embed_local([text])[0]
         if self.expected_dim and len(local_emb) != self.expected_dim:
             print(f"WARNING: Local model dim {len(local_emb)} != expected {self.expected_dim}. Queries may fail.")
