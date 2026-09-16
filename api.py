@@ -47,6 +47,27 @@ limiter = Limiter(key_func=get_remote_address)
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
+
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    """Add hardening headers and stop leaking the server banner."""
+
+    async def dispatch(self, request: Request, call_next):
+        response = await call_next(request)
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
+        # Minimal CSP: API returns JSON only; docs UI needs inline scripts.
+        response.headers.setdefault(
+            "Content-Security-Policy",
+            "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; object-src 'none'; frame-ancestors 'none'",
+        )
+        response.headers["server"] = "rag-api"
+        return response
+
+
+app.add_middleware(SecurityHeadersMiddleware)
+
 # CORS middleware for frontend
 cors_origins = os.getenv("CORS_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000").split(",")
 app.add_middleware(
@@ -268,7 +289,7 @@ async def _process_file_upload(file: UploadFile, user_id: str) -> dict:
             detail="Embedding service not configured. Set NVIDIA_API_KEY in .env file."
         )
 
-    # Validate file size
+    # Validate file size BEFORE reading the whole body into memory twice
     content = await file.read()
     max_size = settings.max_file_size_mb * 1024 * 1024
     if len(content) > max_size:
@@ -277,21 +298,21 @@ async def _process_file_upload(file: UploadFile, user_id: str) -> dict:
             detail=f"File too large. Maximum size: {settings.max_file_size_mb}MB"
         )
 
-    # Validate file extension
-    allowed_exts = {".pdf", ".txt", ".md", ".docx", ".doc"}
-    ext = Path(file.filename).suffix.lower()
-    if ext not in allowed_exts:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Unsupported file type: {ext}. Allowed: {', '.join(sorted(allowed_exts))}"
-        )
-
-    # Validate filename (no path traversal)
-    safe_filename = Path(file.filename).name
+    # Validate filename (no path traversal) BEFORE any processing
+    safe_filename = Path(file.filename or "").name
     if not safe_filename or safe_filename.startswith("."):
         raise HTTPException(
             status_code=400,
             detail="Invalid filename"
+        )
+
+    # Validate file extension
+    allowed_exts = {".pdf", ".txt", ".md", ".docx", ".doc"}
+    ext = Path(safe_filename).suffix.lower()
+    if ext not in allowed_exts:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unsupported file type: {ext}. Allowed: {', '.join(sorted(allowed_exts))}"
         )
 
     # Validate MIME type from content
@@ -301,23 +322,28 @@ async def _process_file_upload(file: UploadFile, user_id: str) -> dict:
         "application/pdf",
         "text/plain",
         "text/markdown",
+        "text/x-markdown",
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         "application/msword",
+        "application/zip",  # older libmagic reports legacy .doc as zip
     }
     if mime not in allowed_mimes:
         raise HTTPException(400, f"Invalid file type: {mime}. Allowed: PDF, TXT, MD, DOCX, DOC")
 
-    # Check extension matches MIME (python-magic returns text/plain for .md, application/zip for .doc)
+    # Check extension matches MIME.
+    # .docx MUST be the OOXML MIME (python-docx also rejects non-zip anyway).
+    # .doc: libmagic historically reports older .doc files as application/zip,
+    # so both are accepted — but anything else (e.g. octet-stream from a
+    # spoofed 4-byte header) is rejected.
     ext_mime_map = {
-        ".pdf": "application/pdf",
-        ".txt": "text/plain",
-        ".md": "text/plain",        # libmagic returns text/plain for markdown
-        ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        ".doc": "application/zip",  # older libmagic returns zip for .doc
+        ".pdf": {"application/pdf"},
+        ".txt": {"text/plain"},
+        ".md": {"text/plain", "text/markdown"},
+        ".docx": {"application/vnd.openxmlformats-officedocument.wordprocessingml.document"},
+        ".doc": {"application/msword", "application/zip", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"},
     }
-    ext = Path(safe_filename).suffix.lower()
-    if ext in ext_mime_map and mime != ext_mime_map[ext]:
-        raise HTTPException(400, "File extension does not match content type")
+    if mime not in ext_mime_map.get(ext, set()):
+        raise HTTPException(400, f"File extension does not match content type")
 
     # Save to user's upload directory
     upload_dir = settings.get_user_upload_dir(user_id)
@@ -484,8 +510,10 @@ def clear_auth_cookies(response: Response):
 
 @limiter.limit("5/minute")
 @app.post("/v1/auth/register", response_model=TokenResponse)
-async def register(request: Request, req: RegisterRequest = Body(...), response: Response = Response()):
+async def register(request: Request, req: RegisterRequest = Body(...), response: Response = None):
     """Register a new user and return JWT tokens in HttpOnly cookies."""
+    # FastAPI injects the real Response when the default is None; a manually
+    # constructed Response() here would be discarded and its cookies lost.
     existing_user_id = get_user_by_email(req.email)
     if existing_user_id:
         raise HTTPException(status_code=400, detail="User already exists")
@@ -502,7 +530,7 @@ async def register(request: Request, req: RegisterRequest = Body(...), response:
 
 @limiter.limit("5/minute")
 @app.post("/v1/auth/login", response_model=TokenResponse)
-async def login(request: Request, req: LoginRequest = Body(...), response: Response = Response()):
+async def login(request: Request, req: LoginRequest = Body(...), response: Response = None):
     """Login user and return JWT tokens in HttpOnly cookies."""
     user_id = get_user_by_email(req.email)
     if not user_id:
