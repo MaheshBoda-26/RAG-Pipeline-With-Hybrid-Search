@@ -1,17 +1,12 @@
 <div align="center">
 
-<img src="docs/assets/brag-poster.jpg" alt="RAG Pipeline with Hybrid Search — demo video poster" width="100%">
+<video src="https://maheshboda-26.github.io/RAG-Pipeline-With-Hybrid-Search/brag-demo.mp4" controls muted playsinline width="100%"></video>
 
 **A retrieval-augmented generation pipeline that refuses to guess.**
 
 [Hybrid search](#architecture) · [Verified citations](#usage) · [Design decisions](#design-decisions-worth-knowing-about) · [Testing without a key](#testing-without-an-api-key) · [Extending](#extending-this-to-the-full-spec)
 
-▶ **[Watch the 20-second demo video](docs/assets/brag-demo.mp4)**
-
-<!-- ▶ To render the player inline instead of a poster: drag `docs/assets/brag-demo.mp4`
-     into any GitHub issue, replace the poster <img> above with:
-     <video src="https://github.com/user-attachments/assets/...mp4" controls muted></video>
--->
+<sub>Video not loading? [Download it here](https://github.com/MaheshBoda-26/RAG-Pipeline-With-Hybrid-Search/releases/download/demo-video/brag-demo.mp4) · Poster: [docs/assets/brag-poster.jpg](docs/assets/brag-poster.jpg)</sub>
 
 </div>
 
