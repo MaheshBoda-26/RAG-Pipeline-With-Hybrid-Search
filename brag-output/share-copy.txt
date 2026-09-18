@@ -1,0 +1,3 @@
+Every RAG demo answers. This one refuses when it isn't sure — hybrid search (dense + BM25 → RRF fusion → LLM rerank), grounded answers with verified inline citations, and a composite confidence score guarding the floor.
+
+Built it. It's on GitHub.
