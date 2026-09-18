@@ -1,3 +1,20 @@
+<div align="center">
+
+<img src="docs/assets/brag-poster.jpg" alt="RAG Pipeline with Hybrid Search — demo video poster" width="100%">
+
+**A retrieval-augmented generation pipeline that refuses to guess.**
+
+[Hybrid search](#architecture) · [Verified citations](#usage) · [Design decisions](#design-decisions-worth-knowing-about) · [Testing without a key](#testing-without-an-api-key) · [Extending](#extending-this-to-the-full-spec)
+
+▶ **[Watch the 20-second demo video](docs/assets/brag-demo.mp4)**
+
+<!-- ▶ To render the player inline instead of a poster: drag `docs/assets/brag-demo.mp4`
+     into any GitHub issue, replace the poster <img> above with:
+     <video src="https://github.com/user-attachments/assets/...mp4" controls muted></video>
+-->
+
+</div>
+
 # RAG Pipeline with Hybrid Search Over Internal Docs
 
 A retrieval-augmented generation system that ingests internal documentation,
@@ -164,4 +181,3 @@ python tests/test_pipeline_smoke.py
   service and a real Qdrant server (swap `QDRANT_PATH` for `QDRANT_URL` in
   the compose env) — not included here since embedded mode was the chosen
   setup for this pass.
-

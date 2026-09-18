@@ -1,0 +1,719 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>RAG Pipeline — Hybrid Search Brag</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <script src="assets/audio-data.js"></script>
+    <style>
+      :root {
+        --black: #000000;
+        --white: #ffffff;
+        --offwhite: #fffdf5;
+        --pink: #fe90e8;
+        --blue: #c0f7fe;
+        --green: #99e885;
+        --yellow: #f7cb46;
+        --cream: #ffdc8b;
+      }
+      @font-face {
+        font-family: "Space Grotesk";
+        font-style: normal;
+        font-weight: 300 700;
+        src: url("assets/fonts/space-grotesk.woff2") format("woff2");
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: #000;
+        font-family: "Inter", sans-serif;
+        color: var(--black);
+      }
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        container-type: size;
+      }
+      .scene {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+      }
+      #s1 { background: var(--offwhite); z-index: 1; }
+      #s2 { background: var(--blue); z-index: 2; opacity: 0; }
+      #s3 { background: var(--green); z-index: 3; opacity: 0; }
+      #s4 { background: var(--cream); z-index: 4; opacity: 0; }
+      #s5 { background: var(--black); z-index: 5; opacity: 0; }
+      .inner { position: absolute; inset: 0; }
+
+      /* ---- BlockFrame atoms ---- */
+      .dotgrid {
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(#000 1.3px, transparent 1.3px);
+        background-size: 24px 24px;
+        opacity: 0.07;
+        will-change: opacity;
+      }
+      .card {
+        position: absolute;
+        background: var(--white);
+        border: 4px solid var(--black);
+        box-shadow: 8px 8px 0 var(--black);
+      }
+      .card-sm {
+        position: absolute;
+        background: var(--white);
+        border: 3px solid var(--black);
+        box-shadow: 4px 4px 0 var(--black);
+      }
+      .pill {
+        position: absolute;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        border: 3px solid var(--black);
+        border-radius: 9999px;
+        box-shadow: 4px 4px 0 var(--black);
+        padding: 10px 26px;
+        font-family: "Space Grotesk", sans-serif;
+        font-weight: 600;
+        font-size: 21px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        background: var(--white);
+        color: var(--black);
+        white-space: nowrap;
+      }
+      .pill-inv {
+        background: var(--black);
+        color: var(--white);
+        border: 3px solid var(--white);
+        box-shadow: 4px 4px 0 var(--yellow);
+      }
+      .heading {
+        position: absolute;
+        font-weight: 800;
+        font-size: 3.3cqw;
+        line-height: 1.0;
+        letter-spacing: -0.02em;
+        text-transform: uppercase;
+        margin: 0;
+      }
+      .tilt-a { transform: rotate(6deg); }
+      .tilt-b { transform: rotate(-5deg); }
+      .tilt-c { transform: rotate(9deg); }
+      .star {
+        position: absolute;
+        clip-path: polygon(50% 0%, 61% 24%, 88% 12%, 80% 41%, 100% 50%, 80% 59%, 88% 88%, 61% 76%, 50% 100%, 39% 76%, 12% 88%, 20% 59%, 0% 50%, 20% 41%, 12% 12%, 39% 24%);
+      }
+      .card-title {
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: -0.01em;
+        font-size: 30px;
+        line-height: 1.1;
+      }
+      .label {
+        font-family: "Space Grotesk", sans-serif;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        border: 3px solid var(--black);
+        box-shadow: 4px 4px 0 var(--black);
+        padding: 12px 22px;
+        font-family: "Space Grotesk", sans-serif;
+        font-weight: 600;
+        font-size: 21px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        background: var(--white);
+        white-space: nowrap;
+      }
+      .icon-square {
+        width: 52px;
+        height: 52px;
+        border: 3px solid var(--black);
+        box-shadow: 4px 4px 0 var(--black);
+        flex: 0 0 auto;
+      }
+      .deco-dot {
+        width: 14px;
+        height: 14px;
+        border: 2px solid var(--black);
+        border-radius: 50%;
+        flex: 0 0 auto;
+      }
+
+      /* S1 terminal */
+      .term-head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 16px 24px;
+        border-bottom: 3px solid var(--black);
+        background: var(--offwhite);
+      }
+      .term-dot { width: 16px; height: 16px; border: 3px solid var(--black); }
+      .term-line {
+        font-family: "Space Grotesk", sans-serif;
+        font-weight: 500;
+        font-size: 31px;
+        letter-spacing: 0.01em;
+        display: flex;
+        align-items: center;
+        white-space: pre;
+      }
+      .term-cursor {
+        display: inline-block;
+        width: 15px;
+        height: 36px;
+        background: var(--black);
+        margin-left: 4px;
+      }
+
+      /* S3 rows */
+      .judge-row {
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 96px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: var(--white);
+        border: 3px solid var(--black);
+        box-shadow: 4px 4px 0 var(--black);
+        padding: 0 28px;
+        will-change: transform;
+      }
+      .score-chip {
+        font-family: "Space Grotesk", sans-serif;
+        font-weight: 700;
+        font-size: 26px;
+        border: 3px solid var(--black);
+        background: var(--yellow);
+        padding: 6px 18px;
+        font-variant-numeric: tabular-nums;
+      }
+
+      /* S4 bars */
+      .bar-track {
+        position: relative;
+        height: 30px;
+        border: 3px solid var(--black);
+        background: var(--white);
+        overflow: hidden;
+      }
+      .bar-fill {
+        position: absolute;
+        inset: 0;
+        transform: scaleX(0);
+        transform-origin: left center;
+        will-change: transform;
+      }
+      .cite-chip {
+        display: inline-flex;
+        align-items: center;
+        border: 3px solid var(--black);
+        background: var(--green);
+        box-shadow: 3px 3px 0 var(--black);
+        font-family: "Space Grotesk", sans-serif;
+        font-weight: 700;
+        font-size: 24px;
+        padding: 2px 12px;
+        margin: 0 6px;
+        vertical-align: middle;
+      }
+      .stamp {
+        position: absolute;
+        border: 4px solid var(--black);
+        background: var(--yellow);
+        box-shadow: 6px 6px 0 var(--black);
+        font-weight: 900;
+        font-size: 40px;
+        letter-spacing: -0.01em;
+        text-transform: uppercase;
+        padding: 12px 28px;
+        opacity: 0;
+      }
+
+      /* S5 close */
+      .close-frame {
+        position: absolute;
+        background: var(--black);
+        border: 4px solid var(--white);
+        box-shadow: 14px 14px 0 var(--yellow);
+      }
+      .close-title {
+        font-weight: 900;
+        font-size: 4.2cqw;
+        line-height: 1.0;
+        letter-spacing: -0.03em;
+        text-transform: uppercase;
+        color: var(--white);
+        margin: 0;
+      }
+      .close-word { display: inline-block; opacity: 0; will-change: transform; }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-width="1920"
+      data-height="1080"
+      data-duration="20"
+      data-fps="30"
+    >
+      <!-- ============ SCENE 1 — INGEST (offwhite) ============ -->
+      <section id="s1" class="scene">
+        <div class="inner" id="s1-inner">
+          <div class="dotgrid" id="s1-dots"></div>
+          <div class="card tilt-a" style="width: 320px; height: 170px; background: var(--yellow); left: 1640px; top: 150px;"></div>
+          <div class="card tilt-b" style="width: 240px; height: 150px; background: var(--pink); left: -60px; top: 860px;"></div>
+          <div id="s1-starwrap" style="position: absolute; left: 1610px; top: 640px; width: 180px; height: 180px;">
+            <div class="star" style="inset: 0; background: var(--black); transform: rotate(10deg);"></div>
+            <div class="star" style="inset: 6px; background: var(--blue); transform: rotate(10deg);"></div>
+          </div>
+
+          <div class="pill" id="s1-pill" style="left: 60px; top: 60px; background: var(--yellow);">01 · INGESTION</div>
+          <h2 class="heading" id="s1-h" style="left: 60px; top: 140px;">INGEST. INDEX. CITE.</h2>
+
+          <div class="card" id="s1-term" style="left: 280px; top: 330px; width: 1360px; height: 400px;">
+            <div class="term-head">
+              <div class="term-dot" style="background: var(--pink);"></div>
+              <div class="term-dot" style="background: var(--yellow);"></div>
+              <div class="term-dot" style="background: var(--green);"></div>
+              <div class="label" style="margin-left: 14px; font-size: 17px; color: #333;">TERMINAL — RAG-PIPELINE</div>
+            </div>
+            <div style="padding: 34px 40px;">
+              <div class="term-line" id="s1-cmdline"><span id="s1-cmd"></span><span class="term-cursor" id="s1-cursor"></span></div>
+              <div id="s1-check" class="label" style="display: flex; align-items: center; gap: 14px; margin-top: 26px; font-size: 23px; opacity: 0;">
+                <span style="display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; background: var(--green); border: 3px solid var(--black); font-weight: 700; color: var(--black);">✓</span>
+                INDEXED · DEDUP APPLIED · EMBEDDINGS WRITTEN TO QDRANT
+              </div>
+            </div>
+            <div style="position: absolute; left: 40px; right: 40px; bottom: 34px; display: flex; gap: 22px;">
+              <div class="chip" id="s1-chip1" style="background: var(--pink); opacity: 0;">4 FORMATS</div>
+              <div class="chip" id="s1-chip2" style="background: var(--blue); opacity: 0;">RECURSIVE CHUNKING</div>
+              <div class="chip" id="s1-chip3" style="background: var(--cream); opacity: 0;">COSINE &gt; 0.95 DEDUP</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ SCENE 2 — HYBRID RETRIEVAL (blue) ============ -->
+      <section id="s2" class="scene">
+        <div class="inner" id="s2-inner">
+          <div class="dotgrid"></div>
+          <div class="card tilt-c" style="width: 260px; height: 140px; background: var(--cream); left: 1740px; top: 880px;"></div>
+
+          <div class="pill" id="s2-pill" style="left: 60px; top: 60px;">02 · HYBRID RETRIEVAL</div>
+          <h2 class="heading" id="s2-h" style="left: 60px; top: 140px;">ONE QUESTION, TWO SEARCHES.</h2>
+
+          <!-- dense lane -->
+          <div class="card" id="s2-laneL" style="left: 110px; top: 310px; width: 780px; height: 380px; will-change: transform;">
+            <div style="display: flex; align-items: center; gap: 18px; padding: 20px 26px; border-bottom: 3px solid var(--black);">
+              <div class="icon-square" style="background: var(--blue);"></div>
+              <div class="card-title">DENSE → QDRANT</div>
+              <div class="deco-dot" style="background: var(--blue); margin-left: auto;"></div>
+            </div>
+            <div style="position: absolute; left: 26px; right: 26px; top: 108px; display: flex; flex-direction: column; gap: 16px;">
+              <div class="s2-row card-sm" style="position: relative; display: flex; justify-content: space-between; align-items: center; padding: 12px 22px; background: var(--cream);"><span class="label" style="font-size: 20px;">AUTHENTICATION.MD</span><span class="label" style="font-size: 20px;">#1</span></div>
+              <div class="s2-row card-sm" style="position: relative; display: flex; justify-content: space-between; align-items: center; padding: 12px 22px;"><span class="label" style="font-size: 20px;">OAUTH2.MD</span><span class="label" style="font-size: 20px;">#2</span></div>
+              <div class="s2-row card-sm" style="position: relative; display: flex; justify-content: space-between; align-items: center; padding: 12px 22px; background: var(--green);"><span class="label" style="font-size: 20px;">RATE-LIMITS.MD</span><span class="label" style="font-size: 20px;">#3</span></div>
+            </div>
+          </div>
+
+          <!-- sparse lane -->
+          <div class="card" id="s2-laneR" style="left: 1030px; top: 310px; width: 780px; height: 380px; will-change: transform;">
+            <div style="display: flex; align-items: center; gap: 18px; padding: 20px 26px; border-bottom: 3px solid var(--black);">
+              <div class="icon-square" style="background: var(--pink);"></div>
+              <div class="card-title">BM25 → SPARSE INDEX</div>
+              <div class="deco-dot" style="background: var(--pink); margin-left: auto;"></div>
+            </div>
+            <div style="position: absolute; left: 26px; right: 26px; top: 108px; display: flex; flex-direction: column; gap: 16px;">
+              <div class="s2-row card-sm" style="position: relative; display: flex; justify-content: space-between; align-items: center; padding: 12px 22px;"><span class="label" style="font-size: 20px;">RATE-LIMITS.MD</span><span class="label" style="font-size: 20px;">#1</span></div>
+              <div class="s2-row card-sm" style="position: relative; display: flex; justify-content: space-between; align-items: center; padding: 12px 22px; background: var(--blue);"><span class="label" style="font-size: 20px;">AUTHENTICATION.MD</span><span class="label" style="font-size: 20px;">#2</span></div>
+              <div class="s2-row card-sm" style="position: relative; display: flex; justify-content: space-between; align-items: center; padding: 12px 22px; background: var(--pink);"><span class="label" style="font-size: 20px;">ERROR-CODES.MD</span><span class="label" style="font-size: 20px;">#3</span></div>
+            </div>
+          </div>
+
+          <!-- fusion -->
+          <div class="card-sm" id="s2-fusion" style="left: 560px; top: 742px; width: 800px; height: 210px; background: var(--green); will-change: transform;">
+            <div style="padding: 22px 30px;">
+              <div class="card-title" style="font-size: 34px;">RRF FUSION</div>
+              <div class="label" style="font-size: 21px; margin-top: 10px;">TWO RANKED LISTS → ONE RANKED LIST · TOP 20 CANDIDATES</div>
+            </div>
+            <div style="position: absolute; right: 26px; top: 24px; display: flex; gap: 8px;">
+              <div class="deco-dot" style="background: var(--blue);"></div>
+              <div class="deco-dot" style="background: var(--pink);"></div>
+              <div class="deco-dot" style="background: var(--yellow);"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ SCENE 3 — RERANKING (green) ============ -->
+      <section id="s3" class="scene">
+        <div class="inner" id="s3-inner">
+          <div class="dotgrid"></div>
+          <div class="card tilt-b" style="width: 280px; height: 150px; background: var(--yellow); left: -70px; top: 820px;"></div>
+          <div id="s3-starwrap" style="position: absolute; left: 1700px; top: 100px; width: 160px; height: 160px;">
+            <div class="star" style="inset: 0; background: var(--black); transform: rotate(-8deg);"></div>
+            <div class="star" style="inset: 6px; background: var(--pink); transform: rotate(-8deg);"></div>
+          </div>
+
+          <div class="pill" id="s3-pill" style="left: 60px; top: 60px;">03 · RERANKING</div>
+          <h2 class="heading" id="s3-h" style="left: 60px; top: 140px;">THE JUDGE STEPS IN.</h2>
+
+          <div class="card" id="s3-card" style="left: 260px; top: 300px; width: 1400px; height: 560px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 20px 30px; border-bottom: 3px solid var(--black);">
+              <div class="card-title" style="font-size: 32px;">LLM-AS-JUDGE</div>
+              <div class="label" style="font-size: 19px; color: #333;">RELEVANCE · 0.0 – 1.0</div>
+            </div>
+            <div style="position: absolute; left: 34px; right: 34px; top: 108px; height: 420px;">
+              <div class="judge-row" id="s3-r0" style="top: 0;"><span class="label" style="font-size: 22px;">AUTHENTICATION.MD · RATE LIMITS</span><span class="score-chip" id="s3-sc0">0.74</span></div>
+              <div class="judge-row" id="s3-r1" style="top: 112px;"><span class="label" style="font-size: 22px;">GATEWAYS.MD · DEPLOYMENT NOTES</span><span class="score-chip" id="s3-sc1">0.62</span></div>
+              <div class="judge-row" id="s3-r2" style="top: 224px;"><span class="label" style="font-size: 22px;">ERROR-CODES.MD · COMMON ERRORS</span><span class="score-chip" id="s3-sc2">0.87</span></div>
+              <div class="judge-row" id="s3-r3" style="top: 336px;"><span class="label" style="font-size: 22px;">AUTHENTICATION.MD · API KEYS</span><span class="score-chip" id="s3-sc3">0.91</span></div>
+            </div>
+          </div>
+
+          <div class="chip" id="s3-chip" style="position: absolute; left: 50%; transform: translateX(-50%); top: 906px; background: var(--cream); opacity: 0;">ONE BATCHED CALL · FALLS BACK TO FUSION ORDER</div>
+        </div>
+      </section>
+
+      <!-- ============ SCENE 4 — GROUNDED GENERATION (cream) ============ -->
+      <section id="s4" class="scene">
+        <div class="inner" id="s4-inner">
+          <div class="dotgrid"></div>
+          <div class="card tilt-a" style="width: 300px; height: 150px; background: var(--blue); left: 1700px; top: -50px;"></div>
+
+          <div class="pill" id="s4-pill" style="left: 60px; top: 60px;">04 · GROUNDED GENERATION</div>
+          <h2 class="heading" id="s4-h" style="left: 60px; top: 140px;">GROUNDED. CITED. SCORED.</h2>
+
+          <!-- answer card -->
+          <div class="card" id="s4-answer" style="left: 60px; top: 300px; width: 1100px; height: 560px; will-change: transform;">
+            <div style="display: flex; align-items: center; gap: 16px; padding: 18px 28px; border-bottom: 3px solid var(--black);">
+              <div class="term-dot" style="background: var(--green);"></div>
+              <div class="label" style="font-size: 18px;">ANSWER — CLI ASK</div>
+            </div>
+            <div style="padding: 34px 38px; font-weight: 600; font-size: 31px; line-height: 1.5;">
+              <span id="s4-sentence" style="opacity: 0; display: inline;">Use either an API key in the Authorization header</span><span id="s4-cite1" class="cite-chip" style="opacity: 0;">[1]</span><span id="s4-sentence2" style="opacity: 0;">or OAuth2.</span><span id="s4-cite2" class="cite-chip" style="opacity: 0;">[3]</span>
+            </div>
+            <div id="s4-sources" class="label" style="position: absolute; left: 38px; right: 38px; bottom: 108px; font-size: 20px; color: #222; opacity: 0;">
+              [1] AUTHENTICATION.MD — RATE LIMITS&nbsp;&nbsp;·&nbsp;&nbsp;[3] AUTHENTICATION.MD — OAUTH2
+            </div>
+            <div id="s4-notcov" class="chip" style="position: absolute; left: 38px; bottom: 30px; background: #eeeeee; opacity: 0; font-size: 19px; padding: 9px 18px;">NOT COVERED: KUBERNETES DEPLOY — SAY SO, DON'T CITE</div>
+            <div class="stamp" id="s4-stamp" style="right: -46px; top: -34px; transform: rotate(-8deg);">VERIFIED</div>
+          </div>
+
+          <!-- confidence panel -->
+          <div class="card" id="s4-panel" style="left: 1220px; top: 300px; width: 640px; height: 560px; will-change: transform;">
+            <div style="padding: 18px 28px; border-bottom: 3px solid var(--black);"><div class="card-title" style="font-size: 30px;">CONFIDENCE</div></div>
+            <div style="padding: 26px 30px; display: flex; flex-direction: column; gap: 24px;">
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
+                  <span class="label" style="font-size: 19px;">RETRIEVAL</span>
+                  <span class="label" id="s4-v0" style="font-weight: 700; font-size: 26px; font-variant-numeric: tabular-nums;">0.00</span>
+                </div>
+                <div class="bar-track"><div class="bar-fill" id="s4-b0" style="background: var(--blue);"></div></div>
+              </div>
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
+                  <span class="label" style="font-size: 19px;">CITATION COVERAGE</span>
+                  <span class="label" id="s4-v1" style="font-weight: 700; font-size: 26px; font-variant-numeric: tabular-nums;">0.00</span>
+                </div>
+                <div class="bar-track"><div class="bar-fill" id="s4-b1" style="background: var(--pink);"></div></div>
+              </div>
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
+                  <span class="label" style="font-size: 19px;">COMPLETENESS</span>
+                  <span class="label" id="s4-v2" style="font-weight: 700; font-size: 26px; font-variant-numeric: tabular-nums;">0.00</span>
+                </div>
+                <div class="bar-track"><div class="bar-fill" id="s4-b2" style="background: var(--green);"></div></div>
+              </div>
+            </div>
+            <div style="position: absolute; left: 30px; right: 30px; bottom: 26px; border-top: 3px solid var(--black); padding-top: 18px; display: flex; align-items: baseline; justify-content: space-between;">
+              <span class="label" style="font-size: 20px;">COMPOSITE</span>
+              <span id="s4-composite" style="font-weight: 900; font-size: 72px; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; opacity: 0;">0.923</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ SCENE 5 — CLOSE (black) ============ -->
+      <section id="s5" class="scene">
+        <div class="inner" id="s5-inner">
+          <div class="pill pill-inv" id="s5-pill" style="left: 50%; top: 200px; transform: translateX(-50%);">RAG PIPELINE · HYBRID SEARCH</div>
+
+          <div class="close-frame" id="s5-frame" style="left: 440px; top: 330px; width: 1040px; height: 400px; will-change: transform;">
+            <div style="padding: 70px 60px;">
+              <h2 class="close-title"><span class="close-word" id="s5-w1">IT</span> <span class="close-word" id="s5-w2">REFUSES</span> <span class="close-word" id="s5-w3">TO</span> <span class="close-word" id="s5-w4">GUESS.</span></h2>
+              <div id="s5-sub" class="label" style="margin-top: 36px; font-size: 22px; color: #cfcfcf; opacity: 0;">MIN CONFIDENCE FLOOR — REFUSES RATHER THAN GENERATES</div>
+            </div>
+            <div id="s5-starwrap" style="position: absolute; right: -70px; top: -70px; width: 170px; height: 170px; will-change: transform;">
+              <div class="star" style="inset: 0; background: var(--white); transform: rotate(12deg);"></div>
+              <div class="star" style="inset: 6px; background: var(--pink); transform: rotate(12deg);"></div>
+            </div>
+          </div>
+
+          <div class="pill" id="s5-ghost" style="left: 50%; top: 930px; transform: translateX(-50%); opacity: 0; background: var(--offwhite); font-size: 18px;">GITHUB · RAG-PIPELINE-WITH-HYBRID-SEARCH</div>
+        </div>
+      </section>
+
+      <!-- ============ AUDIO ============ -->
+      <audio id="music" src="assets/music/happy-beats-business-moves-vol-12-by-ende-dot-app.mp3" data-start="0" data-duration="20" data-track-index="10" data-volume="0.32"
+        data-automation="{&quot;version&quot;:1,&quot;lanes&quot;:[{&quot;target&quot;:&quot;volume&quot;,&quot;points&quot;:[{&quot;t&quot;:0,&quot;v&quot;:1},{&quot;t&quot;:19.2,&quot;v&quot;:1},{&quot;t&quot;:20,&quot;v&quot;:0}]}]}"></audio>
+
+      <!-- SFX — CC0 Kenney, each clip its own track, aligned to animation start -->
+      <!-- S1 typing ticks (0.95–2.14) -->
+      <audio id="sfx-k1" src="assets/sfx/keyboard/keypress-001.wav" data-start="0.95" data-duration="0.25" data-track-index="11" data-volume="0.35"></audio>
+      <audio id="sfx-k2" src="assets/sfx/keyboard/keypress-003.wav" data-start="1.12" data-duration="0.25" data-track-index="12" data-volume="0.35"></audio>
+      <audio id="sfx-k3" src="assets/sfx/keyboard/keypress-005.wav" data-start="1.29" data-duration="0.25" data-track-index="13" data-volume="0.35"></audio>
+      <audio id="sfx-k4" src="assets/sfx/keyboard/keypress-009.wav" data-start="1.46" data-duration="0.25" data-track-index="14" data-volume="0.35"></audio>
+      <audio id="sfx-k5" src="assets/sfx/keyboard/keypress-003.wav" data-start="1.63" data-duration="0.25" data-track-index="15" data-volume="0.35"></audio>
+      <audio id="sfx-k6" src="assets/sfx/keyboard/keypress-001.wav" data-start="1.80" data-duration="0.25" data-track-index="16" data-volume="0.35"></audio>
+      <audio id="sfx-k7" src="assets/sfx/keyboard/keypress-005.wav" data-start="1.97" data-duration="0.25" data-track-index="17" data-volume="0.35"></audio>
+      <audio id="sfx-k8" src="assets/sfx/keyboard/keypress-009.wav" data-start="2.14" data-duration="0.25" data-track-index="18" data-volume="0.35"></audio>
+      <!-- S1 chips -->
+      <audio id="sfx-c1" src="assets/sfx/interface/drop_002.ogg" data-start="2.72" data-duration="0.19" data-track-index="19" data-volume="0.55"></audio>
+      <audio id="sfx-c2" src="assets/sfx/interface/drop_002.ogg" data-start="3.06" data-duration="0.19" data-track-index="20" data-volume="0.55"></audio>
+      <audio id="sfx-c3" src="assets/sfx/interface/drop_002.ogg" data-start="3.40" data-duration="0.19" data-track-index="21" data-volume="0.55"></audio>
+      <!-- S2 lanes + fusion -->
+      <audio id="sfx-l1" src="assets/sfx/casino/card-slide-1.ogg" data-start="4.50" data-duration="0.60" data-track-index="22" data-volume="0.6"></audio>
+      <audio id="sfx-l2" src="assets/sfx/casino/card-slide-1.ogg" data-start="4.65" data-duration="0.60" data-track-index="23" data-volume="0.6"></audio>
+      <audio id="sfx-fus" src="assets/sfx/impact/impactSoft_medium_001.ogg" data-start="7.09" data-duration="0.18" data-track-index="24" data-volume="0.7"></audio>
+      <!-- S3 judge -->
+      <audio id="sfx-j1" src="assets/sfx/impact/impactSoft_medium_004.ogg" data-start="8.74" data-duration="0.15" data-track-index="25" data-volume="0.6"></audio>
+      <audio id="sfx-r1" src="assets/sfx/interface/select_008.ogg" data-start="9.35" data-duration="0.06" data-track-index="26" data-volume="0.45"></audio>
+      <audio id="sfx-r2" src="assets/sfx/interface/select_008.ogg" data-start="9.47" data-duration="0.06" data-track-index="27" data-volume="0.45"></audio>
+      <audio id="sfx-r3" src="assets/sfx/interface/select_008.ogg" data-start="9.59" data-duration="0.06" data-track-index="28" data-volume="0.45"></audio>
+      <audio id="sfx-r4" src="assets/sfx/interface/select_008.ogg" data-start="9.71" data-duration="0.06" data-track-index="29" data-volume="0.45"></audio>
+      <audio id="sfx-set" src="assets/sfx/impact/impactSoft_medium_001.ogg" data-start="11.15" data-duration="0.18" data-track-index="30" data-volume="0.55"></audio>
+      <!-- S4 citation chips, bar ticks, composite bell, stamp -->
+      <audio id="sfx-ct1" src="assets/sfx/ui/click2.ogg" data-start="13.10" data-duration="0.07" data-track-index="31" data-volume="0.5"></audio>
+      <audio id="sfx-ct2" src="assets/sfx/ui/click2.ogg" data-start="13.40" data-duration="0.07" data-track-index="32" data-volume="0.5"></audio>
+      <audio id="sfx-b1" src="assets/sfx/ui/rollover2.ogg" data-start="12.75" data-duration="0.06" data-track-index="33" data-volume="0.3"></audio>
+      <audio id="sfx-b2" src="assets/sfx/ui/rollover2.ogg" data-start="12.95" data-duration="0.06" data-track-index="34" data-volume="0.3"></audio>
+      <audio id="sfx-b3" src="assets/sfx/ui/rollover2.ogg" data-start="13.15" data-duration="0.06" data-track-index="35" data-volume="0.3"></audio>
+      <audio id="sfx-bell" src="assets/sfx/impact/impactBell_heavy_000.ogg" data-start="13.64" data-duration="1.48" data-track-index="36" data-volume="0.75"></audio>
+      <audio id="sfx-stamp" src="assets/sfx/interface/bong_001.ogg" data-start="15.29" data-duration="0.13" data-track-index="37" data-volume="0.7"></audio>
+      <!-- S5 final line -->
+      <audio id="sfx-fin" src="assets/sfx/interface/bong_001.ogg" data-start="17.47" data-duration="0.13" data-track-index="38" data-volume="0.5"></audio>
+    </div>
+
+    <script>
+      (function () {
+        var TL_TOTAL = 20;
+        var tl = gsap.timeline({ paused: true });
+
+        // ---------- helpers ----------
+        function pop(sel, at, dur) {
+          tl.fromTo(sel, { opacity: 0, scale: 0.4, y: 26 }, { opacity: 1, scale: 1, y: 0, duration: dur || 0.45, ease: "back.out(1.9)" }, at);
+        }
+        function rise(sel, at, dur) {
+          tl.fromTo(sel, { opacity: 0, y: 42 }, { opacity: 1, y: 0, duration: dur || 0.55, ease: "power4.out" }, at);
+        }
+        // deterministic typing text (pure function of tween progress)
+        var CMD = "$ python cli.py ingest ./sample_docs";
+
+        // ============ SCENE 1 (0 – 4.0) ============
+        rise("#s1-pill", 0.15, 0.4);
+        rise("#s1-h", 0.3, 0.5);
+        tl.fromTo("#s1-term", { opacity: 0, y: 70 }, { opacity: 1, y: 0, duration: 0.6, ease: "power4.out" }, 0.45);
+        tl.fromTo("#s1-dots", { opacity: 0 }, { opacity: 0.07, duration: 0.8, ease: "power2.out" }, 0.2);
+        tl.fromTo("#s1-starwrap", { opacity: 0, scale: 0, rotation: -30 }, { opacity: 1, scale: 1, rotation: 0, duration: 0.5, ease: "back.out(2)" }, 0.7);
+
+        // typing driver — pure f(t): text slice + square-cursor blink + dot-grid breathe
+        // // audio-reactive: dot-grid opacity breathes with music RMS (subtle)
+        var d1 = { t: 0 };
+        tl.to(d1, {
+          t: 4, duration: 4, ease: "none",
+          onUpdate: function () {
+            var t = d1.t;
+            var chars = Math.max(0, Math.min(CMD.length, Math.floor(((t - 0.95) / 1.35) * CMD.length)));
+            document.getElementById("s1-cmd").textContent = CMD.slice(0, chars);
+            document.getElementById("s1-cursor").style.opacity = (Math.floor(t * 5) % 2 === 0) ? "1" : "0.15";
+            var f = Math.floor(t * 30);
+            var rms = (window.AUDIO_DATA && window.AUDIO_DATA.frames[f]) ? window.AUDIO_DATA.frames[f].rms : 0;
+            document.getElementById("s1-dots").style.opacity = (0.055 + rms * 0.035).toFixed(3);
+          }
+        }, 0);
+
+        pop("#s1-check", 2.5, 0.4);
+        pop("#s1-chip1", 2.72, 0.4);
+        pop("#s1-chip2", 3.06, 0.4);
+        pop("#s1-chip3", 3.4, 0.4);
+
+        // transition S1 -> S2 (smooth slide)
+        tl.to("#s1-inner", { opacity: 0, x: -140, duration: 0.45, ease: "power3.in" }, 4.0);
+        tl.set("#s2", { opacity: 1 }, 4.0);
+
+        // ============ SCENE 2 (4.0 – 8.0) ============
+        rise("#s2-pill", 4.15, 0.4);
+        rise("#s2-h", 4.3, 0.5);
+        // lane cards slide in from opposite sides
+        tl.fromTo("#s2-laneL", { x: -360, opacity: 0 }, { x: 0, opacity: 1, duration: 0.6, ease: "power4.out" }, 4.5); // // card-slide SFX
+        tl.fromTo("#s2-laneR", { x: 360, opacity: 0 }, { x: 0, opacity: 1, duration: 0.6, ease: "power4.out" }, 4.65);
+
+        // result rows drop — beat-grid: L rows 5.34 / 6.00 / 6.56 (±0.10 of beats)
+        var rowsL = document.querySelectorAll("#s2-laneL .s2-row");
+        var rowsR = document.querySelectorAll("#s2-laneR .s2-row");
+        [5.34, 6.0, 6.56].forEach(function (t, i) {
+          tl.fromTo(rowsL[i], { y: -46, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: "back.out(1.7)" }, t);
+        });
+        [5.56, 6.1, 6.62].forEach(function (t, i) {
+          tl.fromTo(rowsR[i], { y: -46, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: "back.out(1.7)" }, t);
+        });
+
+        // // beat-locked: 7.09 — RRF fusion card lands
+        tl.fromTo("#s2-fusion", { scale: 0, opacity: 0, rotation: -4 }, { scale: 1, opacity: 1, rotation: 0, duration: 0.55, ease: "back.out(1.8)" }, 7.09);
+
+        // transition S2 -> S3 (crossfade + drift)
+        tl.to("#s2-inner", { opacity: 0, y: -60, duration: 0.45, ease: "power3.in" }, 8.0);
+        tl.set("#s3", { opacity: 1 }, 8.0);
+
+        // ============ SCENE 3 (8.0 – 11.0) ============
+        rise("#s3-pill", 8.15, 0.4);
+        rise("#s3-h", 8.3, 0.5);
+        // // beat-locked: 8.74 — judge card lands
+        tl.fromTo("#s3-card", { opacity: 0, scale: 0.92, y: 40 }, { opacity: 1, scale: 1, y: 0, duration: 0.55, ease: "power4.out" }, 8.74);
+        tl.fromTo("#s3-starwrap", { opacity: 0, scale: 0 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(2)" }, 8.9);
+
+        var jrows = ["#s3-r0", "#s3-r1", "#s3-r2", "#s3-r3"];
+        jrows.forEach(function (sel, i) {
+          tl.fromTo(sel, { opacity: 0, x: -60 }, { opacity: 1, x: 0, duration: 0.4, ease: "power3.out" }, 9.35 + i * 0.12);
+        });
+
+        // score scramble → resolve (deterministic function of proxy)
+        var sc = { t: 0 };
+        tl.to(sc, {
+          t: 1, duration: 0.6, ease: "none",
+          onUpdate: function () {
+            var p = sc.t;
+            var finals = ["0.74", "0.62", "0.87", "0.91"];
+            for (var i = 0; i < 4; i++) {
+              var el = document.getElementById("s3-sc" + i);
+              if (p >= 1) { el.textContent = finals[i]; continue; }
+              if (p < 0.15) { continue; }
+              var digits = "";
+              for (var d = 0; d < 2; d++) {
+                digits += String((Math.floor(p * 37) * 7 + i * 13 + d * 5) % 10);
+              }
+              el.textContent = "0." + digits;
+            }
+          }
+        }, 9.95);
+
+        // reorder — rows travel to sorted positions (0.91 top → 0.62 demoted)
+        // final tops: r3(0.91)→0, r2(0.87)→112, r0(0.74)→224, r1(0.62)→336
+        tl.to("#s3-r0", { y: 224, duration: 0.6, ease: "power3.inOut" }, 10.55);
+        tl.to("#s3-r1", { y: 224 + 112, duration: 0.6, ease: "power3.inOut" }, 10.55);
+        tl.to("#s3-r2", { y: -112, duration: 0.6, ease: "power3.inOut" }, 10.55);
+        tl.to("#s3-r3", { y: -336, duration: 0.6, ease: "power3.inOut" }, 10.55);
+        tl.to("#s3-sc1", { backgroundColor: "#eeeeee", duration: 0.4 }, 10.75);
+
+        pop("#s3-chip", 10.55, 0.45);
+
+        // transition S3 -> S4 (crossfade)
+        tl.to("#s3-inner", { opacity: 0, scale: 0.98, duration: 0.45, ease: "power3.in" }, 11.4);
+        tl.set("#s4", { opacity: 1 }, 11.4);
+
+        // ============ SCENE 4 (11.4 – 16.4) ============
+        rise("#s4-pill", 11.55, 0.4);
+        rise("#s4-h", 11.7, 0.5);
+        tl.fromTo("#s4-answer", { x: -110, opacity: 0 }, { x: 0, opacity: 1, duration: 0.6, ease: "power4.out" }, 11.9);
+        tl.fromTo("#s4-panel", { x: 110, opacity: 0 }, { x: 0, opacity: 1, duration: 0.6, ease: "power4.out" }, 12.05);
+
+        rise("#s4-sentence", 12.5, 0.5);
+        pop("#s4-cite1", 13.1, 0.35);
+        rise("#s4-sentence2", 13.25, 0.4);
+        pop("#s4-cite2", 13.4, 0.35);
+        rise("#s4-sources", 13.7, 0.45);
+        pop("#s4-notcov", 13.95, 0.4);
+
+        // confidence bars — count-up + fill (pure onUpdate)
+        function bar(i, start, target) {
+          var v = { p: 0 };
+          tl.to(v, {
+            p: 1, duration: 0.85, ease: "power2.inOut",
+            onUpdate: function () {
+              var val = target * v.p;
+              document.getElementById("s4-v" + i).textContent = val.toFixed(2);
+              gsap.set("#s4-b" + i, { scaleX: v.p });
+            }
+          }, start);
+          tl.fromTo("#s4-b" + i, { scaleX: 0 }, { scaleX: 1, duration: 0.85, ease: "power2.inOut" }, start);
+        }
+        bar(0, 12.75, 0.87);
+        bar(1, 12.95, 1.0);
+        bar(2, 13.15, 0.9);
+
+        // // beat-locked: 13.64 — COMPOSITE 0.923 slams (bell)
+        tl.fromTo("#s4-composite", { opacity: 0, scale: 0.55, y: 24 }, { opacity: 1, scale: 1, y: 0, duration: 0.5, ease: "back.out(2.2)" }, 13.64);
+
+        // // beat-align: 15.29 — VERIFIED stamp slaps on (press-release overshoot), settles 15.91
+        tl.fromTo("#s4-stamp", { opacity: 0, scale: 2.4 }, { opacity: 1, scale: 1, duration: 0.32, ease: "power4.in" }, 15.29);
+        tl.to("#s4-stamp", { scale: 1.08, duration: 0.12, ease: "power2.out" }, 15.61);
+        tl.to("#s4-stamp", { scale: 1, duration: 0.18, ease: "power2.inOut" }, 15.73);
+
+        // transition S4 -> S5 (crossfade, frame settles)
+        tl.to("#s4-inner", { opacity: 0, duration: 0.45, ease: "power3.in" }, 16.4);
+        tl.set("#s5", { opacity: 1 }, 16.4);
+
+        // ============ SCENE 5 (16.4 – 20.0) ============
+        tl.fromTo("#s5-frame", { scale: 0.94, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.6, ease: "power4.out" }, 16.5);
+        rise("#s5-pill", 16.75, 0.4);
+        tl.fromTo("#s5-starwrap", { scale: 0, rotation: -40 }, { scale: 1, rotation: 0, duration: 0.5, ease: "back.out(2)" }, 16.9);
+
+        // // beat-locked: 17.47 — "TO GUESS." lands (waterfall word arrivals, binary opacity)
+        [17.0, 17.18].forEach(function (t, i) {
+          tl.set("#s5-w" + (i + 1), { opacity: 1 }, t);
+          tl.fromTo("#s5-w" + (i + 1), { y: 70 }, { y: 0, duration: 0.45, ease: "power4.out" }, t);
+        });
+        tl.set("#s5-w3", { opacity: 1 }, 17.47);
+        tl.fromTo("#s5-w3", { y: 70 }, { y: 0, duration: 0.45, ease: "power4.out" }, 17.47);
+        tl.set("#s5-w4", { opacity: 1 }, 17.62);
+        tl.fromTo("#s5-w4", { y: 70 }, { y: 0, duration: 0.45, ease: "power4.out" }, 17.62);
+
+        rise("#s5-sub", 18.35, 0.5);
+        pop("#s5-ghost", 18.75, 0.45);
+
+        // // audio-reactive: pink star breathes with music bass (subtle, ±6%)
+        var d5 = { t: 0 };
+        tl.to(d5, {
+          t: 4, duration: 4, ease: "none",
+          onUpdate: function () {
+            var f = Math.floor((16 + d5.t) * 30);
+            var fr = window.AUDIO_DATA && window.AUDIO_DATA.frames[f];
+            var bass = fr ? fr.bands[0] : 0;
+            gsap.set("#s5-starwrap", { scale: 1 + bass * 0.06, rotation: 0 });
+          }
+        }, 17.3);
+
+        // hold last frame to the end
+        tl.to({}, { duration: 0.01 }, 19.99);
+
+        window.__timelines["main"] = tl;
+      })();
+    </script>
+  </body>
+</html>
