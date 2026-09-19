@@ -152,6 +152,8 @@ class QdrantVectorStore:
         top_k: int,
         source_filter: str | None = None,
         bm25: Any | None = None,
+        dense_weight: float | None = None,
+        sparse_weight: float | None = None,
     ) -> list[dict]:
         """Hybrid search using dense vector query + Python BM25 + RRF fusion.
 
@@ -203,10 +205,14 @@ class QdrantVectorStore:
             else:
                 bm25_results = []
 
-        # Step 3: Fuse results using reciprocal rank fusion
+        # Step 3: Fuse results using reciprocal rank fusion. Per-query weight
+        # overrides (demo sliders) replace the 0.7/0.3 defaults when provided.
         from retrieval.fusion import reciprocal_rank_fusion
 
-        fused = reciprocal_rank_fusion(dense_results, bm25_results)
+        fusion_kwargs: dict = {}
+        if dense_weight is not None and sparse_weight is not None:
+            fusion_kwargs = {"dense_weight": dense_weight, "sparse_weight": sparse_weight}
+        fused = reciprocal_rank_fusion(dense_results, bm25_results, **fusion_kwargs)
 
         # Step 4: Defensive post-filter (should be redundant now) and top_k
         if source_filter:

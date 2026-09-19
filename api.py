@@ -331,6 +331,11 @@ async def verify_admin(
 class AskRequest(BaseModel):
     question: str
     source: str | None = None
+    # Per-query fusion-weight overrides (optional; normalized server-side).
+    # 0 <= w <= 1, and the pair is normalized so dense + sparse = 1.0, matching
+    # the pipeline's RRF weighting contract.
+    dense_weight: float | None = None
+    sparse_weight: float | None = None
 
 
 class IngestRequest(BaseModel):
@@ -722,7 +727,13 @@ async def get_current_user(user_id: str = Depends(verify_auth)):
 async def demo_ask(request: Request, req: AskRequest = Body(...)):
     """Ask question using demo/global collection (no auth required)."""
     pipeline = get_pipeline(settings.default_user_id)
-    response = pipeline.ask(req.question, source=req.source)
+    weights = _normalized_weights(req)
+    response = pipeline.ask(
+        req.question,
+        source=req.source,
+        dense_weight=weights[0] if weights else None,
+        sparse_weight=weights[1] if weights else None,
+    )
     return response.__dict__
 
 
@@ -733,6 +744,18 @@ async def demo_documents():
     docs = pipeline.list_documents()
     total_chunks = sum(d.get("chunk_count", 0) for d in docs)
     return {"documents": docs, "total_documents": len(docs), "total_chunks": total_chunks}
+
+
+@app.post("/v1/demo/ingest")
+async def demo_ingest():
+    """(Re-)ingest the bundled sample corpus into the demo collection.
+
+    Idempotent: incremental ingest skips unchanged documents, so this is safe
+    to click repeatedly. Used by the website's "Ingest Sample Docs" button so
+    a visitor can seed the demo without a terminal.
+    """
+    pipeline = get_pipeline(settings.default_user_id)
+    return pipeline.ingest_directory("./sample_docs")
 
 
 @app.post("/v1/demo/upload")
@@ -762,6 +785,25 @@ async def demo_vector_space(request: Request):
     return pipeline.vector_space(with_vectors=with_vectors, max_chunks=max(1, min(max_chunks, 2000)))
 
 
+def _normalized_weights(req: AskRequest) -> tuple[float, float] | None:
+    """Validate and normalize the optional per-query fusion weights.
+
+    Returns None when the client sent no override (use pipeline defaults), or a
+    (dense_weight, sparse_weight) pair summing to 1.0. Invalid input is a 422,
+    not a silent default — a visitor moving a slider expects it to matter.
+    """
+    if req.dense_weight is None and req.sparse_weight is None:
+        return None
+    dense = 0.7 if req.dense_weight is None else req.dense_weight
+    sparse = 0.3 if req.sparse_weight is None else req.sparse_weight
+    if not (0.0 <= dense <= 1.0 and 0.0 <= sparse <= 1.0):
+        raise HTTPException(status_code=422, detail="dense_weight/sparse_weight must be within [0, 1]")
+    total = dense + sparse
+    if total <= 0:
+        raise HTTPException(status_code=422, detail="at least one of dense_weight/sparse_weight must be > 0")
+    return (dense / total, sparse / total)
+
+
 @app.post("/v1/demo/pipeline")
 async def demo_pipeline_trace(request: Request, req: AskRequest = Body(...)):
     """One real ask() execution with its internals exposed.
@@ -771,4 +813,10 @@ async def demo_pipeline_trace(request: Request, req: AskRequest = Body(...)):
     pipeline, not a simulation.
     """
     pipeline = get_pipeline(settings.default_user_id)
-    return pipeline.pipeline_trace(req.question, source=req.source)
+    weights = _normalized_weights(req)
+    return pipeline.pipeline_trace(
+        req.question,
+        source=req.source,
+        dense_weight=weights[0] if weights else None,
+        sparse_weight=weights[1] if weights else None,
+    )

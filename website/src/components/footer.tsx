@@ -14,7 +14,7 @@ const footerLinks = {
   ],
   Components: [
     { label: "Hybrid Search", href: "#features" },
-    { label: "LLM Reranking", href: "#features" },
+    { label: "Two-Stage Reranking", href: "#features" },
     { label: "Verified Citations", href: "#features" },
   ],
   Config: [
@@ -41,8 +41,11 @@ function SpikeMark({ className }: { className?: string }) {
   );
 }
 
+const REPO_URL = "https://github.com/MaheshBoda-26/RAG-Pipeline-With-Hybrid-Search";
+
 export function Footer() {
   const [email, setEmail] = React.useState("");
+  const [subscribed, setSubscribed] = React.useState(false);
 
   return (
     <footer className="text-on-dark-soft" role="contentinfo" style={{ backgroundColor: 'var(--color-bg-elev)', borderTop: '1px solid var(--color-border)' }}>
@@ -60,8 +63,8 @@ export function Footer() {
             </a>
             <p className="text-sm leading-relaxed mb-6" style={{ color: 'var(--color-text-2)' }}>
               Production-grade retrieval-augmented generation with hybrid search,
-              LLM reranking, and verified citations. No vendor lock-in — runs on
-              your infrastructure.
+              two-stage reranking, and verified citations. No vendor lock-in — runs
+              on your infrastructure.
             </p>
             <div className="flex items-center gap-4">
               <motion.a
@@ -76,14 +79,18 @@ export function Footer() {
                 <Github className="w-5 h-5" />
               </motion.a>
               <motion.a
-                href="#"
+                href={`${REPO_URL}/issues`}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="hover:text-on-dark transition-colors"
                 style={{ color: 'var(--color-text-2)' }}
               >
                 Issues
               </motion.a>
               <motion.a
-                href="#"
+                href={`${REPO_URL}/releases`}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="hover:text-on-dark transition-colors"
                 style={{ color: 'var(--color-text-2)' }}
               >
@@ -132,7 +139,10 @@ export function Footer() {
             </p>
             <form
               className="flex gap-2"
-              onSubmit={(e) => e.preventDefault()}
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (email.trim()) setSubscribed(true);
+              }}
             >
               <input
                 type="email"
@@ -153,6 +163,12 @@ export function Footer() {
                 <ArrowRight className="w-4 h-4" />
               </Button>
             </form>
+            {subscribed && (
+              <p className="mt-3 text-xs" style={{ color: 'var(--color-accent-teal)' }} role="status">
+                This is a demo site — no mailing list. Star or watch the repo on
+                GitHub to follow releases.
+              </p>
+            )}
           </motion.div>
         </div>
 

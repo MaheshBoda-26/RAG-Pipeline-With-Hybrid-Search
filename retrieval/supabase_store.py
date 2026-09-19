@@ -166,6 +166,8 @@ class SupabaseVectorStore:
         top_k: int,
         source_filter: Optional[str] = None,
         bm25: Optional[Any] = None,
+        dense_weight: Optional[float] = None,
+        sparse_weight: Optional[float] = None,
     ) -> List[dict]:
         """Hybrid search combining Supabase dense vector query + BM25 + RRF fusion."""
         # Dense search via Supabase
@@ -191,7 +193,11 @@ class SupabaseVectorStore:
                 bm25_results = []
 
         from retrieval.fusion import reciprocal_rank_fusion
-        fused = reciprocal_rank_fusion(dense_results, bm25_results)
+
+        fusion_kwargs: dict = {}
+        if dense_weight is not None and sparse_weight is not None:
+            fusion_kwargs = {"dense_weight": dense_weight, "sparse_weight": sparse_weight}
+        fused = reciprocal_rank_fusion(dense_results, bm25_results, **fusion_kwargs)
 
         if source_filter:
             fused = [r for r in fused if r["payload"].get("source") == source_filter]

@@ -60,7 +60,7 @@ const configTable = [
   { variable: "DENSE_WEIGHT", default: "0.7", description: "Vector search weight" },
   { variable: "SPARSE_WEIGHT", default: "0.3", description: "BM25 search weight" },
   { variable: "RRF_K", default: "60", description: "Reciprocal rank fusion constant" },
-  { variable: "RERANK_CANDIDATE_POOL", default: "20", description: "Candidates sent to LLM judge" },
+  { variable: "RERANK_CANDIDATE_POOL", default: "20", description: "Candidates rescored by the reranker" },
   { variable: "FINAL_TOP_K", default: "5", description: "Final chunks for generation" },
   { variable: "MIN_RETRIEVAL_CONFIDENCE", default: "0.35", description: "Refusal threshold" },
   { variable: "DEDUP_SIMILARITY_THRESHOLD", default: "0.95", description: "Cosine similarity for dedup" },

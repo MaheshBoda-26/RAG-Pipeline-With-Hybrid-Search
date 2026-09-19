@@ -44,6 +44,8 @@ export function Demo() {
   const [trace, setTrace] = React.useState<PipelineTrace | null>(null);
   const [error, setError] = React.useState<string | null>(null);
   const [config, setConfig] = React.useState({ denseWeight: 0.7, sparseWeight: 0.3 });
+  const [ingestState, setIngestState] = React.useState<"idle" | "ingesting" | "done" | "failed">("idle");
+  const [ingestMsg, setIngestMsg] = React.useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,7 +63,7 @@ export function Demo() {
       const res = await fetch("/api/demo/pipeline", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question: query.trim() }),
+        body: JSON.stringify({ question: query.trim(), ...weights() }),
       });
 
       const data = await res.json();
@@ -104,6 +106,35 @@ export function Demo() {
     setQuery(q);
   };
 
+  // Per-query fusion weights: sent with every ask so the sliders actually
+  // change retrieval behavior (the backend normalizes the pair).
+  const weights = () => ({
+    dense_weight: config.denseWeight,
+    sparse_weight: config.sparseWeight,
+  });
+
+  // Seed the demo collection with the bundled corpus. Idempotent upstream
+  // (incremental ingest skips unchanged docs), so repeat clicks are safe.
+  const handleIngestSample = async () => {
+    if (ingestState === "ingesting") return;
+    setIngestState("ingesting");
+    setIngestMsg(null);
+    try {
+      const res = await fetch("/api/demo/ingest", { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Ingest failed");
+      setIngestState("done");
+      setIngestMsg(
+        data.chunks_indexed > 0
+          ? `Indexed ${data.chunks_indexed} new chunks (${data.documents_unchanged} docs unchanged).`
+          : `Corpus already indexed (${data.documents_unchanged} docs unchanged).`
+      );
+    } catch (err) {
+      setIngestState("failed");
+      setIngestMsg(err instanceof Error ? err.message : "Ingest failed");
+    }
+  };
+
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
   };
@@ -131,9 +162,10 @@ export function Demo() {
             Live Query Demo
           </h2>
           <p className="text-lg sm:text-xl text-muted-foreground text-pretty leading-relaxed">
-            Ask questions against the sample documentation. The API must be running
-            at <code className="bg-muted/30 px-1.5 py-0.5 rounded font-mono text-sm">localhost:8000</code>
-            with documents ingested.
+            Ask questions against the sample documentation. Requests are proxied
+            to the live pipeline from this page — no API key needed. Answers are
+            grounded, cited and confidence-scored; the console below each answer
+            shows the real execution.
           </p>
         </motion.div>
 
@@ -156,17 +188,15 @@ export function Demo() {
 
               <div className="space-y-4">
                 <div>
-                  <label htmlFor="api-url" className="block text-sm font-medium text-muted-foreground mb-1" style={{ color: 'var(--color-muted-foreground)' }}>
+                  <span className="block text-sm font-medium text-muted-foreground mb-1" style={{ color: 'var(--color-muted-foreground)' }}>
                     API Endpoint
-                  </label>
-                  <input
-                    id="api-url"
-                    type="text"
-                    value="http://localhost:8000"
-                    readOnly
+                  </span>
+                  <p
                     className="w-full px-3 py-2 rounded-md text-sm font-mono"
-                    style={{ backgroundColor: 'var(--color-surface-soft)', borderColor: 'var(--color-border)', color: 'var(--color-muted-foreground)' }}
-                  />
+                    style={{ backgroundColor: 'var(--color-surface-soft)', borderColor: 'var(--color-border)', border: '1px solid var(--color-border)', color: 'var(--color-muted-foreground)' }}
+                  >
+                    /api/demo/* — same-origin proxy
+                  </p>
                 </div>
 
                 <div>
@@ -203,9 +233,30 @@ export function Demo() {
                   />
                 </div>
 
-                <Button variant="outline" className="w-full" disabled={isLoading}>
-                  Ingest Sample Docs
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  disabled={isLoading || ingestState === "ingesting"}
+                  onClick={handleIngestSample}
+                >
+                  {ingestState === "ingesting" ? (
+                    <span className="flex items-center gap-2">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Ingesting…
+                    </span>
+                  ) : (
+                    "Ingest Sample Docs"
+                  )}
                 </Button>
+                {ingestMsg && (
+                  <p
+                    className="text-xs mt-2 font-mono"
+                    style={{ color: ingestState === "failed" ? "var(--color-error)" : "var(--color-accent)" }}
+                    role="status"
+                  >
+                    {ingestMsg}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -291,9 +342,9 @@ export function Demo() {
                 >
                   <Loader2 className="w-10 h-10 mx-auto mb-4 text-primary animate-spin" />
                   <p className="text-muted-foreground" style={{ color: 'var(--color-muted-foreground)' }}>Searching vector space...</p>
-                  <p className="text-sm text-muted-foreground/70 mt-1" style={{ color: 'var(--color-muted-foreground)' }}>Reranking top candidates with LLM judge</p>
+                  <p className="text-sm text-muted-foreground/70 mt-1" style={{ color: 'var(--color-muted-foreground)' }}>Reranking top candidates with the local cross-encoder</p>
                 </motion.div>
-              ) : response ? (
+              ) : response && !response.refused ? (
                 <motion.div
                   key="response"
                   initial={{ opacity: 0, y: 20 }}

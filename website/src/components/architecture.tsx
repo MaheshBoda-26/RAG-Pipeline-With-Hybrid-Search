@@ -28,7 +28,7 @@ const PIPELINE_STAGES: PipelineStage[] = [
     label: "Ingestion",
     description: "Document loading, parsing, and chunking with configurable strategies",
     icon: FileText,
-    color: "from-primary-500 to-primary-600",
+    color: "linear-gradient(135deg, #cc785c, #a9583e)", // coral
     details: [
       "Multi-format support (PDF, MD, HTML, DOCX)",
       "Configurable chunking: fixed, recursive, semantic",
@@ -46,7 +46,7 @@ const PIPELINE_STAGES: PipelineStage[] = [
     label: "Embedding",
     description: "Generate dense and sparse vector representations for hybrid search",
     icon: Cpu,
-    color: "from-accent-cyan to-accent-teal",
+    color: "linear-gradient(135deg, #5db8a6, #4aa38f)", // teal
     details: [
       "Dense embeddings (OpenAI, Cohere, local)",
       "Sparse embeddings (BM25, SPLADE)",
@@ -63,7 +63,7 @@ const PIPELINE_STAGES: PipelineStage[] = [
     label: "Retrieval",
     description: "Hybrid vector + keyword search with reciprocal rank fusion",
     icon: Search,
-    color: "from-accent-amber to-accent-orange",
+    color: "linear-gradient(135deg, #e8a55a, #d48f3f)", // amber
     details: [
       "Dense vector similarity (HNSW index)",
       "Sparse lexical search (BM25)",
@@ -81,7 +81,7 @@ const PIPELINE_STAGES: PipelineStage[] = [
     label: "Reranking",
     description: "Cross-encoder reranking for precision improvement",
     icon: ArrowUpDown,
-    color: "from-accent-pink to-accent-rose",
+    color: "linear-gradient(135deg, #5db8a6, #3f8f7e)", // deep teal (rerank stage color)
     details: [
       "Cross-encoder models (Cohere, BGE, local)",
       "Top-k reranking (default: 50 → 10)",
@@ -98,7 +98,7 @@ const PIPELINE_STAGES: PipelineStage[] = [
     label: "Generation",
     description: "Grounded answer synthesis with citation tracking",
     icon: Sparkles,
-    color: "from-success-500 to-success-600",
+    color: "linear-gradient(135deg, #5db872, #4a9c5e)", // green
     details: [
       "RAG prompt templates with context windowing",
       "Streaming responses with citations",
@@ -117,7 +117,7 @@ const PIPELINE_STAGES: PipelineStage[] = [
     label: "Observability",
     description: "End-to-end tracing, metrics, and real-time monitoring",
     icon: Activity,
-    color: "from-purple-500 to-purple-600",
+    color: "linear-gradient(135deg, #817a6b, #5f594e)", // warm stone
     details: [
       "Distributed tracing (OpenTelemetry)",
       "Latency percentiles per pipeline stage",
@@ -146,7 +146,7 @@ async def query_with_tracing(question: str):
     label: "Evaluation",
     description: "Automated quality assessment with golden datasets",
     icon: BarChart2,
-    color: "from-indigo-500 to-indigo-600",
+    color: "linear-gradient(135deg, #47423a, #2e2b25)", // dark stone
     details: [
       "Golden dataset management (Q&A pairs)",
       "RAGAS metrics: faithfulness, answer_relevancy, context_precision",
@@ -256,8 +256,8 @@ function StageCard({ stage, index }: { stage: PipelineStage; index: number }) {
                       {stage.id}.py
                     </span>
                   </div>
-                  <pre className="overflow-x-auto p-4 text-xs sm:text-sm" style={{ backgroundColor: 'var(--color-surface-2)' }}>
-                    <code className="font-mono" style={{ color: 'var(--color-on-dark)' }}>{stage.code}</code>
+                  <pre className="overflow-x-auto p-4 text-xs sm:text-sm" style={{ backgroundColor: 'var(--color-bg-elev)' }}>
+                    <code className="font-mono" style={{ color: 'var(--color-text-1)' }}>{stage.code}</code>
                   </pre>
                 </div>
               </div>

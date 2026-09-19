@@ -42,7 +42,7 @@ export function Hero() {
               style={{ backgroundColor: 'var(--color-surface-card)', borderColor: 'var(--color-hairline)', color: 'var(--color-ink)' }}
             >
               <span className="w-1.5 h-1.5 bg-coral rounded-full" />
-              <span className="text-muted-foreground">v2.0 — Hybrid Search + LLM Reranking</span>
+              <span className="text-muted-foreground">v2.0 — Hybrid Search + Two-Stage Reranking</span>
             </motion.div>
 
             <motion.h1

@@ -133,3 +133,65 @@ class TestPipelineTraceEndpoint:
     def test_requires_question(self, viz_client):
         response = viz_client.post("/v1/demo/pipeline", json={})
         assert response.status_code == 422
+
+
+class TestDemoIngestEndpoint:
+    """POST /v1/demo/ingest — seed the demo corpus from the website button."""
+
+    def test_ingest_returns_stats(self, viz_client):
+        response = viz_client.post("/v1/demo/ingest")
+        assert response.status_code == 200
+        data = response.json()
+        for key in (
+            "documents",
+            "documents_unchanged",
+            "chunks_created",
+            "chunks_indexed",
+            "duplicates_skipped",
+        ):
+            assert key in data
+        assert data["documents"] > 0
+
+    def test_ingest_is_idempotent(self, viz_client, shared_pipeline):
+        """Clicking the button twice must not duplicate the corpus."""
+        before = shared_pipeline.vector_store.count()
+        assert before > 0
+        viz_client.post("/v1/demo/ingest")
+        assert shared_pipeline.vector_store.count() == before
+
+
+class TestFusionWeightOverrides:
+    """Per-query dense/sparse fusion-weight overrides (the demo sliders)."""
+
+    QUESTION = "What authentication methods does Aegis support?"
+
+    def test_trace_without_weights_uses_defaults(self, viz_client):
+        response = viz_client.post("/v1/demo/pipeline", json={"question": self.QUESTION})
+        assert response.status_code == 200
+
+    def test_trace_accepts_explicit_weights(self, viz_client):
+        response = viz_client.post(
+            "/v1/demo/pipeline",
+            json={"question": self.QUESTION, "dense_weight": 0.9, "sparse_weight": 0.1},
+        )
+        assert response.status_code == 200
+        assert response.json()["answer"]
+
+    def test_out_of_range_weight_is_422(self, viz_client):
+        response = viz_client.post(
+            "/v1/demo/pipeline", json={"question": "q", "dense_weight": 1.7}
+        )
+        assert response.status_code == 422
+
+    def test_negative_weight_is_422(self, viz_client):
+        response = viz_client.post(
+            "/v1/demo/pipeline", json={"question": "q", "sparse_weight": -0.1}
+        )
+        assert response.status_code == 422
+
+    def test_all_zero_weights_are_422(self, viz_client):
+        response = viz_client.post(
+            "/v1/demo/pipeline",
+            json={"question": "q", "dense_weight": 0.0, "sparse_weight": 0.0},
+        )
+        assert response.status_code == 422

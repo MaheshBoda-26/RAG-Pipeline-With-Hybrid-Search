@@ -324,7 +324,13 @@ class RAGPipeline:
     # ------------------------------------------------------------------
     # Retrieval + generation
     # ------------------------------------------------------------------
-    def ask(self, question: str, source: str | None = None) -> AskResponse:
+    def ask(
+        self,
+        question: str,
+        source: str | None = None,
+        dense_weight: float | None = None,
+        sparse_weight: float | None = None,
+    ) -> AskResponse:
         trace_id = new_trace_id()
         timer = StageTimer(trace_id=trace_id, log=bool(os.getenv("LOG_PIPELINE_STAGES")))
 
@@ -363,12 +369,18 @@ class RAGPipeline:
         # index via reciprocal rank fusion. With QUERY_TRANSFORM=expand, each
         # rephrasing gets its own pass and the pools are unioned by consensus.
         with timer.stage("retrieve"):
+            # Per-query weight override (website demo sliders). None = config
+            # defaults; the pair arrives pre-normalized from the API layer.
+            fusion_kwargs: dict = {}
+            if dense_weight is not None and sparse_weight is not None:
+                fusion_kwargs = {"dense_weight": dense_weight, "sparse_weight": sparse_weight}
             candidate_pool = self.vector_store.hybrid_query(
                 query_embedding=query_embedding,
                 question=queries[0],
                 top_k=self.settings.rerank_candidate_pool,
                 source_filter=source,
                 bm25=self.bm25,
+                **fusion_kwargs,
             )
             if variant_embeddings:
                 extra_pools = [
@@ -378,6 +390,7 @@ class RAGPipeline:
                         top_k=self.settings.rerank_candidate_pool,
                         source_filter=source,
                         bm25=self.bm25,
+                        **fusion_kwargs,
                     )
                     for variant, embedding in zip(queries[1:], variant_embeddings, strict=False)
                 ]
@@ -643,7 +656,13 @@ class RAGPipeline:
             "truncated": len(records) > len(chunks),
         }
 
-    def pipeline_trace(self, question: str, source: str | None = None) -> dict:
+    def pipeline_trace(
+        self,
+        question: str,
+        source: str | None = None,
+        dense_weight: float | None = None,
+        sparse_weight: float | None = None,
+    ) -> dict:
         """Run one real ask() and return the answer plus its internals.
 
         The website's pipeline console shows the ACTUAL execution — per-stage
@@ -652,7 +671,12 @@ class RAGPipeline:
         No mock path exists; if the pipeline cannot answer, the trace shows the
         refusal, which is itself the product.
         """
-        response = self.ask(question, source=source)
+        response = self.ask(
+            question,
+            source=source,
+            dense_weight=dense_weight,
+            sparse_weight=sparse_weight,
+        )
         timings = response.timings or {}
 
         # Reconstruct the lanes for the console. The ask() path fuses dense and
