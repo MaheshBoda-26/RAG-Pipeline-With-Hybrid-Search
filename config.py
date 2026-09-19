@@ -193,6 +193,23 @@ class Settings:
     rerank_candidate_pool: int = int(os.getenv("RERANK_CANDIDATE_POOL", "15"))
     final_top_k: int = int(os.getenv("FINAL_TOP_K", "5"))
 
+    # --- Reranking strategy: cross-encoder (default) | llm ---
+    # Both modes emit a 0-10 relevance score on the same scale, so changing the
+    # mode never changes how confidence and the refusal gate are interpreted.
+    rerank_mode: str = os.getenv("RERANK_MODE", "cross-encoder")
+
+    # --- Query transformation: none (default) | rewrite | expand ---
+    # Off by default: it costs a model call per question and is only worth it
+    # when the benchmark says so (see docs/benchmarks.md).
+    query_transform: str = os.getenv("QUERY_TRANSFORM", "none")
+    query_transform_variants: int = int(os.getenv("QUERY_TRANSFORM_VARIANTS", "3"))
+
+    # --- Contextual retrieval: situate each chunk before indexing it ---
+    contextual_retrieval: bool = os.getenv("CONTEXTUAL_RETRIEVAL", "false").lower() == "true"
+    contextual_model: str = field(default_factory=lambda: os.getenv("CONTEXTUAL_MODEL") or os.getenv("CHAT_MODEL", "meta/llama-3.1-70b-instruct"))
+    contextual_max_chunks: int = int(os.getenv("CONTEXTUAL_MAX_CHUNKS", "400"))
+    context_cache_path: str = os.getenv("CONTEXT_CACHE_PATH", "./.context_cache.json")
+
     # --- Confidence / fallback ---
     min_retrieval_confidence: float = float(os.getenv("MIN_RETRIEVAL_CONFIDENCE", "0.35"))
 
@@ -238,6 +255,18 @@ class Settings:
             raise RuntimeError(
                 "NVIDIA_API_KEY is not set. Copy .env.example to .env and fill it in."
             )
+
+    @property
+    def normalized_rerank_mode(self) -> str:
+        """Validated rerank mode; an unknown value falls back to the default."""
+        mode = (self.rerank_mode or "cross-encoder").strip().lower()
+        return mode if mode in {"cross-encoder", "llm"} else "cross-encoder"
+
+    @property
+    def normalized_query_transform(self) -> str:
+        """Validated query transformation; an unknown value falls back to none."""
+        mode = (self.query_transform or "none").strip().lower()
+        return mode if mode in {"none", "rewrite", "expand"} else "none"
 
     def get_collection_name(self, user_id: str | None = None) -> str:
         """Get collection name for a user. If multi-tenant disabled or no user_id, use default."""

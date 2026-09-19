@@ -121,6 +121,11 @@ class QdrantVectorStore:
                     "section_heading": chunk.section_heading,
                     "embedding_model": chunk.embedding_model,
                     "doc_hash": chunk.doc_hash,
+                    # Situating context (contextual retrieval). `text` stays the
+                    # verbatim passage that citations quote; `index_text` is the
+                    # enriched form the embedding and keyword index were built from.
+                    "context": chunk.context,
+                    "index_text": chunk.embedding_text,
                 },
             )
             for chunk, embedding in zip(chunks, embeddings, strict=False)

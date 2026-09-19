@@ -43,6 +43,17 @@ class Chunk:
     # Content hash of the source document this chunk came from. Lets a later
     # ingest skip re-embedding documents whose text has not changed.
     doc_hash: str | None = None
+    # Situating context generated at ingest time (contextual retrieval). It is
+    # prepended for embedding and keyword indexing but NOT shown to the user:
+    # the cited passage stays exactly what the document said.
+    context: str | None = None
+
+    @property
+    def embedding_text(self) -> str:
+        """Text to embed and index: the situating context plus the passage."""
+        if self.context:
+            return f"{self.context}\n\n{self.text}"
+        return self.text
 
 
 def _make_chunk(text: str, source: str, index: int, strategy: str, heading: str | None) -> Chunk:
