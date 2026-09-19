@@ -78,6 +78,10 @@ exclude = [".venv", "venv", "node_modules", "website", "brag-output", "sample_do
 # follow-up once the codebase is reformatted.
 select = ["E4", "E7", "E9", "F", "B"]
 
+[tool.ruff.lint.per-file-ignores]
+# FastAPI dependency injection requires call expressions in argument defaults.
+"api.py" = ["B008"]
+
 [tool.mypy]
 python_version = "3.11"
 ignore_missing_imports = true

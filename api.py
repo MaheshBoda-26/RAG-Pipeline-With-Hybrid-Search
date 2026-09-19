@@ -373,7 +373,7 @@ async def ingest(request: Request, req: IngestRequest = Body(...), user_id: str 
     try:
         return pipeline.ingest_directory(req.path)
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
 
 
 async def _process_file_upload(file: UploadFile, user_id: str) -> dict:
@@ -496,21 +496,23 @@ async def _process_file_upload(file: UploadFile, user_id: str) -> dict:
             raise HTTPException(
                 status_code=503,
                 detail="Embedding API authentication failed. Check NVIDIA_API_KEY in .env"
-            )
+            ) from e
         if "404" in error_msg and "model" in error_msg.lower():
             raise HTTPException(
                 status_code=503,
                 detail="Embedding model not found. Check EMBEDDING_MODEL in .env"
-            )
-        raise HTTPException(status_code=502, detail=f"Indexing service unavailable: {error_msg}")
+            ) from e
+        raise HTTPException(
+            status_code=502, detail=f"Indexing service unavailable: {error_msg}"
+        ) from e
     except ValueError as e:
         # Path validation / file format errors - clean up file
         if file_path.exists():
             file_path.unlink()
-        raise HTTPException(status_code=400, detail=f"Invalid file: {str(e)}")
+        raise HTTPException(status_code=400, detail=f"Invalid file: {str(e)}") from e
     except Exception as e:
         # Unknown errors - keep file for debugging
-        raise HTTPException(status_code=500, detail=f"Failed to process file: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to process file: {str(e)}") from e
 
 
 @app.post("/v1/upload")

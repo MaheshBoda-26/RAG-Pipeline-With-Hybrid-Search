@@ -83,7 +83,7 @@ def main() -> None:
         created = min((r["created_at"] for r in rows if r["payload"].get("source") == src), default="")
         by_canonical[canonical].append((created, src))
 
-    for canonical, entries in by_canonical.items():
+    for _canonical, entries in by_canonical.items():
         if len(entries) > 1:
             entries.sort()  # oldest first by created_at
             for _, src in entries[1:]:

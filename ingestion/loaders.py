@@ -56,7 +56,9 @@ def _load_docx(path: Path) -> RawDocument:
     try:
         from docx import Document
     except ImportError:
-        raise ValueError("DOCX support requires 'python-docx' package. Install with: pip install python-docx")
+        raise ValueError(
+            "DOCX support requires 'python-docx' package. Install with: pip install python-docx"
+        ) from None
 
     doc = Document(str(path))
     paragraphs = [p.text for p in doc.paragraphs if p.text.strip()]

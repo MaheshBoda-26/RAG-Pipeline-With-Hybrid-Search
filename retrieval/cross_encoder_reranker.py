@@ -107,7 +107,7 @@ class CrossEncoderReranker:
             # 0-10, then cap at 5.0 (neutral) — fusion rank carries no absolute
             # relevance signal, so reporting >5 would let the pipeline claim
             # confidence it doesn't have and bypass the refusal gate.
-            for i, c in enumerate(candidates):
+            for c in candidates:
                 c["rerank_score"] = min(5.0, c.get("fused_score", 0.0) * 400.0)
             ranked = sorted(candidates, key=lambda c: c["rerank_score"], reverse=True)
             return ranked[:top_n]

@@ -122,7 +122,9 @@ class Embedder:
             )
         return embeddings.tolist()
 
-    @lru_cache(maxsize=1000)
+    # Intentional per-instance cache: bounded, and Embedder instances are
+    # long-lived singletons per process (see create_openai_client).
+    @lru_cache(maxsize=1000)  # noqa: B019
     def _cached_embed_one(self, text: str) -> tuple[float, ...]:
         """Cached single query embedding - returns tuple for hashability."""
         # Respect the sticky backend so queries use the SAME model as documents.

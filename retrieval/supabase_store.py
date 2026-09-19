@@ -10,7 +10,7 @@ Requires:
 
 from __future__ import annotations
 
-from typing import Optional, List
+from typing import Any, List, Optional
 
 from supabase import create_client, Client
 from ingestion.chunking import Chunk

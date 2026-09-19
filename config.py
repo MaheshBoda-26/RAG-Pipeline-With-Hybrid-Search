@@ -201,8 +201,7 @@ class Settings:
     cross_encoder_device: str = os.getenv("CROSS_ENCODER_DEVICE", "cpu")
     cross_encoder_max_length: int = int(os.getenv("CROSS_ENCODER_MAX_LENGTH", "512"))
 
-    # --- Query cache ---
-    redis_url: str = os.getenv("REDIS_URL", "")
+    # --- Query cache (redis_url itself is declared under Storage above) ---
     cache_exact_ttl: int = int(os.getenv("CACHE_EXACT_TTL", "3600"))
     cache_semantic_ttl: int = int(os.getenv("CACHE_SEMANTIC_TTL", "14400"))
     cache_distance_threshold: float = float(os.getenv("CACHE_DISTANCE_THRESHOLD", "0.1"))

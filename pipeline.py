@@ -6,6 +6,8 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
+# Re-exported for tests, which patch ``pipeline.OpenAI`` to stub the LLM client.
+from openai import OpenAI  # noqa: F401
 
 from config import Settings
 from generation.citations import (
