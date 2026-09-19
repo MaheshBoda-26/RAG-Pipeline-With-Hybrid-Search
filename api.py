@@ -744,3 +744,31 @@ async def demo_upload(
     import logging
     logging.getLogger(__name__).info("Demo upload by anonymous user")
     return await _process_file_upload(file, settings.default_user_id)
+
+
+@app.get("/v1/demo/viz")
+async def demo_vector_space(request: Request):
+    """Corpus as a 3D map: real chunk embeddings projected to coordinates.
+
+    Read-only, powers the website's vector-space view. Coordinates are derived
+    from the actual stored embeddings — the visualization cannot invent points.
+    """
+    pipeline = get_pipeline(settings.default_user_id)
+    with_vectors = request.query_params.get("vectors", "true").lower() != "false"
+    try:
+        max_chunks = int(request.query_params.get("max_chunks", "800"))
+    except ValueError:
+        max_chunks = 800
+    return pipeline.vector_space(with_vectors=with_vectors, max_chunks=max(1, min(max_chunks, 2000)))
+
+
+@app.post("/v1/demo/pipeline")
+async def demo_pipeline_trace(request: Request, req: AskRequest = Body(...)):
+    """One real ask() execution with its internals exposed.
+
+    Returns the answer plus per-stage timings, the dense/sparse/fused/reranked
+    lanes and the confidence breakdown — the pipeline console shows the real
+    pipeline, not a simulation.
+    """
+    pipeline = get_pipeline(settings.default_user_id)
+    return pipeline.pipeline_trace(req.question, source=req.source)

@@ -1,4 +1,4 @@
-.PHONY: help install test test-integration lint typecheck check api demo site clean
+.PHONY: help install test test-integration lint typecheck check api demo eval eval-sweep eval-refusal corpus site clean
 
 help:  ## show available targets
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-18s\033[0m %s\n", $$1, $$2}'
@@ -29,6 +29,12 @@ demo:  ## ingest the sample corpus and ask one question end to end
 
 eval:  ## run the 54-question golden-set benchmark against a fresh local store
 	USE_SUPABASE=false QDRANT_PATH=./qdrant_data_eval python tests/eval/run_eval.py --golden-set tests/eval/golden_set.json --output tests/eval/results.json
+
+eval-sweep:  ## run the configuration sweep over the golden set → docs/benchmarks.md
+	python scripts/run_sweep.py --limit 12 --out docs/benchmarks.md
+
+eval-refusal:  ## measure the refusal gate on unanswerable questions
+	USE_SUPABASE=false QDRANT_PATH=./qdrant_data_eval python scripts/measure_refusal.py --output /tmp/refusals.json
 
 corpus:  ## regenerate the Aegis demo corpus from the golden set
 	python scripts/build_demo_corpus.py

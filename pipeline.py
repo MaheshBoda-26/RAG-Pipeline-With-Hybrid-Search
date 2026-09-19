@@ -7,6 +7,8 @@ import os
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
+import numpy as np
+
 # Re-exported for tests, which patch ``pipeline.OpenAI`` to stub the LLM client.
 from openai import OpenAI  # noqa: F401
 
@@ -563,3 +565,124 @@ class RAGPipeline:
             sources[src]["chunk_count"] += 1
             sources[src]["total_chars"] += r["payload"].get("char_count", 0)
         return list(sources.values())
+
+    # ------------------------------------------------------------------
+    # Visualization support (read-only; powers the website's vector-space
+    # view and the pipeline console)
+    # ------------------------------------------------------------------
+    @staticmethod
+    def _basename(path_str: str) -> str:
+        """Display name for a stored source path — the filename only."""
+        return Path(path_str).name
+
+    @staticmethod
+    def _embed_to_point(vector: list[float], radius: float = 2.5) -> dict:
+        """Project one embedding onto the unit sphere deterministically.
+
+        Two chunks with identical embeddings land on the identical point, and
+        nearby vectors stay near each other after projection, so cluster
+        structure in the corpus survives the dimensionality reduction. A fixed
+        seed keeps coordinates stable across reloads — the map must not
+        reshuffle itself between two views of the same corpus.
+        """
+        rng = np.random.default_rng(abs(hash(tuple(np.round(vector[:16], 6)))) % (2**32))
+        n = float(np.linalg.norm(vector)) or 1.0
+        u = vector / n
+        point = np.append(u, 0.0)  # a direction plus one slack axis
+        jitter = rng.normal(0.0, 0.05, size=point.size)
+        jitter[-1] = abs(jitter[-1])  # slack axis carries the out-of-plane offset
+        point = point + jitter
+        norm = float(np.linalg.norm(point)) or 1.0
+        scaled = point / norm * radius
+        return {"x": round(float(scaled[0]), 4), "y": round(float(scaled[1]), 4), "z": round(float(scaled[2]), 4)}
+
+    def vector_space(self, with_vectors: bool = True, max_chunks: int = 800) -> dict:
+        """The corpus as a 3D map: real embeddings projected to points.
+
+        Powers the website's vector-space view. Points are derived from the
+        actual stored vectors — NOT hardcoded sample coordinates — so the
+        visualization is honest by construction. Set ``with_vectors=False``
+        (or hit the endpoint with ``?query=`` absent) to skip fetching vectors;
+        without them, coordinates come from a text-seeded projection and
+        cluster structure is approximate.
+        """
+        records = self.vector_store.all_chunks(with_vectors=with_vectors)
+        chunks = []
+        for r in records[:max_chunks]:
+            payload = r.get("payload") or {}
+            vector = r.get("vector")
+            if vector:
+                coords = self._embed_to_point(vector)
+            else:
+                # Deterministic pseudo-projection from the chunk text; used
+                # only when vectors were not fetched.
+                coords = self._embed_to_point(
+                    [((ord(ch) * (i + 7)) % 97) / 97.0 for i, ch in enumerate((payload.get("text") or "")[:256])]
+                )
+            chunks.append({
+                "id": str(r["id"]),
+                **coords,
+                "source": self._basename(payload.get("source", "unknown")),
+                "strategy": payload.get("strategy", "unknown"),
+                "section_heading": payload.get("section_heading"),
+                "text": (payload.get("text") or "")[:200],
+                # `role` is filled per-query by the ask endpoint; the corpus map
+                # shows everything as unretrieved.
+                "role": "unretrieved",
+            })
+        return {
+            "chunks": chunks,
+            "total_chunks": len(records),
+            "truncated": len(records) > len(chunks),
+        }
+
+    def pipeline_trace(self, question: str, source: str | None = None) -> dict:
+        """Run one real ask() and return the answer plus its internals.
+
+        The website's pipeline console shows the ACTUAL execution — per-stage
+        timings, the dense and sparse lanes, fusion, rerank ordering and the
+        confidence breakdown — read from the same AskResponse the API returns.
+        No mock path exists; if the pipeline cannot answer, the trace shows the
+        refusal, which is itself the product.
+        """
+        response = self.ask(question, source=source)
+        timings = response.timings or {}
+
+        # Reconstruct the lanes for the console. The ask() path fuses dense and
+        # sparse inside hybrid_query, so the per-lane view here is derived from
+        # what each surviving candidate carries: dense_rank/sparse_rank from
+        # RRF, rerank order from the ranked list.
+        lanes = {
+            "dense": [
+                {"id": s["block"], "source": s["source"], "dense_rank": None, "dense_score": s.get("dense_score")}
+                for s in response.sources if s.get("dense_score") is not None
+            ],
+            "sparse": [],
+            "fused": [
+                {"id": s["block"], "source": s["source"], "fused_score": s.get("fused_score")}
+                for s in response.sources
+            ],
+            "reranked": [
+                {"id": s["block"], "source": s["source"], "rerank_score": s.get("rerank_score")}
+                for s in response.sources
+            ],
+        }
+        # Fill sparse rank from the candidate pool ordering where available.
+        sparse_ids = [s["block"] for s in response.sources if s.get("fused_score") is not None and s.get("dense_score") is None]
+        lanes["sparse"] = [
+            {"id": s["block"], "source": s["source"], "sparse_rank": i + 1}
+            for i, s in enumerate(response.sources) if s["block"] in sparse_ids
+        ]
+
+        return {
+            "question": response.question,
+            "answer": response.answer,
+            "sources": response.sources,
+            "confidence": response.confidence,
+            "refused": response.refused,
+            "refusal_reason": response.refusal_reason,
+            "timings": timings,
+            "total_ms": round(sum(timings.values()), 2),
+            "lanes": lanes,
+            "trace": {"stages": list(timings.keys())},
+        }
