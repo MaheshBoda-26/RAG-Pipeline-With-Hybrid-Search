@@ -86,7 +86,7 @@ export function Navigation() {
             whileTap={{ scale: 0.98 }}
             style={{ color: 'var(--color-text-1)' }}
           >
-            <SpikeMark style={{ stroke: 'var(--color-text-1)' }} />
+            <SpikeMark />
             <span className="hidden sm:block font-medium tracking-tight" style={{ color: 'var(--color-text-1)' }}>RAG Pipeline</span>
           </motion.a>
 
@@ -123,8 +123,6 @@ export function Navigation() {
               style={{
                 color: 'var(--color-text-2)',
                 borderColor: 'var(--color-border-strong)',
-                hoverColor: 'var(--color-text-1)',
-                hoverBorderColor: 'var(--color-primary)',
               }}
             >
               {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
@@ -137,7 +135,7 @@ export function Navigation() {
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
               aria-label="View on GitHub"
-              style={{ color: 'var(--color-text-2)', hoverColor: 'var(--color-text-1)' }}
+              style={{ color: 'var(--color-text-2)' }}
             >
               <Github className="w-5 h-5" />
             </motion.a>
@@ -149,7 +147,7 @@ export function Navigation() {
             aria-expanded={isOpen}
             aria-controls="mobile-menu"
             aria-label="Toggle navigation"
-            style={{ color: 'var(--color-text-2)', hoverColor: 'var(--color-text-1)' }}
+            style={{ color: 'var(--color-text-2)' }}
           >
             {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -182,7 +180,7 @@ export function Navigation() {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.05 }}
-                  style={{ color: 'var(--color-text-2)', hoverColor: 'var(--color-text-1)' }}
+                  style={{ color: 'var(--color-text-2)' }}
                 >
                   {link.label}
                 </motion.a>
@@ -194,7 +192,7 @@ export function Navigation() {
                   onClick={toggleTheme}
                   aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
                   className="justify-start"
-                  style={{ color: 'var(--color-text-2)', borderColor: 'var(--color-border-strong)', hoverColor: 'var(--color-text-1)', hoverBorderColor: 'var(--color-primary)' }}
+                  style={{ color: 'var(--color-text-2)', borderColor: 'var(--color-border-strong)' }}
                 >
                   {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
                 </Button>
@@ -205,7 +203,7 @@ export function Navigation() {
                   className="transition-colors"
                   whileHover={{ scale: 1.1 }}
                   aria-label="View on GitHub"
-                  style={{ color: 'var(--color-text-2)', hoverColor: 'var(--color-text-1)' }}
+                  style={{ color: 'var(--color-text-2)' }}
                 >
                   <Github className="w-5 h-5" />
                 </motion.a>

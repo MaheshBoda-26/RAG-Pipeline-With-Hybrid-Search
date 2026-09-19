@@ -7,29 +7,8 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        coral: {
-          DEFAULT: "#cc785c",
-          active: "#a9583e",
-        },
-        "accent-teal": "#5db8a6",
-        "accent-amber": "#e8a55a",
-        canvas: "#faf9f5",
-        "surface-soft": "#f5f0e8",
-        "surface-card": "#efe9de",
-        "surface-cream-strong": "#e8e0d2",
-        "surface-dark": "#181715",
-        "surface-dark-elevated": "#252320",
-        "surface-dark-soft": "#1f1e1b",
         hairline: "#e6dfd8",
         "hairline-soft": "#ebe6df",
-        ink: "#141413",
-        "body-strong": "#252523",
-        body: "#3d3d3a",
-        muted: "#8e8b82",
-        "muted-soft": "#8e8b82",
-        "on-primary": "#ffffff",
-        "on-dark": "#faf9f5",
-        "on-dark-soft": "#a09d96",
         primary: {
           DEFAULT: "#cc785c",
           hover: "#a9583e",

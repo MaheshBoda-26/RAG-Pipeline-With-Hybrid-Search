@@ -2,7 +2,18 @@
 
 import * as React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Loader2, Copy, Check, AlertCircle, Info, Sparkles, Upload, AlertTriangle } from "lucide-react";
+import { Loader2, Copy, Check, AlertCircle, Info, Sparkles, Upload, AlertTriangle, RefreshCw, Trash2, FileText } from "lucide-react";
+
+interface DemoDocument {
+  source: string;
+  chunk_count: number;
+  total_chars: number;
+}
+
+/** Files bundled with the repo — sample corpus is protected from deletion. */
+const SAMPLE_DOC_NAMES = new Set([
+  "readme.md", "computer_vision.txt", "data_science.txt", "rag_basics.md", "ml_fundamentals.txt",
+]);
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { DocumentUploader } from "@/components/DocumentUploader";
@@ -46,6 +57,44 @@ export function Demo() {
   const [config, setConfig] = React.useState({ denseWeight: 0.7, sparseWeight: 0.3 });
   const [ingestState, setIngestState] = React.useState<"idle" | "ingesting" | "done" | "failed">("idle");
   const [ingestMsg, setIngestMsg] = React.useState<string | null>(null);
+  const [documents, setDocuments] = React.useState<DemoDocument[]>([]);
+  const [deletingSource, setDeletingSource] = React.useState<string | null>(null);
+
+  const refreshDocuments = React.useCallback(async () => {
+    try {
+      const res = await fetch("/api/demo/documents", { cache: "no-store" });
+      if (res.ok) {
+        const data = await res.json();
+        setDocuments(data.documents || []);
+      }
+    } catch {
+      /* panel is secondary; leave the list as-is on failure */
+    }
+  }, []);
+
+  React.useEffect(() => {
+    refreshDocuments();
+    const handler = () => refreshDocuments();
+    window.addEventListener("rag:documents-changed", handler);
+    return () => window.removeEventListener("rag:documents-changed", handler);
+  }, [refreshDocuments]);
+
+  const handleDeleteDocument = async (source: string) => {
+    if (deletingSource) return;
+    setDeletingSource(source);
+    try {
+      const res = await fetch(`/api/demo/documents?source=${encodeURIComponent(source)}`, { method: "DELETE" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Delete failed");
+      setDocuments(prev => prev.filter(d => d.source !== source));
+      window.dispatchEvent(new Event("rag:documents-changed"));
+    } catch (err) {
+      setIngestState("failed");
+      setIngestMsg(err instanceof Error ? err.message : "Delete failed");
+    } finally {
+      setDeletingSource(null);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -273,6 +322,66 @@ export function Demo() {
                   </p>
                 )}
               </div>
+            </div>
+
+            {/* Corpus — live list of indexed documents with per-document delete.
+                Sample corpus files are protected; only user uploads are deletable. */}
+            <div className="bg-surface border border-border rounded-xl p-6" style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold flex items-center gap-2" style={{ color: 'var(--color-foreground)' }}>
+                  <FileText className="w-5 h-5 text-primary" />
+                  Corpus
+                </h3>
+                <button
+                  onClick={refreshDocuments}
+                  aria-label="Refresh document list"
+                  className="p-1.5 rounded-md hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                  style={{ color: 'var(--color-muted-foreground)' }}
+                >
+                  <RefreshCw className="w-4 h-4" />
+                </button>
+              </div>
+              {documents.length === 0 ? (
+                <p className="text-sm" style={{ color: 'var(--color-muted-foreground)' }}>
+                  No documents indexed yet — upload files or ingest the sample corpus.
+                </p>
+              ) : (
+                <ul className="space-y-1.5 max-h-48 overflow-y-auto" role="list">
+                  {documents.map(doc => {
+                    const name = doc.source.split("/").pop() || doc.source;
+                    const deletable = !SAMPLE_DOC_NAMES.has(name.toLowerCase());
+                    return (
+                      <li
+                        key={doc.source}
+                        className="flex items-center gap-2 px-2.5 py-2 rounded-lg border text-sm"
+                        style={{ backgroundColor: 'var(--color-surface-soft)', borderColor: 'var(--color-border)' }}
+                      >
+                        <span className="flex-1 min-w-0 truncate font-mono text-xs" style={{ color: 'var(--color-foreground)' }} title={doc.source}>
+                          {name}
+                        </span>
+                        <span className="flex-shrink-0 text-xs tabular-nums" style={{ color: 'var(--color-muted-foreground)' }}>
+                          {doc.chunk_count} ch
+                        </span>
+                        {deletable && (
+                          <button
+                            onClick={() => handleDeleteDocument(doc.source)}
+                            disabled={deletingSource !== null}
+                            aria-label={`Delete ${name}`}
+                            className="flex-shrink-0 p-1 rounded-md hover:bg-destructive/10 disabled:opacity-40 transition-colors"
+                            style={{ color: "var(--color-error)" }}
+                          >
+                            {deletingSource === doc.source ? (
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            ) : (
+                              <Trash2 className="w-3.5 h-3.5" />
+                            )}
+                          </button>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
             </div>
 
             <div className="bg-surface border border-border rounded-xl p-6" style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}>

@@ -47,9 +47,9 @@ export function DocumentUploader() {
         id: `${file.name}-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
         name: file.name,
         size: file.size,
-        status: error ? "error" : "pending" as const,
+        status: (error ? "error" : "pending") as UploadedFile["status"],
         progress: 0,
-        error,
+        error: error ?? undefined,
       };
     });
     setFiles(prev => [...prev, ...validFiles]);
@@ -104,6 +104,8 @@ export function DocumentUploader() {
       }
 
       setFiles(prev => prev.map(f => f.id === file.id ? { ...f, status: "success", progress: 100 } : f));
+      // Let listeners (e.g. the Corpus panel) refresh their document list.
+      window.dispatchEvent(new Event("rag:documents-changed"));
       return data;
     } catch (err) {
       setFiles(prev => prev.map(f => f.id === file.id ? { ...f, status: "error", error: (err as Error).message } : f));
@@ -138,9 +140,9 @@ export function DocumentUploader() {
           id,
           name: file.name,
           size: file.size,
-          status: error ? "error" : "pending",
+          status: (error ? "error" : "pending") as UploadedFile["status"],
           progress: 0,
-          error,
+          error: error ?? undefined,
         }]);
       });
       e.target.value = "";
@@ -161,9 +163,9 @@ export function DocumentUploader() {
           id,
           name: file.name,
           size: file.size,
-          status: error ? "error" : "pending",
+          status: (error ? "error" : "pending") as UploadedFile["status"],
           progress: 0,
-          error,
+          error: error ?? undefined,
         }]);
       });
     }

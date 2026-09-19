@@ -13,6 +13,8 @@ shared_pipeline) so the whole suite runs one mocked pipeline.
 """
 from __future__ import annotations
 
+import uuid
+
 import pytest
 
 from tests.test_api import (  # noqa: F401 — re-exported as fixtures
@@ -195,3 +197,63 @@ class TestFusionWeightOverrides:
             json={"question": "q", "dense_weight": 0.0, "sparse_weight": 0.0},
         )
         assert response.status_code == 422
+
+
+class TestDemoDeleteDocumentEndpoint:
+    """DELETE /v1/demo/documents?source=... — per-document removal.
+
+    The website's Corpus panel deletes user-uploaded documents; the endpoint
+    must remove every chunk for the source and keep the index consistent.
+    """
+
+    def _seed_test_doc(self, shared_pipeline, name: str) -> None:
+        """Insert a chunk for `name` directly into the shared store."""
+        from ingestion.chunking import Chunk
+
+        text = f"Unique delete-test content for {name}: the flibberwock galumphs at dawn."
+        chunk = Chunk(
+            # Qdrant point ids must be UUIDs — derive one deterministically.
+            id=str(uuid.uuid5(uuid.NAMESPACE_URL, f"test:{name}")),
+            text=text,
+            source=name,
+            chunk_index=0,
+            strategy="recursive",
+            char_count=len(text),
+            embedding_model=shared_pipeline.settings.embedding_model,
+        )
+        vector = [0.05] * shared_pipeline.settings.embedding_dim
+        shared_pipeline.vector_store.upsert([chunk], [vector])
+
+    def test_delete_removes_uploaded_document(self, viz_client, shared_pipeline):
+        self._seed_test_doc(shared_pipeline, "e2e_delete_a.md")
+        docs = viz_client.get("/v1/demo/documents").json()["documents"]
+        assert any(d["source"] == "e2e_delete_a.md" for d in docs)
+
+        response = viz_client.delete("/v1/demo/documents", params={"source": "e2e_delete_a.md"})
+        assert response.status_code == 200
+        assert response.json()["deleted_chunks"] > 0
+
+        docs_after = viz_client.get("/v1/demo/documents").json()["documents"]
+        assert not any(d["source"] == "e2e_delete_a.md" for d in docs_after)
+
+    def test_delete_missing_document_returns_zero(self, viz_client):
+        response = viz_client.delete(
+            "/v1/demo/documents", params={"source": "never_existed_xyz.md"}
+        )
+        assert response.status_code == 200
+        assert response.json()["deleted_chunks"] == 0
+
+    def test_delete_requires_source(self, viz_client):
+        response = viz_client.request("DELETE", "/v1/demo/documents")
+        assert response.status_code == 422
+
+    def test_deleted_content_is_not_listed_or_retrievable(self, viz_client, shared_pipeline):
+        """After deletion the source must vanish from the corpus list."""
+        self._seed_test_doc(shared_pipeline, "e2e_delete_b.md")
+        deleted = viz_client.delete(
+            "/v1/demo/documents", params={"source": "e2e_delete_b.md"}
+        ).json()
+        assert deleted["deleted_chunks"] > 0
+
+        docs = viz_client.get("/v1/demo/documents").json()["documents"]
+        assert not any(d["source"] == "e2e_delete_b.md" for d in docs)

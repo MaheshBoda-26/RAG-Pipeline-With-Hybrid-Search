@@ -150,7 +150,7 @@ export function Footer() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
                 className="flex-1 px-3 py-2 rounded-lg text-sm"
-                style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border-strong)', color: 'var(--color-text-1)', placeholderColor: 'var(--color-text-3)' }}
+                style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border-strong)', color: 'var(--color-text-1)' }}
                 aria-label="Email address"
                 suppressHydrationWarning
               />
