@@ -40,3 +40,34 @@ def reciprocal_rank_fusion(
         entry["sparse_rank"] = rank + 1
 
     return sorted(fused.values(), key=lambda e: e["fused_score"], reverse=True)
+
+
+def merge_candidate_pools(pools: list[list[dict]]) -> list[dict]:
+    """Union several already-fused candidate pools into one.
+
+    Used by multi-query retrieval (``QUERY_TRANSFORM=expand``): every rephrasing
+    gets its own dense+sparse pass, and a chunk that several rephrasings agree on
+    accumulates score (consensus), while a chunk only one phrasing found keeps
+    its own. Scores from different pools are on the same RRF scale, so summing
+    them is meaningful; ranks are not comparable across pools and are dropped.
+
+    Returns entries sorted by fused_score descending, with ``variants`` recording
+    how many queries surfaced the chunk.
+    """
+    merged: dict[str, dict] = {}
+    for pool in pools:
+        for entry in pool:
+            current = merged.get(entry["id"])
+            if current is None:
+                merged[entry["id"]] = {**entry, "variants": 1}
+                current = merged[entry["id"]]
+            else:
+                current["fused_score"] = current.get("fused_score", 0.0) + entry.get("fused_score", 0.0)
+                current["variants"] = current.get("variants", 1) + 1
+                # Keep the strongest evidence of either pass for downstream
+                # confidence blending (dense cosine rides along from fusion).
+                if entry.get("dense_score") is not None:
+                    current["dense_score"] = max(
+                        current.get("dense_score", float("-inf")), entry["dense_score"]
+                    )
+    return sorted(merged.values(), key=lambda e: e.get("fused_score", 0.0), reverse=True)

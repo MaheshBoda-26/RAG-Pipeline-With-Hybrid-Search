@@ -16,6 +16,9 @@ import numpy as np
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
+from tests.eval.metrics import answer_relevancy as compute_answer_relevancy  # noqa: E402
+from tests.eval.metrics import lexical_f1 as f1_score  # noqa: E402
+
 EMBED_DIM = 768
 
 
@@ -133,6 +136,8 @@ class EvalResult:
     faithfulness: float | None = None
     citation_accuracy: float | None = None
     retrieval_relevance: float | None = None
+    answer_relevancy: float | None = None
+    answer_f1: float | None = None
 
 
 @dataclass
@@ -210,6 +215,8 @@ def run_evaluation(
                 confidence=response.confidence,
                 sources=response.sources,
                 latency_ms=latency_ms,
+                answer_relevancy=compute_answer_relevancy(response.answer, expected),
+                answer_f1=f1_score(response.answer, expected),
             )
 
             if not response.refused:
@@ -253,6 +260,8 @@ def run_evaluation(
         avg_retrieval_relevance=avg([r.retrieval_relevance for r in answered]),
         avg_latency_ms=statistics.mean([r.latency_ms for r in results]) if results else 0,
         refusal_rate=len(refused) / len(results) if results else 0,
+        avg_answer_relevancy=avg([r.answer_relevancy for r in results]),
+        avg_answer_f1=avg([r.answer_f1 for r in results]),
     )
 
     return results, summary

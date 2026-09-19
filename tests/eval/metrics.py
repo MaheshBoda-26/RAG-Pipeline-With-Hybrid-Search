@@ -1,4 +1,4 @@
-"""Retrieval-quality metrics for the golden set.
+"""Metrics for the golden set: retrieval quality plus judge-free answer overlap.
 
 Ground truth is the golden item's ``context`` field: the passage that contains
 the answer. A retrieved chunk counts as relevant when it carries that passage,
@@ -77,6 +77,55 @@ def ndcg_at_k(flags: Sequence[bool], k: int) -> float:
         if hit
     )
     return dcg
+
+
+# Function words carry no answer content, and their presence would inflate
+# overlap between any two English sentences.
+_STOPWORDS = frozenset(
+    """a an and are as at be been by can could do does for from had has have he her his
+    how i if in into is it its may might must no not of on or our should so than that the
+    their them then there these they this to was we were what when where which who why will
+    with would you your""".split()
+)
+
+
+def content_tokens(text: str) -> set[str]:
+    """Meaning-bearing tokens: lowercased, punctuation-stripped, stopwords removed."""
+    return {token for token in normalize(text).split() if token not in _STOPWORDS}
+
+
+def answer_relevancy(generated: str, expected: str) -> float | None:
+    """Judge-free RAGAS-style answer relevancy: how much of the expected answer's
+    content the generated answer actually covers.
+
+    Deterministic on purpose — it runs in CI without an API key, and it is
+    measured on the same 0-1 scale as the LLM judge so the two can be compared.
+    Returns ``None`` when the expected answer has no content tokens (nothing to
+    measure against).
+    """
+    want = content_tokens(expected)
+    if not want:
+        return None
+    got = content_tokens(generated)
+    return len(want & got) / len(want)
+
+
+def lexical_f1(generated: str, expected: str) -> float | None:
+    """Token-level F1 between generated and expected answers (SQuAD-style).
+
+    Complements ``answer_relevancy``: relevancy catches omission (the answer
+    ignores part of the question), F1 catches verbosity and drift.
+    """
+    want = content_tokens(expected)
+    got = content_tokens(generated)
+    if not want or not got:
+        return None
+    overlap = len(want & got)
+    if not overlap:
+        return 0.0
+    precision = overlap / len(got)
+    recall = overlap / len(want)
+    return 2 * precision * recall / (precision + recall)
 
 
 def aggregate(

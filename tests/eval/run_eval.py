@@ -10,6 +10,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 from pathlib import Path
 
@@ -34,9 +35,18 @@ def main():
     parser.add_argument("--dense-only", action="store_true", help="Run with dense-only retrieval (sparse_weight=0)")
     parser.add_argument("--compare-chunking", action="store_true", help="Compare all chunking strategies")
     parser.add_argument("--strategies", nargs="+", default=["fixed", "recursive", "semantic"], help="Chunking strategies to compare")
+    parser.add_argument("--limit", type=int, default=0, help="Evaluate only the first N questions (0 = all)")
+    parser.add_argument("--offset", type=int, default=0, help="Skip the first N questions (for sharded runs)")
+    parser.add_argument("--quiet-config", action="store_true", help="Suppress the config banner")
     args = parser.parse_args()
 
     settings = Settings()
+
+    # Which pipeline produced these numbers is part of the result, so it is
+    # printed with them and stored in the results file.
+    from tests.eval.runner import describe_config
+    if not args.quiet_config:
+        print("CONFIG: " + json.dumps(describe_config(settings), sort_keys=True))
 
     # Load golden set
     golden_path = Path(args.golden_set)
@@ -45,6 +55,8 @@ def main():
         sys.exit(1)
 
     golden_set = load_golden_set(str(golden_path))
+    if args.offset or args.limit:
+        golden_set = golden_set[args.offset : (args.offset + args.limit) or None]
     print(f"Loaded {len(golden_set)} questions from {golden_path}")
 
     comparison = None

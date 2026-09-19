@@ -25,12 +25,19 @@ from ingestion.dedup import DuplicateIndex
 from ingestion.incremental import document_hash, plan_incremental, stored_hashes
 from ingestion.loaders import RawDocument, load_directory, load_file
 from observability import StageTimer, log_event, new_trace_id
+from retrieval.contextual import ContextCache, add_chunk_contexts, make_llm_generator
+from retrieval.fusion import merge_candidate_pools
+from retrieval.query_transform import transform_queries
 from retrieval.embeddings import Embedder, create_openai_client
 from retrieval.reranker import rerank
 from retrieval.sparse import BM25Index
 from retrieval.vector_store import QdrantVectorStore
 from retrieval.supabase_store import create_supabase_store
 from retrieval.query_cache import QueryCache
+
+# Process-wide context cache: one ingest run touches many documents, and each
+# should reuse the cached situating contexts instead of re-reading the file.
+_CONTEXT_CACHE: ContextCache | None = None
 
 
 @dataclass
@@ -113,6 +120,28 @@ class RAGPipeline:
             c.embedding_model = self.settings.embedding_model
         return chunks
 
+    def _apply_contextual_context(self, doc: RawDocument, chunks: list[Chunk]) -> int:
+        """Situate chunks inside their document before indexing (opt-in).
+
+        Returns the number of contexts newly generated; cache hits are free.
+        """
+        if not self.settings.contextual_retrieval or not chunks:
+            return 0
+
+        global _CONTEXT_CACHE
+        if _CONTEXT_CACHE is None or str(_CONTEXT_CACHE.path) != str(Path(self.settings.context_cache_path)):
+            _CONTEXT_CACHE = ContextCache(self.settings.context_cache_path)
+
+        generate = make_llm_generator(self.client, self.settings.contextual_model)
+        return add_chunk_contexts(
+            chunks,
+            doc.text,
+            document_hash(doc.text),
+            generate,
+            cache=_CONTEXT_CACHE,
+            max_chunks=self.settings.contextual_max_chunks,
+        )
+
     def _check_embedding_drift(self) -> None:
         """Warn loudly if indexed chunks were embedded by a different model
         than the one this pipeline is querying with."""
@@ -158,6 +187,7 @@ class RAGPipeline:
             chunks = self._chunk_document(doc)
             for chunk in chunks:
                 chunk.doc_hash = document_hash(doc.text)
+            self._apply_contextual_context(doc, chunks)
             all_chunks.extend(chunks)
 
         if not all_chunks:
@@ -175,7 +205,9 @@ class RAGPipeline:
                 "duplicates_skipped": 0,
             }
 
-        embeddings = self.embedder.embed([c.text for c in all_chunks])
+        # embedding_text = situating context + passage when contextual retrieval
+        # is on, and the plain passage otherwise.
+        embeddings = self.embedder.embed([c.embedding_text for c in all_chunks])
 
         dedup = DuplicateIndex(self.settings.dedup_similarity_threshold)
         # Seed with everything already indexed so re-ingesting the same
@@ -238,6 +270,7 @@ class RAGPipeline:
         chunks = self._chunk_document(doc)
         for chunk in chunks:
             chunk.doc_hash = document_hash(doc.text)
+        self._apply_contextual_context(doc, chunks)
         if not chunks:
             # Invalidate query cache since documents may have changed
             if self.query_cache:
@@ -248,7 +281,7 @@ class RAGPipeline:
             return {"documents": 1, "chunks_created": 0, "chunks_indexed": 0, "duplicates_skipped": 0}
 
         try:
-            embeddings = self.embedder.embed([c.text for c in chunks])
+            embeddings = self.embedder.embed([c.embedding_text for c in chunks])
         except Exception as e:
             # Surface upstream embedding errors with context for API layer
             raise RuntimeError(f"Embedding API call failed ({type(e).__name__}): {e}") from e
@@ -292,8 +325,24 @@ class RAGPipeline:
         trace_id = new_trace_id()
         timer = StageTimer(trace_id=trace_id, log=bool(os.getenv("LOG_PIPELINE_STAGES")))
 
+        # Optional query transformation (QUERY_TRANSFORM=rewrite|expand). The
+        # user's question always leads: transformation can add retrieval passes,
+        # never replace the query that was actually asked.
+        with timer.stage("transform_query"):
+            transform_mode = self.settings.normalized_query_transform
+            queries = transform_queries(
+                question,
+                mode=transform_mode,
+                client=self.client if transform_mode != "none" else None,
+                model=self.settings.chat_model,
+                variants=self.settings.query_transform_variants,
+            )
+
         with timer.stage("embed_query"):
-            query_embedding = self.embedder.embed_one(question)
+            query_embedding = self.embedder.embed_one(queries[0])
+            variant_embeddings = (
+                self.embedder.embed(queries[1:]) if len(queries) > 1 else []
+            )
 
         # Check query cache first
         if self.query_cache:
@@ -306,19 +355,34 @@ class RAGPipeline:
             if cached:
                 return AskResponse(**cached)
 
-        # Use Qdrant's native hybrid search (dense + sparse + server-side RRF)
-        # This replaces the previous pipeline of: dense query + Python BM25 + manual RRF
-        # Qdrant handles sparse vector search, RRF fusion, and filtering server-side
+        # Hybrid retrieval: a dense Qdrant query (filtered at the database level
+        # when a source is specified) fused with the in-process BM25 keyword
+        # index via reciprocal rank fusion. With QUERY_TRANSFORM=expand, each
+        # rephrasing gets its own pass and the pools are unioned by consensus.
         with timer.stage("retrieve"):
             candidate_pool = self.vector_store.hybrid_query(
                 query_embedding=query_embedding,
-                question=question,
+                question=queries[0],
                 top_k=self.settings.rerank_candidate_pool,
                 source_filter=source,
                 bm25=self.bm25,
             )
+            if variant_embeddings:
+                extra_pools = [
+                    self.vector_store.hybrid_query(
+                        query_embedding=embedding,
+                        question=variant,
+                        top_k=self.settings.rerank_candidate_pool,
+                        source_filter=source,
+                        bm25=self.bm25,
+                    )
+                    for variant, embedding in zip(queries[1:], variant_embeddings, strict=False)
+                ]
+                candidate_pool = merge_candidate_pools([candidate_pool, *extra_pools])
 
         with timer.stage("rerank"):
+            # Rerank against the ORIGINAL question: rephrasings are for recall,
+            # the user's own wording is the precision target.
             ranked = rerank(
                 self.client, self.settings.chat_model, question, candidate_pool,
                 top_n=self.settings.final_top_k,

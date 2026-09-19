@@ -19,7 +19,13 @@ from openai import OpenAI
 
 from config import Settings
 from pipeline import RAGPipeline
-from tests.eval.metrics import aggregate, first_relevant_rank, relevance_flags
+from tests.eval.metrics import (
+    aggregate,
+    answer_relevancy as compute_answer_relevancy,
+    first_relevant_rank,
+    lexical_f1,
+    relevance_flags,
+)
 
 
 @dataclass
@@ -36,6 +42,10 @@ class EvalResult:
     faithfulness: float | None = None
     citation_accuracy: float | None = None
     retrieval_relevance: float | None = None
+    # Judge-free answer overlap: catches omission (relevancy) and drift (F1)
+    # without spending an API call, so it also runs in CI.
+    answer_relevancy: float | None = None
+    answer_f1: float | None = None
     # Retrieval metrics: computed from the golden context passage, no judge call
     retrieved_flags: list[bool] | None = None
     relevant_rank: int | None = None
@@ -52,6 +62,13 @@ class EvalSummary:
     avg_retrieval_relevance: float | None
     avg_latency_ms: float
     refusal_rate: float
+    # Judge-free metrics default to None so older result files and the mocked
+    # runner stay loadable.
+    avg_answer_relevancy: float | None = None
+    avg_answer_f1: float | None = None
+    # The exact configuration this run used. A benchmark is only honest if the
+    # numbers say which pipeline produced them.
+    config: dict | None = None
     # Per-strategy breakdown (for chunking comparison)
     by_strategy: dict[str, dict] | None = None
     # Retrieval metrics (mean across queries, judge-free)
@@ -98,6 +115,26 @@ Respond with ONLY a JSON object: {"score": 0.8, "reasoning": "..."}"""
 def load_golden_set(path: str) -> list[dict]:
     with open(path) as f:
         return json.load(f)
+
+
+def describe_config(settings: Settings) -> dict:
+    """The retrieval configuration behind a run, recorded with its results."""
+    return {
+        "chunking_strategy": settings.chunking_strategy,
+        "chunk_size": settings.fixed_chunk_size,
+        "chunk_overlap": settings.fixed_chunk_overlap,
+        "embedding_model": settings.embedding_model,
+        "chat_model": settings.chat_model,
+        "rerank_mode": settings.normalized_rerank_mode,
+        "query_transform": settings.normalized_query_transform,
+        "contextual_retrieval": settings.contextual_retrieval,
+        "candidate_pool": settings.rerank_candidate_pool,
+        "final_top_k": settings.final_top_k,
+        "dense_weight": settings.dense_weight,
+        "sparse_weight": settings.sparse_weight,
+        "rrf_k": settings.rrf_k,
+        "min_retrieval_confidence": settings.min_retrieval_confidence,
+    }
 
 
 def judge_score(client: OpenAI, model: str, system_prompt: str, user_prompt: str) -> tuple[float, str]:
@@ -168,6 +205,11 @@ def run_evaluation(
             )
             result.relevant_rank = first_relevant_rank(result.retrieved_flags)
 
+            # Judge-free overlap metrics, computed for every answer including
+            # refusals (a refusal over a known-answer question is a real miss).
+            result.answer_relevancy = compute_answer_relevancy(response.answer, expected)
+            result.answer_f1 = lexical_f1(response.answer, expected)
+
             if not response.refused:
                 # Correctness
                 correctness_prompt = f"Question: {question}\n\nExpected: {expected}\n\nActual: {response.answer}"
@@ -220,8 +262,11 @@ def run_evaluation(
         avg_faithfulness=avg([r.faithfulness for r in answered]),
         avg_citation_accuracy=avg([r.citation_accuracy for r in answered]),
         avg_retrieval_relevance=avg([r.retrieval_relevance for r in answered]),
+        avg_answer_relevancy=avg([r.answer_relevancy for r in results]),
+        avg_answer_f1=avg([r.answer_f1 for r in results]),
         avg_latency_ms=statistics.mean([r.latency_ms for r in results]) if results else 0,
         refusal_rate=len(refused) / len(results) if results else 0,
+        config=describe_config(settings),
         recall_at_1=as_float(retrieval["recall_at_1"]),
         recall_at_3=as_float(retrieval["recall_at_3"]),
         recall_at_5=as_float(retrieval["recall_at_5"]),
@@ -290,6 +335,8 @@ def print_summary(summary: EvalSummary) -> None:
     print(f"Faithfulness:     {summary.avg_faithfulness:.3f}" if summary.avg_faithfulness else "Faithfulness:     N/A")
     print(f"Citation accuracy: {summary.avg_citation_accuracy:.3f}" if summary.avg_citation_accuracy else "Citation accuracy: N/A")
     print(f"Retrieval relevance: {summary.avg_retrieval_relevance:.3f}" if summary.avg_retrieval_relevance else "Retrieval relevance: N/A")
+    print(f"Answer relevancy: {summary.avg_answer_relevancy:.3f}" if summary.avg_answer_relevancy else "Answer relevancy: N/A")
+    print(f"Answer token F1:  {summary.avg_answer_f1:.3f}" if summary.avg_answer_f1 else "Answer token F1: N/A")
     print("")
     if summary.recall_at_1 is None:
         print("Retrieval quality: N/A")
