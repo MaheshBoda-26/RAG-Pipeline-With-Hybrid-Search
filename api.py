@@ -746,6 +746,19 @@ async def demo_documents():
     return {"documents": docs, "total_documents": len(docs), "total_chunks": total_chunks}
 
 
+@app.delete("/v1/demo/documents")
+async def demo_delete_document(request: Request, source: str):
+    """Delete every chunk belonging to one source document (no auth required).
+
+    Powers the per-document delete button on the website. The frontend only
+    shows it for user-uploaded files (anything outside the bundled sample
+    corpus), but the endpoint itself is a straight source match.
+    """
+    pipeline = get_pipeline(settings.default_user_id)
+    deleted = pipeline.delete_document(source)
+    return {"source": source, "deleted_chunks": deleted}
+
+
 @app.post("/v1/demo/ingest")
 async def demo_ingest():
     """(Re-)ingest the bundled sample corpus into the demo collection.

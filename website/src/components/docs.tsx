@@ -76,7 +76,22 @@ export function Docs() {
   const [copied, setCopied] = React.useState<string | null>(null);
 
   const handleCopy = (text: string) => {
-    navigator.clipboard.writeText(text);
+    // Clipboard API can reject (unfocused window, iframe permission denial).
+    // Fall back to a hidden textarea + execCommand so the button always works.
+    const fallback = () => {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand("copy");
+      } finally {
+        document.body.removeChild(ta);
+      }
+    };
+    navigator.clipboard.writeText(text).catch(fallback);
     setCopied(text);
     setTimeout(() => setCopied(null), 2000);
   };
