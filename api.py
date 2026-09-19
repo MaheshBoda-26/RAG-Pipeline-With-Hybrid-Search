@@ -33,6 +33,46 @@ from pipeline import RAGPipeline
 
 app = FastAPI(title="RAG Pipeline API")
 
+
+def _warm_models() -> None:
+    """Pre-load the ML models so the FIRST user query isn't slow.
+
+    Without this, the first request after every server start pays the full
+    model-load bill inline: ~0.8 s (embedding backend selection + local
+    model init) plus ~15 s (cross-encoder load) — which reads to users as
+    "retrieval is slow" when it's really cold start. Runs in a daemon thread
+    so uvicorn binds the port immediately; a query arriving mid-warmup just
+    falls back to today's behavior for that one request.
+    """
+    import threading
+
+    def _run() -> None:
+        try:
+            pipeline = get_pipeline(settings.default_user_id)
+            # 1) Embedding backend: resolves API-vs-local ONCE and loads the
+            #    local model if needed, so queries stop paying for the doomed
+            #    remote attempt.
+            pipeline.embedder.embed_one("warmup")
+            # 2) Cross-encoder: force the lazy load by scoring a tiny batch.
+            from retrieval.cross_encoder_reranker import get_reranker
+            get_reranker(
+                model_name=settings.cross_encoder_model,
+                device=settings.cross_encoder_device,
+                max_length=settings.cross_encoder_max_length,
+            ).rerank("warmup", [{"id": "w", "payload": {"text": "warmup"}}], 1)
+            import logging
+            logging.getLogger(__name__).info("Model warmup complete: embedding backend resolved, cross-encoder loaded")
+        except Exception as e:  # warmup must never crash the server
+            import logging
+            logging.getLogger(__name__).warning("Model warmup skipped: %s", e)
+
+    threading.Thread(target=_run, name="model-warmup", daemon=True).start()
+
+
+@app.on_event("startup")
+def _startup_warmup() -> None:
+    _warm_models()
+
 # Rate limiter.
 #
 # WHY NOT slowapi: slowapi's @limiter.limit decorator relies on FastAPI calling

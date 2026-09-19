@@ -152,10 +152,19 @@ class Embedder:
 
 
 def create_openai_client(api_key: str | None = None, base_url: str | None = None) -> OpenAI:
-    """Create OpenAI client with optional base_url for NVIDIA NIM."""
+    """Create OpenAI client with optional base_url for NVIDIA NIM.
+
+    Latency guardrails: without an explicit timeout the SDK waits up to 10
+    minutes per call, and with the default max_retries=2 a transient NVIDIA
+    error silently adds two backoff retries to a user's wait — observed as
+    25 s answers. One retry with a 30 s ceiling keeps transient-error
+    resilience while capping the worst-case wall clock.
+    """
     kwargs = {}
     if api_key:
         kwargs["api_key"] = api_key
     if base_url:
         kwargs["base_url"] = base_url
+    kwargs.setdefault("timeout", 30.0)
+    kwargs.setdefault("max_retries", 1)
     return OpenAI(**kwargs)

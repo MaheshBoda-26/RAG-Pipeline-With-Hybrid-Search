@@ -236,7 +236,10 @@ class Settings:
     # --- Cross-encoder reranker ---
     cross_encoder_model: str = os.getenv("CROSS_ENCODER_MODEL", "cross-encoder/ms-marco-MiniLM-L-6-v2")
     cross_encoder_device: str = os.getenv("CROSS_ENCODER_DEVICE", "cpu")
-    cross_encoder_max_length: int = int(os.getenv("CROSS_ENCODER_MAX_LENGTH", "512"))
+    # 256 tokens covers the corpus's chunk sizes (chunks are paragraph-sized,
+    # ~60-650 chars ≈ 15-160 tokens) with generous headroom while roughly
+    # halving cross-encoder scoring time vs the 512 default.
+    cross_encoder_max_length: int = int(os.getenv("CROSS_ENCODER_MAX_LENGTH", "256"))
 
     # --- Query cache (redis_url itself is declared under Storage above) ---
     cache_exact_ttl: int = int(os.getenv("CACHE_EXACT_TTL", "3600"))

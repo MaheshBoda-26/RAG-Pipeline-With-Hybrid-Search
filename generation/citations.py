@@ -134,6 +134,14 @@ def verify_citations(
             {"role": "user", "content": user_prompt},
         ],
         temperature=0,
+        # Verdicts are one short JSON line per claim — cap output tokens so a
+        # rambling backend can't stretch the response, and bound the request
+        # so a slow/hung API can't stall the whole ask() pipeline (median call
+        # is ~1 s; the cap only bites on provider spikes). On timeout the JSON
+        # parse fails and every claim falls through to the lexical rescue
+        # rule, which is exactly the graceful degradation we want.
+        max_tokens=300,
+        timeout=8,
     )
     raw = resp.choices[0].message.content.strip()
     raw = raw.removeprefix("```json").removeprefix("```").removesuffix("```").strip()
@@ -204,6 +212,10 @@ def score_completeness_and_answerability(
             {"role": "user", "content": user_prompt},
         ],
         temperature=0,
+        # Same bounding as citation verification: small JSON verdict, hard
+        # ceiling on how long the pipeline will wait for it.
+        max_tokens=300,
+        timeout=8,
     )
     return parse_completeness(resp.choices[0].message.content)
 

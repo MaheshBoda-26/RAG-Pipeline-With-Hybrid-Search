@@ -38,7 +38,7 @@ class FakeEmbeddingsAPI:
 
 
 class FakeChatAPI:
-    def create(self, model, messages, temperature=0):
+    def create(self, model, messages, temperature=0, max_tokens=None, timeout=None):
         system = messages[0]["content"]
         user = messages[1]["content"]
         if "relevance-scoring assistant" in system:
@@ -78,7 +78,7 @@ class FakeChatAPI:
 
 
 class FakeOpenAI:
-    def __init__(self, api_key=None, base_url=None):
+    def __init__(self, api_key=None, base_url=None, timeout=None, max_retries=None):
         self.embeddings = FakeEmbeddingsAPI()
         self.chat = mock.Mock(completions=FakeChatAPI())
 
