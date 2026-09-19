@@ -30,13 +30,13 @@ const features = [
   },
   {
     icon: GitMerge,
-    title: "LLM Reranking",
+    title: "Two-Stage Reranking",
     description:
-      "Batched LLM-as-judge scores top 20 fused candidates in a single call. Falls back to fusion order on parse failure. Costs ~1 call per query.",
+      "A local cross-encoder (ms-marco MiniLM) rescores the fused candidates in one batch — ~100 ms on CPU, no API cost. RERANK_MODE=llm swaps in an LLM judge for corpora far from its training distribution.",
     details: [
-      "Single batched API call",
-      "JSON array output",
-      "Graceful fallback",
+      "Cross-encoder default",
+      "LLM-judge fallback mode",
+      "Fusion-order fallback on failure",
       "Top-N configurable",
     ],
     color: "accent",

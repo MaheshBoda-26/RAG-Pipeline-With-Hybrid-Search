@@ -1,0 +1,3909 @@
+{
+  "summary": {
+    "total_questions": 54,
+    "answered": 54,
+    "refused": 0,
+    "refusal_rate": 0.0,
+    "avg_correctness": 0.8537037037037037,
+    "avg_faithfulness": 0.9814814814814815,
+    "avg_citation_accuracy": 0.9629629629629629,
+    "avg_retrieval_relevance": 0.6907407407407408,
+    "avg_latency_ms": 5135.684654297721,
+    "recall_at_1": 0.7962962962962963,
+    "recall_at_3": 0.9444444444444444,
+    "recall_at_5": 0.9814814814814815,
+    "mrr": 0.8725308641975309,
+    "ndcg_at_5": 0.952343957509712,
+    "queries": 54
+  },
+  "results": [
+    {
+      "question": "What are the two authentication methods supported by the Aegis API?",
+      "expected_answer": "The Aegis API supports two authentication methods: OAuth2 and static API keys.",
+      "actual_answer": "The Aegis API supports two authentication methods: OAuth2 and static API keys [1].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.785,
+        "citation_coverage": 1.0,
+        "completeness": 0.8,
+        "composite": 0.862
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What are the two authentication methods supported by the Aegis API",
+          "text": "The Aegis API supports two authentication methods: OAuth2 and static API keys. Choose OAuth2 for user-facing applications and API keys for server-to-server integrations.",
+          "fused_score": 0.01639344262295082,
+          "rerank_score": 5.0,
+          "dense_score": 0.8348764240936203
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "How do you authenticate with an API key in the Aegis API",
+          "text": "To authenticate with an API key, include it in the Authorization header: Authorization: Bearer aegis_live_xxxxxxxxxxxx",
+          "fused_score": 0.015576036866359446,
+          "rerank_score": 5.0,
+          "dense_score": 0.769345360618069
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What does the AUTH_INVALID_KEY error code mean",
+          "text": "AUTH_INVALID_KEY (401): the provided API key does not exist or has been revoked.",
+          "fused_score": 0.015415111940298506,
+          "rerank_score": 5.0,
+          "dense_score": 0.672830105411953
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "Aegis API \u2014 Authentication",
+          "text": "Reference documentation for the Aegis platform API. Every statement below is normative for the current API version.",
+          "fused_score": 0.015367965367965367,
+          "rerank_score": 5.0,
+          "dense_score": 0.6533391534472401
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What is the OAuth2 authorization endpoint for Aegis",
+          "text": "The authorization endpoint is https://auth.aegis.example.com/oauth/authorize and the token endpoint is https://auth.aegis.example.com/oauth/token.",
+          "fused_score": 0.014908579465541489,
+          "rerank_score": 5.0,
+          "dense_score": 0.7517856972108595
+        }
+      ],
+      "latency_ms": 10123.032208008226,
+      "correctness": 1.0,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 1.0,
+      "retrieved_flags": [
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "relevant_rank": 1
+    },
+    {
+      "question": "How do you authenticate with an API key in the Aegis API?",
+      "expected_answer": "Include the API key in the Authorization header as 'Bearer aegis_live_xxxxxxxxxxxx'.",
+      "actual_answer": "To authenticate with an API key in the Aegis API, include it in the Authorization header: Authorization: Bearer aegis_live_xxxxxxxxxxxx [2].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.801,
+        "citation_coverage": 0.0,
+        "completeness": 0.6,
+        "composite": 0.467
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "How do you authenticate with an API key in the Aegis API",
+          "text": "To authenticate with an API key, include it in the Authorization header: Authorization: Bearer aegis_live_xxxxxxxxxxxx",
+          "fused_score": 0.01639344262295082,
+          "rerank_score": 5.0,
+          "dense_score": 0.8628942935306279
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What are the two authentication methods supported by the Aegis API",
+          "text": "The Aegis API supports two authentication methods: OAuth2 and static API keys. Choose OAuth2 for user-facing applications and API keys for server-to-server integrations.",
+          "fused_score": 0.01605222734254992,
+          "rerank_score": 5.0,
+          "dense_score": 0.7988339639058457
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What does the AUTH_INVALID_KEY error code mean",
+          "text": "AUTH_INVALID_KEY (401): the provided API key does not exist or has been revoked.",
+          "fused_score": 0.01579861111111111,
+          "rerank_score": 5.0,
+          "dense_score": 0.7401520120895686
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "Aegis API \u2014 Authentication",
+          "text": "Reference documentation for the Aegis platform API. Every statement below is normative for the current API version.",
+          "fused_score": 0.01522144522144522,
+          "rerank_score": 5.0,
+          "dense_score": 0.6459226292266168
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "Where are API keys generated in the Aegis dashboard",
+          "text": "API keys are generated in the dashboard under Settings > API Keys.",
+          "fused_score": 0.015132827324478178,
+          "rerank_score": 5.0,
+          "dense_score": 0.6008344020609252
+        }
+      ],
+      "latency_ms": 2252.5589159922674,
+      "correctness": 0.8,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 1.0,
+      "retrieved_flags": [
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "relevant_rank": 1
+    },
+    {
+      "question": "What happens when you make a request without a valid API key?",
+      "expected_answer": "Requests without a valid key return 401 Unauthorized.",
+      "actual_answer": "Requests without a valid key return 401 Unauthorized [1].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.776,
+        "citation_coverage": 1.0,
+        "completeness": 0.2,
+        "composite": 0.659
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What happens when you make a request without a valid API key",
+          "text": "Requests without a valid key return 401 Unauthorized.",
+          "fused_score": 0.01639344262295082,
+          "rerank_score": 5.0,
+          "dense_score": 0.8320061257868696
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What happens when a read-only API key attempts a write operation",
+          "text": "Requests with a valid but read-only key attempting a write operation return 403 Forbidden.",
+          "fused_score": 0.015949820788530463,
+          "rerank_score": 5.0,
+          "dense_score": 0.7126315352945384
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What does the AUTH_INVALID_KEY error code mean",
+          "text": "AUTH_INVALID_KEY (401): the provided API key does not exist or has been revoked.",
+          "fused_score": 0.015905707196029777,
+          "rerank_score": 5.0,
+          "dense_score": 0.78224256329979
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/error_codes.md",
+          "section_heading": "What does the INTERNAL_ERROR error code mean",
+          "text": "INTERNAL_ERROR (500): an unexpected server error. These are logged with a request_id -- include it when contacting support.",
+          "fused_score": 0.015625,
+          "rerank_score": 5.0,
+          "dense_score": 0.676603952090847
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/error_codes.md",
+          "section_heading": "Which error codes will NOT succeed on retry without changing the request",
+          "text": "VALIDATION_ERROR, PERMISSION_DENIED, and CONFLICT will not succeed on retry without changing the request itself.",
+          "fused_score": 0.015367965367965367,
+          "rerank_score": 5.0,
+          "dense_score": 0.6650621398649917
+        }
+      ],
+      "latency_ms": 11340.141791006317,
+      "correctness": 1.0,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 0.5,
+      "retrieved_flags": [
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "relevant_rank": 1
+    },
+    {
+      "question": "What happens when a read-only API key attempts a write operation?",
+      "expected_answer": "Requests with a valid but read-only key attempting a write operation return 403 Forbidden.",
+      "actual_answer": "Requests with a valid but read-only key attempting a write operation return 403 Forbidden [1].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.743,
+        "citation_coverage": 1.0,
+        "completeness": 0.8,
+        "composite": 0.848
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What happens when a read-only API key attempts a write operation",
+          "text": "Requests with a valid but read-only key attempting a write operation return 403 Forbidden.",
+          "fused_score": 0.01639344262295082,
+          "rerank_score": 5.0,
+          "dense_score": 0.8329251445618755
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What scopes can an API key have",
+          "text": "Each key is scoped to a single workspace and can be restricted to read-only or read-write access.",
+          "fused_score": 0.015949820788530463,
+          "rerank_score": 5.0,
+          "dense_score": 0.6931670578249287
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What happens when you make a request without a valid API key",
+          "text": "Requests without a valid key return 401 Unauthorized.",
+          "fused_score": 0.015767934520943667,
+          "rerank_score": 5.0,
+          "dense_score": 0.7024183151370338
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What does the AUTH_INVALID_KEY error code mean",
+          "text": "AUTH_INVALID_KEY (401): the provided API key does not exist or has been revoked.",
+          "fused_score": 0.015482954545454545,
+          "rerank_score": 5.0,
+          "dense_score": 0.6651162399564615
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "How do you authenticate with an API key in the Aegis API",
+          "text": "To authenticate with an API key, include it in the Authorization header: Authorization: Bearer aegis_live_xxxxxxxxxxxx",
+          "fused_score": 0.015017825311942958,
+          "rerank_score": 5.0,
+          "dense_score": 0.6167973344097875
+        }
+      ],
+      "latency_ms": 6320.42299999739,
+      "correctness": 1.0,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 0.5,
+      "retrieved_flags": [
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "relevant_rank": 1
+    },
+    {
+      "question": "What is the OAuth2 authorization endpoint for Aegis?",
+      "expected_answer": "The authorization endpoint is https://auth.aegis.example.com/oauth/authorize.",
+      "actual_answer": "The OAuth2 authorization endpoint for Aegis is https://auth.aegis.example.com/oauth/authorize [1].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.795,
+        "citation_coverage": 1.0,
+        "completeness": 1.0,
+        "composite": 0.932
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What is the OAuth2 authorization endpoint for Aegis",
+          "text": "The authorization endpoint is https://auth.aegis.example.com/oauth/authorize and the token endpoint is https://auth.aegis.example.com/oauth/token.",
+          "fused_score": 0.01639344262295082,
+          "rerank_score": 5.0,
+          "dense_score": 0.8546940558234746
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What are the two authentication methods supported by the Aegis API",
+          "text": "The Aegis API supports two authentication methods: OAuth2 and static API keys. Choose OAuth2 for user-facing applications and API keys for server-to-server integrations.",
+          "fused_score": 0.016129032258064516,
+          "rerank_score": 5.0,
+          "dense_score": 0.7855335645951831
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "How do you authenticate with an API key in the Aegis API",
+          "text": "To authenticate with an API key, include it in the Authorization header: Authorization: Bearer aegis_live_xxxxxxxxxxxx",
+          "fused_score": 0.01579861111111111,
+          "rerank_score": 5.0,
+          "dense_score": 0.7451890140577486
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "Aegis API \u2014 Authentication",
+          "text": "Reference documentation for the Aegis platform API. Every statement below is normative for the current API version.",
+          "fused_score": 0.01569940476190476,
+          "rerank_score": 5.0,
+          "dense_score": 0.6546358383606733
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/deployment.md",
+          "section_heading": "What are the supported deployment environments for Aegis",
+          "text": "Aegis can be deployed on Kubernetes (recommended for production), Docker Compose (recommended for staging/local), or as a managed service via Aegis Cloud.",
+          "fused_score": 0.015063145809414466,
+          "rerank_score": 5.0,
+          "dense_score": 0.6353924606925643
+        }
+      ],
+      "latency_ms": 3040.088707988616,
+      "correctness": 0.8,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 1.0,
+      "retrieved_flags": [
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "relevant_rank": 1
+    },
+    {
+      "question": "What is the OAuth2 token endpoint for Aegis?",
+      "expected_answer": "The token endpoint is https://auth.aegis.example.com/oauth/token.",
+      "actual_answer": "The OAuth2 token endpoint for Aegis is https://auth.aegis.example.com/oauth/token [1].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.754,
+        "citation_coverage": 1.0,
+        "completeness": 1.0,
+        "composite": 0.918
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What is the OAuth2 authorization endpoint for Aegis",
+          "text": "The authorization endpoint is https://auth.aegis.example.com/oauth/authorize and the token endpoint is https://auth.aegis.example.com/oauth/token.",
+          "fused_score": 0.01639344262295082,
+          "rerank_score": 5.0,
+          "dense_score": 0.8394637067166242
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What are the two authentication methods supported by the Aegis API",
+          "text": "The Aegis API supports two authentication methods: OAuth2 and static API keys. Choose OAuth2 for user-facing applications and API keys for server-to-server integrations.",
+          "fused_score": 0.016129032258064516,
+          "rerank_score": 5.0,
+          "dense_score": 0.7747207597861879
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What does the AUTH_EXPIRED_TOKEN error code mean",
+          "text": "AUTH_EXPIRED_TOKEN (401): the OAuth2 access token has expired. Use the refresh token to obtain a new one.",
+          "fused_score": 0.01569940476190476,
+          "rerank_score": 5.0,
+          "dense_score": 0.6474861348652339
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "Aegis API \u2014 Authentication",
+          "text": "Reference documentation for the Aegis platform API. Every statement below is normative for the current API version.",
+          "fused_score": 0.015456730769230768,
+          "rerank_score": 5.0,
+          "dense_score": 0.6410263521194527
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/deployment.md",
+          "section_heading": "What are the supported deployment environments for Aegis",
+          "text": "Aegis can be deployed on Kubernetes (recommended for production), Docker Compose (recommended for staging/local), or as a managed service via Aegis Cloud.",
+          "fused_score": 0.01490950226244344,
+          "rerank_score": 5.0,
+          "dense_score": 0.6158099565026921
+        }
+      ],
+      "latency_ms": 3842.5814580114093,
+      "correctness": 0.8,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 1.0,
+      "retrieved_flags": [
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "relevant_rank": 1
+    },
+    {
+      "question": "How long do OAuth2 access tokens last before expiring?",
+      "expected_answer": "Access tokens expire after 1 hour.",
+      "actual_answer": "OAuth2 access tokens expire after 1 hour [2].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.736,
+        "citation_coverage": 1.0,
+        "completeness": 0.8,
+        "composite": 0.845
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What does the AUTH_EXPIRED_TOKEN error code mean",
+          "text": "AUTH_EXPIRED_TOKEN (401): the OAuth2 access token has expired. Use the refresh token to obtain a new one.",
+          "fused_score": 0.016314119513484927,
+          "rerank_score": 5.0,
+          "dense_score": 0.7622327533294755
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "How long do OAuth2 access tokens last before expiring",
+          "text": "Access tokens expire after 1 hour. Use the returned refresh_token to obtain a new access token without requiring the user to log in again.",
+          "fused_score": 0.016208355367530406,
+          "rerank_score": 5.0,
+          "dense_score": 0.7576137381294763
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What is the rate limit for authenticated requests per API key",
+          "text": "Authenticated requests are limited to 1000 requests per minute per API key, and 100 requests per minute per OAuth2 access token.",
+          "fused_score": 0.015873015873015872,
+          "rerank_score": 5.0,
+          "dense_score": 0.6889807882821553
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "Do API keys expire automatically",
+          "text": "Keys do not expire automatically, but can be revoked at any time from the dashboard.",
+          "fused_score": 0.015135261194029848,
+          "rerank_score": 5.0,
+          "dense_score": 0.6017698930134526
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What are the two authentication methods supported by the Aegis API",
+          "text": "The Aegis API supports two authentication methods: OAuth2 and static API keys. Choose OAuth2 for user-facing applications and API keys for server-to-server integrations.",
+          "fused_score": 0.014690382081686429,
+          "rerank_score": 5.0,
+          "dense_score": 0.5896001949472764
+        }
+      ],
+      "latency_ms": 1435.0717919878662,
+      "correctness": 1.0,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 1.0,
+      "retrieved_flags": [
+        false,
+        true,
+        false,
+        false,
+        false
+      ],
+      "relevant_rank": 2
+    },
+    {
+      "question": "How do you get a new OAuth2 access token after it expires?",
+      "expected_answer": "Use the returned refresh_token to obtain a new access token without requiring the user to log in again.",
+      "actual_answer": "To get a new OAuth2 access token after it expires, you can use the refresh token to obtain a new one. This is because access tokens expire after 1 hour [2].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.746,
+        "citation_coverage": 0.5,
+        "completeness": 0.8,
+        "composite": 0.682
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What does the AUTH_EXPIRED_TOKEN error code mean",
+          "text": "AUTH_EXPIRED_TOKEN (401): the OAuth2 access token has expired. Use the refresh token to obtain a new one.",
+          "fused_score": 0.01639344262295082,
+          "rerank_score": 5.0,
+          "dense_score": 0.8182901521902095
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "How long do OAuth2 access tokens last before expiring",
+          "text": "Access tokens expire after 1 hour. Use the returned refresh_token to obtain a new access token without requiring the user to log in again.",
+          "fused_score": 0.016129032258064516,
+          "rerank_score": 5.0,
+          "dense_score": 0.7763996485008609
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What is the rate limit for authenticated requests per API key",
+          "text": "Authenticated requests are limited to 1000 requests per minute per API key, and 100 requests per minute per OAuth2 access token.",
+          "fused_score": 0.015456730769230768,
+          "rerank_score": 5.0,
+          "dense_score": 0.6270609993873171
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What is the OAuth2 authorization endpoint for Aegis",
+          "text": "The authorization endpoint is https://auth.aegis.example.com/oauth/authorize and the token endpoint is https://auth.aegis.example.com/oauth/token.",
+          "fused_score": 0.014953886693017126,
+          "rerank_score": 5.0,
+          "dense_score": 0.6269127832751045
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What happens when you make a request without a valid API key",
+          "text": "Requests without a valid key return 401 Unauthorized.",
+          "fused_score": 0.014833603896103895,
+          "rerank_score": 5.0,
+          "dense_score": 0.642245251434491
+        }
+      ],
+      "latency_ms": 3292.9559590120334,
+      "correctness": 0.8,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 0.0,
+      "retrieved_flags": [
+        false,
+        true,
+        false,
+        false,
+        false
+      ],
+      "relevant_rank": 2
+    },
+    {
+      "question": "What is the rate limit for authenticated requests per API key?",
+      "expected_answer": "1000 requests per minute per API key.",
+      "actual_answer": "Authenticated requests are limited to 1000 requests per minute per API key [1].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.763,
+        "citation_coverage": 1.0,
+        "completeness": 0.8,
+        "composite": 0.854
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What is the rate limit for authenticated requests per API key",
+          "text": "Authenticated requests are limited to 1000 requests per minute per API key, and 100 requests per minute per OAuth2 access token.",
+          "fused_score": 0.01639344262295082,
+          "rerank_score": 5.0,
+          "dense_score": 0.8212841634993655
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What happens when you make a request without a valid API key",
+          "text": "Requests without a valid key return 401 Unauthorized.",
+          "fused_score": 0.01597782258064516,
+          "rerank_score": 5.0,
+          "dense_score": 0.753080801853251
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What does the AUTH_INVALID_KEY error code mean",
+          "text": "AUTH_INVALID_KEY (401): the provided API key does not exist or has been revoked.",
+          "fused_score": 0.015522875816993463,
+          "rerank_score": 5.0,
+          "dense_score": 0.7158825046203838
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What happens when a read-only API key attempts a write operation",
+          "text": "Requests with a valid but read-only key attempting a write operation return 403 Forbidden.",
+          "fused_score": 0.015415111940298506,
+          "rerank_score": 5.0,
+          "dense_score": 0.7029900148714836
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/rate_limits.md",
+          "section_heading": "What happens when you exceed the rate limit",
+          "text": "Exceeding the limit returns 429 Too Many Requests with a Retry-After header indicating how many seconds to wait.",
+          "fused_score": 0.015132827324478178,
+          "rerank_score": 5.0,
+          "dense_score": 0.6694911124742355
+        }
+      ],
+      "latency_ms": 1844.0422500134446,
+      "correctness": 1.0,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 1.0,
+      "retrieved_flags": [
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "relevant_rank": 1
+    },
+    {
+      "question": "What is the rate limit for OAuth2 access tokens?",
+      "expected_answer": "100 requests per minute per OAuth2 access token.",
+      "actual_answer": "The rate limit for OAuth2 access tokens is 100 requests per minute [1].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.702,
+        "citation_coverage": 0.0,
+        "completeness": 0.6,
+        "composite": 0.434
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What is the rate limit for authenticated requests per API key",
+          "text": "Authenticated requests are limited to 1000 requests per minute per API key, and 100 requests per minute per OAuth2 access token.",
+          "fused_score": 0.016162909836065574,
+          "rerank_score": 5.0,
+          "dense_score": 0.7845764475138685
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What does the AUTH_EXPIRED_TOKEN error code mean",
+          "text": "AUTH_EXPIRED_TOKEN (401): the OAuth2 access token has expired. Use the refresh token to obtain a new one.",
+          "fused_score": 0.015776209677419353,
+          "rerank_score": 5.0,
+          "dense_score": 0.6631679421478718
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "How long do OAuth2 access tokens last before expiring",
+          "text": "Access tokens expire after 1 hour. Use the returned refresh_token to obtain a new access token without requiring the user to log in again.",
+          "fused_score": 0.015365793980915095,
+          "rerank_score": 5.0,
+          "dense_score": 0.6385053965419539
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/rate_limits.md",
+          "section_heading": "What happens when you exceed the rate limit",
+          "text": "Exceeding the limit returns 429 Too Many Requests with a Retry-After header indicating how many seconds to wait.",
+          "fused_score": 0.015246842709529276,
+          "rerank_score": 5.0,
+          "dense_score": 0.6590626735659263
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What is the OAuth2 authorization endpoint for Aegis",
+          "text": "The authorization endpoint is https://auth.aegis.example.com/oauth/authorize and the token endpoint is https://auth.aegis.example.com/oauth/token.",
+          "fused_score": 0.01477272727272727,
+          "rerank_score": 5.0,
+          "dense_score": 0.6419535131743717
+        }
+      ],
+      "latency_ms": 1234.6053330111317,
+      "correctness": 0.8,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 0.5,
+      "retrieved_flags": [
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "relevant_rank": 1
+    },
+    {
+      "question": "What headers indicate rate limit status?",
+      "expected_answer": "X-RateLimit-Limit and X-RateLimit-Remaining response headers.",
+      "actual_answer": "The current limit and remaining quota are returned in the X-RateLimit-Limit and X-RateLimit-Remaining response headers [1].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.75,
+        "citation_coverage": 1.0,
+        "completeness": 0.8,
+        "composite": 0.85
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/rate_limits.md",
+          "section_heading": "What headers indicate rate limit status",
+          "text": "The current limit and remaining quota are returned in the X-RateLimit-Limit and X-RateLimit-Remaining response headers.",
+          "fused_score": 0.016029143897996357,
+          "rerank_score": 5.0,
+          "dense_score": 0.7173306617998804
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/rate_limits.md",
+          "section_heading": "What happens when you exceed the rate limit",
+          "text": "Exceeding the limit returns 429 Too Many Requests with a Retry-After header indicating how many seconds to wait.",
+          "fused_score": 0.015776209677419353,
+          "rerank_score": 5.0,
+          "dense_score": 0.7082286917940284
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/README.md",
+          "section_heading": "Demo corpus",
+          "text": "Nine short documents on retrieval-augmented generation and adjacent ML topics.\nThey exist so a fresh clone can run the full pipeline end to end with no setup:\n\n```bash\npython cli.py ingest ./sample_docs\npython cli.py ask \"What does the RAG pipeline combine?\"\n```\n\nRuntime uploads **never** belong in this repository. The API writes user files\nto `sample_docs/<user_id>/uploads/`, which is gitignored \u2014 personal documents\nmust not be committed (this repository's history was scrubbed once already for\nexactly that reason, see `docs/TOPTIER_ROADMAP.md`, Phase 0).",
+          "fused_score": 0.012539682539682538,
+          "rerank_score": 5.0,
+          "dense_score": 0.49855319929104486
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/rate_limits.md",
+          "section_heading": "What does the RATE_LIMITED error code mean and how should you handle it",
+          "text": "RATE_LIMITED (429): request quota exceeded. See the Retry-After header. RATE_LIMITED and INTERNAL_ERROR are safe to retry with exponential backoff.",
+          "fused_score": 0.011475409836065573,
+          "rerank_score": 4.590163934426229,
+          "dense_score": 0.7822836460966142
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/rate_limits.md",
+          "section_heading": "What HTTP status code does RATE_LIMITED return",
+          "text": "RATE_LIMITED (429): request quota exceeded.",
+          "fused_score": 0.01129032258064516,
+          "rerank_score": 4.516129032258064,
+          "dense_score": 0.7511748387165149
+        }
+      ],
+      "latency_ms": 1944.7599580162205,
+      "correctness": 1.0,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 1.0,
+      "retrieved_flags": [
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "relevant_rank": 1
+    },
+    {
+      "question": "What happens when you exceed the rate limit?",
+      "expected_answer": "Exceeding the limit returns 429 Too Many Requests with a Retry-After header indicating how many seconds to wait.",
+      "actual_answer": "When you exceed the rate limit, it returns a 429 Too Many Requests response with a Retry-After header indicating how many seconds to wait [1].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.688,
+        "citation_coverage": 1.0,
+        "completeness": 0.8,
+        "composite": 0.829
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/rate_limits.md",
+          "section_heading": "What happens when you exceed the rate limit",
+          "text": "Exceeding the limit returns 429 Too Many Requests with a Retry-After header indicating how many seconds to wait.",
+          "fused_score": 0.015776209677419353,
+          "rerank_score": 5.0,
+          "dense_score": 0.6564448648387682
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/rate_limits.md",
+          "section_heading": "What headers indicate rate limit status",
+          "text": "The current limit and remaining quota are returned in the X-RateLimit-Limit and X-RateLimit-Remaining response headers.",
+          "fused_score": 0.015687263556116014,
+          "rerank_score": 5.0,
+          "dense_score": 0.608400184114834
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/rate_limits.md",
+          "section_heading": "What does the RATE_LIMITED error code mean and how should you handle it",
+          "text": "RATE_LIMITED (429): request quota exceeded. See the Retry-After header. RATE_LIMITED and INTERNAL_ERROR are safe to retry with exponential backoff.",
+          "fused_score": 0.014923685698134539,
+          "rerank_score": 5.0,
+          "dense_score": 0.7392174046047035
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/error_codes.md",
+          "section_heading": "Which error codes are safe to retry with exponential backoff",
+          "text": "RATE_LIMITED and INTERNAL_ERROR are safe to retry with exponential backoff. VALIDATION_ERROR, PERMISSION_DENIED, and CONFLICT will not succeed on retry without changing the request itself.",
+          "fused_score": 0.014444444444444444,
+          "rerank_score": 5.0,
+          "dense_score": 0.6684449875591065
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/error_codes.md",
+          "section_heading": "Which error codes will NOT succeed on retry without changing the request",
+          "text": "VALIDATION_ERROR, PERMISSION_DENIED, and CONFLICT will not succeed on retry without changing the request itself.",
+          "fused_score": 0.014403528960490984,
+          "rerank_score": 5.0,
+          "dense_score": 0.5488533388580441
+        }
+      ],
+      "latency_ms": 3955.340000014985,
+      "correctness": 1.0,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 1.0,
+      "retrieved_flags": [
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "relevant_rank": 1
+    },
+    {
+      "question": "What does the AUTH_INVALID_KEY error code mean?",
+      "expected_answer": "The provided API key does not exist or has been revoked (401).",
+      "actual_answer": "The AUTH_INVALID_KEY error code means the provided API key does not exist or has been revoked [1].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.735,
+        "citation_coverage": 1.0,
+        "completeness": 1.0,
+        "composite": 0.912
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What does the AUTH_INVALID_KEY error code mean",
+          "text": "AUTH_INVALID_KEY (401): the provided API key does not exist or has been revoked.",
+          "fused_score": 0.01639344262295082,
+          "rerank_score": 5.0,
+          "dense_score": 0.8578362054750073
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What does the PERMISSION_DENIED error code mean",
+          "text": "PERMISSION_DENIED (403): the authenticated principal does not have the required scope for this operation.",
+          "fused_score": 0.014983637213651237,
+          "rerank_score": 5.0,
+          "dense_score": 0.6563025664401171
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/error_codes.md",
+          "section_heading": "Which error codes will NOT succeed on retry without changing the request",
+          "text": "VALIDATION_ERROR, PERMISSION_DENIED, and CONFLICT will not succeed on retry without changing the request itself.",
+          "fused_score": 0.014566699123661148,
+          "rerank_score": 5.0,
+          "dense_score": 0.6704119448965083
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "How do you authenticate with an API key in the Aegis API",
+          "text": "To authenticate with an API key, include it in the Authorization header: Authorization: Bearer aegis_live_xxxxxxxxxxxx",
+          "fused_score": 0.014551957831325301,
+          "rerank_score": 5.0,
+          "dense_score": 0.6755230035275959
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What does the AUTH_EXPIRED_TOKEN error code mean",
+          "text": "AUTH_EXPIRED_TOKEN (401): the OAuth2 access token has expired. Use the refresh token to obtain a new one.",
+          "fused_score": 0.01446078431372549,
+          "rerank_score": 5.0,
+          "dense_score": 0.6580823053247162
+        }
+      ],
+      "latency_ms": 3949.2608339933213,
+      "correctness": 1.0,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 1.0,
+      "retrieved_flags": [
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "relevant_rank": 1
+    },
+    {
+      "question": "What does the AUTH_EXPIRED_TOKEN error code mean?",
+      "expected_answer": "The OAuth2 access token has expired. Use the refresh token to obtain a new one (401).",
+      "actual_answer": "The AUTH_EXPIRED_TOKEN error code means that the OAuth2 access token has expired [1].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.763,
+        "citation_coverage": 1.0,
+        "completeness": 0.8,
+        "composite": 0.854
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What does the AUTH_EXPIRED_TOKEN error code mean",
+          "text": "AUTH_EXPIRED_TOKEN (401): the OAuth2 access token has expired. Use the refresh token to obtain a new one.",
+          "fused_score": 0.01639344262295082,
+          "rerank_score": 5.0,
+          "dense_score": 0.8182687598426367
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What does the AUTH_INVALID_KEY error code mean",
+          "text": "AUTH_INVALID_KEY (401): the provided API key does not exist or has been revoked.",
+          "fused_score": 0.01597782258064516,
+          "rerank_score": 5.0,
+          "dense_score": 0.7641204300544414
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "How long do OAuth2 access tokens last before expiring",
+          "text": "Access tokens expire after 1 hour. Use the returned refresh_token to obtain a new access token without requiring the user to log in again.",
+          "fused_score": 0.01511111111111111,
+          "rerank_score": 5.0,
+          "dense_score": 0.7073248057868746
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What does the PERMISSION_DENIED error code mean",
+          "text": "PERMISSION_DENIED (403): the authenticated principal does not have the required scope for this operation.",
+          "fused_score": 0.014983637213651237,
+          "rerank_score": 5.0,
+          "dense_score": 0.6325962279128743
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/error_codes.md",
+          "section_heading": "Which error codes will NOT succeed on retry without changing the request",
+          "text": "VALIDATION_ERROR, PERMISSION_DENIED, and CONFLICT will not succeed on retry without changing the request itself.",
+          "fused_score": 0.014403528960490984,
+          "rerank_score": 5.0,
+          "dense_score": 0.6412950700065857
+        }
+      ],
+      "latency_ms": 1802.699833002407,
+      "correctness": 1.0,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 1.0,
+      "retrieved_flags": [
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "relevant_rank": 1
+    },
+    {
+      "question": "What does the PERMISSION_DENIED error code mean?",
+      "expected_answer": "The authenticated principal does not have the required scope for this operation (403).",
+      "actual_answer": "The PERMISSION_DENIED error code means that the authenticated principal does not have the required scope for this operation [1].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.726,
+        "citation_coverage": 1.0,
+        "completeness": 1.0,
+        "composite": 0.909
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What does the PERMISSION_DENIED error code mean",
+          "text": "PERMISSION_DENIED (403): the authenticated principal does not have the required scope for this operation.",
+          "fused_score": 0.01639344262295082,
+          "rerank_score": 5.0,
+          "dense_score": 0.7670517845463097
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/error_codes.md",
+          "section_heading": "Which error codes will NOT succeed on retry without changing the request",
+          "text": "VALIDATION_ERROR, PERMISSION_DENIED, and CONFLICT will not succeed on retry without changing the request itself.",
+          "fused_score": 0.016129032258064516,
+          "rerank_score": 5.0,
+          "dense_score": 0.7484470473730446
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What does the AUTH_INVALID_KEY error code mean",
+          "text": "AUTH_INVALID_KEY (401): the provided API key does not exist or has been revoked.",
+          "fused_score": 0.015293560606060606,
+          "rerank_score": 5.0,
+          "dense_score": 0.6615927222583113
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/error_codes.md",
+          "section_heading": "Which error codes are safe to retry with exponential backoff",
+          "text": "RATE_LIMITED and INTERNAL_ERROR are safe to retry with exponential backoff. VALIDATION_ERROR, PERMISSION_DENIED, and CONFLICT will not succeed on retry without changing the request itself.",
+          "fused_score": 0.01462253947653039,
+          "rerank_score": 5.0,
+          "dense_score": 0.6406310068673189
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What does the RESOURCE_NOT_FOUND error code mean",
+          "text": "RESOURCE_NOT_FOUND (404): the requested resource ID does not exist in this workspace.",
+          "fused_score": 0.014484126984126981,
+          "rerank_score": 5.0,
+          "dense_score": 0.6062186831406524
+        }
+      ],
+      "latency_ms": 1350.8903339970857,
+      "correctness": 1.0,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 1.0,
+      "retrieved_flags": [
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "relevant_rank": 1
+    },
+    {
+      "question": "What does the RATE_LIMITED error code mean and how should you handle it?",
+      "expected_answer": "Request quota exceeded. Safe to retry with exponential backoff using the Retry-After header (429).",
+      "actual_answer": "The RATE_LIMITED error code means that the request quota has been exceeded [1]. It returns an HTTP status code of 429 [2]. When you exceed the rate limit, it returns 429 Too Many Requests with a Retry-After header indicating how many seconds to wait [3]. \n\nYou should handle it by retrying the request with exponential backoff [1][4].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.787,
+        "citation_coverage": 1.0,
+        "completeness": 0.8,
+        "composite": 0.862
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/rate_limits.md",
+          "section_heading": "What does the RATE_LIMITED error code mean and how should you handle it",
+          "text": "RATE_LIMITED (429): request quota exceeded. See the Retry-After header. RATE_LIMITED and INTERNAL_ERROR are safe to retry with exponential backoff.",
+          "fused_score": 0.01639344262295082,
+          "rerank_score": 5.0,
+          "dense_score": 0.8232227118254807
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/rate_limits.md",
+          "section_heading": "What HTTP status code does RATE_LIMITED return",
+          "text": "RATE_LIMITED (429): request quota exceeded.",
+          "fused_score": 0.01597782258064516,
+          "rerank_score": 5.0,
+          "dense_score": 0.7914148036729545
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/rate_limits.md",
+          "section_heading": "What happens when you exceed the rate limit",
+          "text": "Exceeding the limit returns 429 Too Many Requests with a Retry-After header indicating how many seconds to wait.",
+          "fused_score": 0.015607940446650124,
+          "rerank_score": 5.0,
+          "dense_score": 0.6830583381479747
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/error_codes.md",
+          "section_heading": "Which error codes are safe to retry with exponential backoff",
+          "text": "RATE_LIMITED and INTERNAL_ERROR are safe to retry with exponential backoff. VALIDATION_ERROR, PERMISSION_DENIED, and CONFLICT will not succeed on retry without changing the request itself.",
+          "fused_score": 0.01545893719806763,
+          "rerank_score": 5.0,
+          "dense_score": 0.7455943661298712
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/error_codes.md",
+          "section_heading": "What does the INTERNAL_ERROR error code mean",
+          "text": "INTERNAL_ERROR (500): an unexpected server error. These are logged with a request_id -- include it when contacting support.",
+          "fused_score": 0.01477272727272727,
+          "rerank_score": 5.0,
+          "dense_score": 0.6800473310781825
+        }
+      ],
+      "latency_ms": 7238.6770409939345,
+      "correctness": 1.0,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 1.0,
+      "retrieved_flags": [
+        true,
+        false,
+        false,
+        true,
+        false
+      ],
+      "relevant_rank": 1
+    },
+    {
+      "question": "What does the VALIDATION_ERROR error code mean?",
+      "expected_answer": "The request body failed schema validation. The details field lists each failing field and why (422).",
+      "actual_answer": "The VALIDATION_ERROR error code means the request body failed schema validation, and the details field lists each failing field and why [2].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.725,
+        "citation_coverage": 1.0,
+        "completeness": 0.8,
+        "composite": 0.842
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/error_codes.md",
+          "section_heading": "What HTTP status code does VALIDATION_ERROR return",
+          "text": "VALIDATION_ERROR (422): the request body failed schema validation.",
+          "fused_score": 0.01639344262295082,
+          "rerank_score": 5.0,
+          "dense_score": 0.7451921707832376
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/error_codes.md",
+          "section_heading": "What does the VALIDATION_ERROR error code mean",
+          "text": "VALIDATION_ERROR (422): the request body failed schema validation. The details field lists each failing field and why.",
+          "fused_score": 0.015726495726495725,
+          "rerank_score": 5.0,
+          "dense_score": 0.73183644644999
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/error_codes.md",
+          "section_heading": "Which error codes will NOT succeed on retry without changing the request",
+          "text": "VALIDATION_ERROR, PERMISSION_DENIED, and CONFLICT will not succeed on retry without changing the request itself.",
+          "fused_score": 0.015314685314685314,
+          "rerank_score": 5.0,
+          "dense_score": 0.6968982436552761
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What does the AUTH_INVALID_KEY error code mean",
+          "text": "AUTH_INVALID_KEY (401): the provided API key does not exist or has been revoked.",
+          "fused_score": 0.015293560606060606,
+          "rerank_score": 5.0,
+          "dense_score": 0.6352466620019375
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/error_codes.md",
+          "section_heading": "Which error codes are safe to retry with exponential backoff",
+          "text": "RATE_LIMITED and INTERNAL_ERROR are safe to retry with exponential backoff. VALIDATION_ERROR, PERMISSION_DENIED, and CONFLICT will not succeed on retry without changing the request itself.",
+          "fused_score": 0.014579831932773108,
+          "rerank_score": 5.0,
+          "dense_score": 0.626249591763042
+        }
+      ],
+      "latency_ms": 7432.153750007274,
+      "correctness": 1.0,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 1.0,
+      "retrieved_flags": [
+        false,
+        true,
+        false,
+        false,
+        false
+      ],
+      "relevant_rank": 2
+    },
+    {
+      "question": "What does the RESOURCE_NOT_FOUND error code mean?",
+      "expected_answer": "The requested resource ID does not exist in this workspace (404).",
+      "actual_answer": "The RESOURCE_NOT_FOUND error code means the requested resource ID does not exist in this workspace [1].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.7,
+        "citation_coverage": 1.0,
+        "completeness": 0.9,
+        "composite": 0.867
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What does the RESOURCE_NOT_FOUND error code mean",
+          "text": "RESOURCE_NOT_FOUND (404): the requested resource ID does not exist in this workspace.",
+          "fused_score": 0.01639344262295082,
+          "rerank_score": 5.0,
+          "dense_score": 0.783677711708381
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What does the AUTH_INVALID_KEY error code mean",
+          "text": "AUTH_INVALID_KEY (401): the provided API key does not exist or has been revoked.",
+          "fused_score": 0.01520966595593461,
+          "rerank_score": 5.0,
+          "dense_score": 0.6320335727184847
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/error_codes.md",
+          "section_heading": "Which error codes will NOT succeed on retry without changing the request",
+          "text": "VALIDATION_ERROR, PERMISSION_DENIED, and CONFLICT will not succeed on retry without changing the request itself.",
+          "fused_score": 0.014734968354430378,
+          "rerank_score": 5.0,
+          "dense_score": 0.6683548305573235
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/error_codes.md",
+          "section_heading": "What HTTP status code does VALIDATION_ERROR return",
+          "text": "VALIDATION_ERROR (422): the request body failed schema validation.",
+          "fused_score": 0.01466011466011466,
+          "rerank_score": 5.0,
+          "dense_score": 0.6326030357601066
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/general.md",
+          "section_heading": "What does a 503 from /readyz indicate",
+          "text": "A 503 from /readyz indicates the database connection pool is exhausted or unreachable.",
+          "fused_score": 0.014615384615384615,
+          "rerank_score": 5.0,
+          "dense_score": 0.6467898982247668
+        }
+      ],
+      "latency_ms": 6867.353167006513,
+      "correctness": 1.0,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 0.0,
+      "retrieved_flags": [
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "relevant_rank": 1
+    },
+    {
+      "question": "What does the CONFLICT error code mean?",
+      "expected_answer": "The operation would violate a uniqueness constraint, e.g. creating a workspace with a name that's already taken (409).",
+      "actual_answer": "The CONFLICT error code means the operation would violate a uniqueness constraint, e.g. creating a workspace with a name that's already taken [3][2].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.706,
+        "citation_coverage": 1.0,
+        "completeness": 0.8,
+        "composite": 0.835
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/error_codes.md",
+          "section_heading": "Which error codes will NOT succeed on retry without changing the request",
+          "text": "VALIDATION_ERROR, PERMISSION_DENIED, and CONFLICT will not succeed on retry without changing the request itself.",
+          "fused_score": 0.01609079445145019,
+          "rerank_score": 5.0,
+          "dense_score": 0.7344717528014353
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/error_codes.md",
+          "section_heading": "What HTTP status code does CONFLICT return",
+          "text": "CONFLICT (409): the operation would violate a uniqueness constraint.",
+          "fused_score": 0.016029143897996357,
+          "rerank_score": 5.0,
+          "dense_score": 0.6812357014374646
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What does the CONFLICT error code mean",
+          "text": "CONFLICT (409): the operation would violate a uniqueness constraint, e.g. creating a workspace with a name that's already taken.",
+          "fused_score": 0.015767934520943667,
+          "rerank_score": 5.0,
+          "dense_score": 0.7033278853261249
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What does the RESOURCE_NOT_FOUND error code mean",
+          "text": "RESOURCE_NOT_FOUND (404): the requested resource ID does not exist in this workspace.",
+          "fused_score": 0.015056022408963584,
+          "rerank_score": 5.0,
+          "dense_score": 0.6049615983977958
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/error_codes.md",
+          "section_heading": "Which error codes are safe to retry with exponential backoff",
+          "text": "RATE_LIMITED and INTERNAL_ERROR are safe to retry with exponential backoff. VALIDATION_ERROR, PERMISSION_DENIED, and CONFLICT will not succeed on retry without changing the request itself.",
+          "fused_score": 0.01489177489177489,
+          "rerank_score": 5.0,
+          "dense_score": 0.6277446572710417
+        }
+      ],
+      "latency_ms": 2152.6457500003744,
+      "correctness": 1.0,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 1.0,
+      "retrieved_flags": [
+        false,
+        false,
+        true,
+        false,
+        false
+      ],
+      "relevant_rank": 3
+    },
+    {
+      "question": "What does the INTERNAL_ERROR error code mean?",
+      "expected_answer": "An unexpected server error. These are logged with a request_id -- include it when contacting support (500).",
+      "actual_answer": "The INTERNAL_ERROR error code means an unexpected server error [3]. These are logged with a request_id, and you should include it when contacting support [3].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.757,
+        "citation_coverage": 1.0,
+        "completeness": 0.8,
+        "composite": 0.852
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/error_codes.md",
+          "section_heading": "What HTTP status code does INTERNAL_ERROR return",
+          "text": "INTERNAL_ERROR (500): an unexpected server error.",
+          "fused_score": 0.016162909836065574,
+          "rerank_score": 5.0,
+          "dense_score": 0.8107872952225393
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/rate_limits.md",
+          "section_heading": "What does the RATE_LIMITED error code mean and how should you handle it",
+          "text": "RATE_LIMITED (429): request quota exceeded. See the Retry-After header. RATE_LIMITED and INTERNAL_ERROR are safe to retry with exponential backoff.",
+          "fused_score": 0.015656565656565653,
+          "rerank_score": 5.0,
+          "dense_score": 0.6768642347697341
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/error_codes.md",
+          "section_heading": "What does the INTERNAL_ERROR error code mean",
+          "text": "INTERNAL_ERROR (500): an unexpected server error. These are logged with a request_id -- include it when contacting support.",
+          "fused_score": 0.015576036866359446,
+          "rerank_score": 5.0,
+          "dense_score": 0.7839405104419923
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/error_codes.md",
+          "section_heading": "Which error codes are safe to retry with exponential backoff",
+          "text": "RATE_LIMITED and INTERNAL_ERROR are safe to retry with exponential backoff. VALIDATION_ERROR, PERMISSION_DENIED, and CONFLICT will not succeed on retry without changing the request itself.",
+          "fused_score": 0.01528532608695652,
+          "rerank_score": 5.0,
+          "dense_score": 0.6507644296650698
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What does the AUTH_INVALID_KEY error code mean",
+          "text": "AUTH_INVALID_KEY (401): the provided API key does not exist or has been revoked.",
+          "fused_score": 0.014906832298136646,
+          "rerank_score": 5.0,
+          "dense_score": 0.6106119421490438
+        }
+      ],
+      "latency_ms": 5558.169416995952,
+      "correctness": 1.0,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 0.8,
+      "retrieved_flags": [
+        false,
+        false,
+        true,
+        false,
+        false
+      ],
+      "relevant_rank": 3
+    },
+    {
+      "question": "Which error codes are safe to retry with exponential backoff?",
+      "expected_answer": "RATE_LIMITED and INTERNAL_ERROR are safe to retry with exponential backoff.",
+      "actual_answer": "RATE_LIMITED and INTERNAL_ERROR are safe to retry with exponential backoff [1][2].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.752,
+        "citation_coverage": 1.0,
+        "completeness": 0.8,
+        "composite": 0.851
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/error_codes.md",
+          "section_heading": "Which error codes are safe to retry with exponential backoff",
+          "text": "RATE_LIMITED and INTERNAL_ERROR are safe to retry with exponential backoff. VALIDATION_ERROR, PERMISSION_DENIED, and CONFLICT will not succeed on retry without changing the request itself.",
+          "fused_score": 0.016314119513484927,
+          "rerank_score": 5.0,
+          "dense_score": 0.8358241951384675
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/rate_limits.md",
+          "section_heading": "What does the RATE_LIMITED error code mean and how should you handle it",
+          "text": "RATE_LIMITED (429): request quota exceeded. See the Retry-After header. RATE_LIMITED and INTERNAL_ERROR are safe to retry with exponential backoff.",
+          "fused_score": 0.016208355367530406,
+          "rerank_score": 5.0,
+          "dense_score": 0.7643535811698392
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/error_codes.md",
+          "section_heading": "Which error codes will NOT succeed on retry without changing the request",
+          "text": "VALIDATION_ERROR, PERMISSION_DENIED, and CONFLICT will not succeed on retry without changing the request itself.",
+          "fused_score": 0.015726495726495725,
+          "rerank_score": 5.0,
+          "dense_score": 0.6554656465913149
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/rate_limits.md",
+          "section_heading": "What happens when you exceed the rate limit",
+          "text": "Exceeding the limit returns 429 Too Many Requests with a Retry-After header indicating how many seconds to wait.",
+          "fused_score": 0.01528532608695652,
+          "rerank_score": 5.0,
+          "dense_score": 0.6415745961592683
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What happens when a read-only API key attempts a write operation",
+          "text": "Requests with a valid but read-only key attempting a write operation return 403 Forbidden.",
+          "fused_score": 0.014501815248083904,
+          "rerank_score": 5.0,
+          "dense_score": 0.5876149539309304
+        }
+      ],
+      "latency_ms": 1601.068749994738,
+      "correctness": 1.0,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 0.5,
+      "retrieved_flags": [
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "relevant_rank": 1
+    },
+    {
+      "question": "Which error codes will NOT succeed on retry without changing the request?",
+      "expected_answer": "VALIDATION_ERROR, PERMISSION_DENIED, and CONFLICT will not succeed on retry without changing the request itself.",
+      "actual_answer": "VALIDATION_ERROR, PERMISSION_DENIED, and CONFLICT will not succeed on retry without changing the request [1][2].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.782,
+        "citation_coverage": 1.0,
+        "completeness": 0.8,
+        "composite": 0.861
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/error_codes.md",
+          "section_heading": "Which error codes will NOT succeed on retry without changing the request",
+          "text": "VALIDATION_ERROR, PERMISSION_DENIED, and CONFLICT will not succeed on retry without changing the request itself.",
+          "fused_score": 0.01639344262295082,
+          "rerank_score": 5.0,
+          "dense_score": 0.8414004024599386
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/error_codes.md",
+          "section_heading": "Which error codes are safe to retry with exponential backoff",
+          "text": "RATE_LIMITED and INTERNAL_ERROR are safe to retry with exponential backoff. VALIDATION_ERROR, PERMISSION_DENIED, and CONFLICT will not succeed on retry without changing the request itself.",
+          "fused_score": 0.016129032258064516,
+          "rerank_score": 5.0,
+          "dense_score": 0.7922937869548008
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/rate_limits.md",
+          "section_heading": "What does the RATE_LIMITED error code mean and how should you handle it",
+          "text": "RATE_LIMITED (429): request quota exceeded. See the Retry-After header. RATE_LIMITED and INTERNAL_ERROR are safe to retry with exponential backoff.",
+          "fused_score": 0.015873015873015872,
+          "rerank_score": 5.0,
+          "dense_score": 0.7129001510332796
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What happens when you make a request without a valid API key",
+          "text": "Requests without a valid key return 401 Unauthorized.",
+          "fused_score": 0.015104166666666665,
+          "rerank_score": 5.0,
+          "dense_score": 0.707613025670808
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/error_codes.md",
+          "section_heading": "What HTTP status code does VALIDATION_ERROR return",
+          "text": "VALIDATION_ERROR (422): the request body failed schema validation.",
+          "fused_score": 0.014615384615384613,
+          "rerank_score": 5.0,
+          "dense_score": 0.659329461806001
+        }
+      ],
+      "latency_ms": 2115.4173339891713,
+      "correctness": 1.0,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 0.8,
+      "retrieved_flags": [
+        true,
+        true,
+        false,
+        false,
+        false
+      ],
+      "relevant_rank": 1
+    },
+    {
+      "question": "What are the supported deployment environments for Aegis?",
+      "expected_answer": "Aegis can be deployed on Kubernetes (recommended for production), Docker Compose (recommended for staging/local), or as a managed service via Aegis Cloud.",
+      "actual_answer": "Aegis can be deployed on Kubernetes (recommended for production), Docker Compose (recommended for staging/local), or as a managed service via Aegis Cloud [1].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.747,
+        "citation_coverage": 1.0,
+        "completeness": 0.8,
+        "composite": 0.849
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/deployment.md",
+          "section_heading": "What are the supported deployment environments for Aegis",
+          "text": "Aegis can be deployed on Kubernetes (recommended for production), Docker Compose (recommended for staging/local), or as a managed service via Aegis Cloud.",
+          "fused_score": 0.016314119513484927,
+          "rerank_score": 5.0,
+          "dense_score": 0.7711996831946011
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/general.md",
+          "section_heading": "Does Aegis support zero-downtime upgrades",
+          "text": "Aegis supports rolling upgrades between minor versions without downtime.",
+          "fused_score": 0.015588723051409617,
+          "rerank_score": 5.0,
+          "dense_score": 0.7165375264586582
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/deployment.md",
+          "section_heading": "How do you deploy or update Aegis using Helm",
+          "text": "Run helm upgrade --install aegis aegis/aegis-platform -f values.yaml to deploy or update.",
+          "fused_score": 0.015576036866359446,
+          "rerank_score": 5.0,
+          "dense_score": 0.7536877560958885
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "Aegis API \u2014 Authentication",
+          "text": "Reference documentation for the Aegis platform API. Every statement below is normative for the current API version.",
+          "fused_score": 0.015524093392945852,
+          "rerank_score": 5.0,
+          "dense_score": 0.6656419088113783
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What are the two authentication methods supported by the Aegis API",
+          "text": "The Aegis API supports two authentication methods: OAuth2 and static API keys. Choose OAuth2 for user-facing applications and API keys for server-to-server integrations.",
+          "fused_score": 0.01520966595593461,
+          "rerank_score": 5.0,
+          "dense_score": 0.6635137924291078
+        }
+      ],
+      "latency_ms": 7670.639791002031,
+      "correctness": 1.0,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 0.8,
+      "retrieved_flags": [
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "relevant_rank": 1
+    },
+    {
+      "question": "Where is the Helm chart for Aegis Kubernetes deployment published?",
+      "expected_answer": "The Helm chart is published at charts.aegis.example.com/aegis-platform.",
+      "actual_answer": "The Helm chart for Aegis Kubernetes deployment is published at charts.aegis.example.com/aegis-platform [1].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.753,
+        "citation_coverage": 1.0,
+        "completeness": 0.8,
+        "composite": 0.851
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/deployment.md",
+          "section_heading": "Where is the Helm chart for Aegis Kubernetes deployment published",
+          "text": "The Helm chart is published at charts.aegis.example.com/aegis-platform.",
+          "fused_score": 0.01639344262295082,
+          "rerank_score": 5.0,
+          "dense_score": 0.8449862292806375
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/deployment.md",
+          "section_heading": "How do you deploy or update Aegis using Helm",
+          "text": "Run helm upgrade --install aegis aegis/aegis-platform -f values.yaml to deploy or update.",
+          "fused_score": 0.01597782258064516,
+          "rerank_score": 5.0,
+          "dense_score": 0.7248389941129825
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/deployment.md",
+          "section_heading": "What are the supported deployment environments for Aegis",
+          "text": "Aegis can be deployed on Kubernetes (recommended for production), Docker Compose (recommended for staging/local), or as a managed service via Aegis Cloud.",
+          "fused_score": 0.015949820788530463,
+          "rerank_score": 5.0,
+          "dense_score": 0.6901866646682985
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "Aegis API \u2014 Authentication",
+          "text": "Reference documentation for the Aegis platform API. Every statement below is normative for the current API version.",
+          "fused_score": 0.01569940476190476,
+          "rerank_score": 5.0,
+          "dense_score": 0.6240067819373807
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/deployment.md",
+          "section_heading": "What are the minimum Kubernetes and PostgreSQL versions for Aegis deployment",
+          "text": "Minimum requirements are Kubernetes 1.27+ and a PostgreSQL 14+ instance reachable from the cluster.",
+          "fused_score": 0.014993215739484395,
+          "rerank_score": 5.0,
+          "dense_score": 0.5784970447818217
+        }
+      ],
+      "latency_ms": 7653.749374992913,
+      "correctness": 1.0,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 1.0,
+      "retrieved_flags": [
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "relevant_rank": 1
+    },
+    {
+      "question": "What are the minimum Kubernetes and PostgreSQL versions for Aegis deployment?",
+      "expected_answer": "Kubernetes 1.27+ and PostgreSQL 14+.",
+      "actual_answer": "The minimum Kubernetes version for Aegis deployment is 1.27+ [1]. The minimum PostgreSQL version required is 14+ [1].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.756,
+        "citation_coverage": 1.0,
+        "completeness": 0.8,
+        "composite": 0.852
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/deployment.md",
+          "section_heading": "What are the minimum Kubernetes and PostgreSQL versions for Aegis deployment",
+          "text": "Minimum requirements are Kubernetes 1.27+ and a PostgreSQL 14+ instance reachable from the cluster.",
+          "fused_score": 0.01639344262295082,
+          "rerank_score": 5.0,
+          "dense_score": 0.8118221696565373
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/deployment.md",
+          "section_heading": "What are the supported deployment environments for Aegis",
+          "text": "Aegis can be deployed on Kubernetes (recommended for production), Docker Compose (recommended for staging/local), or as a managed service via Aegis Cloud.",
+          "fused_score": 0.016129032258064516,
+          "rerank_score": 5.0,
+          "dense_score": 0.7475869657492935
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/general.md",
+          "section_heading": "Does Aegis support zero-downtime upgrades",
+          "text": "Aegis supports rolling upgrades between minor versions without downtime.",
+          "fused_score": 0.01553113553113553,
+          "rerank_score": 5.0,
+          "dense_score": 0.6720456122538798
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "Aegis API \u2014 Authentication",
+          "text": "Reference documentation for the Aegis platform API. Every statement below is normative for the current API version.",
+          "fused_score": 0.015293560606060606,
+          "rerank_score": 5.0,
+          "dense_score": 0.6326441368840012
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/deployment.md",
+          "section_heading": "How do you deploy or update Aegis using Helm",
+          "text": "Run helm upgrade --install aegis aegis/aegis-platform -f values.yaml to deploy or update.",
+          "fused_score": 0.015220700152207,
+          "rerank_score": 5.0,
+          "dense_score": 0.7099999595029006
+        }
+      ],
+      "latency_ms": 5345.360167004401,
+      "correctness": 1.0,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 1.0,
+      "retrieved_flags": [
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "relevant_rank": 1
+    },
+    {
+      "question": "What is the default replica count for API server pods in the Helm chart?",
+      "expected_answer": "Default is 3.",
+      "actual_answer": "The default replica count for API server pods in the Helm chart is 3 [1].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.74,
+        "citation_coverage": 1.0,
+        "completeness": 1.0,
+        "composite": 0.913
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/deployment.md",
+          "section_heading": "What is the default replica count for API server pods in the Helm chart",
+          "text": "replicaCount: number of API server pods. Default is 3.",
+          "fused_score": 0.016314119513484927,
+          "rerank_score": 5.0,
+          "dense_score": 0.8672234460618736
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/deployment.md",
+          "section_heading": "Where is the Helm chart for Aegis Kubernetes deployment published",
+          "text": "The Helm chart is published at charts.aegis.example.com/aegis-platform.",
+          "fused_score": 0.016029143897996357,
+          "rerank_score": 5.0,
+          "dense_score": 0.6685371346923549
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What is the default memory request per pod in the Helm chart",
+          "text": "resources.requests.memory: default is 512Mi per pod; increase to 1Gi+ for workspaces indexing more than 1M documents.",
+          "fused_score": 0.015767934520943667,
+          "rerank_score": 5.0,
+          "dense_score": 0.6839627043849824
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/README.md",
+          "section_heading": "Demo corpus",
+          "text": "Nine short documents on retrieval-augmented generation and adjacent ML topics.\nThey exist so a fresh clone can run the full pipeline end to end with no setup:\n\n```bash\npython cli.py ingest ./sample_docs\npython cli.py ask \"What does the RAG pipeline combine?\"\n```\n\nRuntime uploads **never** belong in this repository. The API writes user files\nto `sample_docs/<user_id>/uploads/`, which is gitignored \u2014 personal documents\nmust not be committed (this repository's history was scrubbed once already for\nexactly that reason, see `docs/TOPTIER_ROADMAP.md`, Phase 0).",
+          "fused_score": 0.015054945054945054,
+          "rerank_score": 5.0,
+          "dense_score": 0.5983780083566934
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/deployment.md",
+          "section_heading": "What services are included in the Docker Compose setup",
+          "text": "For local or staging use, docker-compose.yml bundles the API server, worker, and a bundled PostgreSQL instance.",
+          "fused_score": 0.014906832298136646,
+          "rerank_score": 5.0,
+          "dense_score": 0.5592090281019144
+        }
+      ],
+      "latency_ms": 1465.812125010416,
+      "correctness": 1.0,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 0.5,
+      "retrieved_flags": [
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "relevant_rank": 1
+    },
+    {
+      "question": "What is the default memory request per pod in the Helm chart?",
+      "expected_answer": "Default is 512Mi per pod.",
+      "actual_answer": "The default memory request per pod in the Helm chart is 512Mi [1].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.709,
+        "citation_coverage": 1.0,
+        "completeness": 0.8,
+        "composite": 0.836
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What is the default memory request per pod in the Helm chart",
+          "text": "resources.requests.memory: default is 512Mi per pod; increase to 1Gi+ for workspaces indexing more than 1M documents.",
+          "fused_score": 0.016314119513484927,
+          "rerank_score": 5.0,
+          "dense_score": 0.8049073741588089
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/deployment.md",
+          "section_heading": "Where is the Helm chart for Aegis Kubernetes deployment published",
+          "text": "The Helm chart is published at charts.aegis.example.com/aegis-platform.",
+          "fused_score": 0.016029143897996357,
+          "rerank_score": 5.0,
+          "dense_score": 0.6143634226810166
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/deployment.md",
+          "section_heading": "What is the default replica count for API server pods in the Helm chart",
+          "text": "replicaCount: number of API server pods. Default is 3.",
+          "fused_score": 0.01597782258064516,
+          "rerank_score": 5.0,
+          "dense_score": 0.7087443762668268
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/deployment.md",
+          "section_heading": "How do you deploy or update Aegis using Helm",
+          "text": "Run helm upgrade --install aegis aegis/aegis-platform -f values.yaml to deploy or update.",
+          "fused_score": 0.01488486842105263,
+          "rerank_score": 5.0,
+          "dense_score": 0.6091060001761119
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/README.md",
+          "section_heading": "Demo corpus",
+          "text": "Nine short documents on retrieval-augmented generation and adjacent ML topics.\nThey exist so a fresh clone can run the full pipeline end to end with no setup:\n\n```bash\npython cli.py ingest ./sample_docs\npython cli.py ask \"What does the RAG pipeline combine?\"\n```\n\nRuntime uploads **never** belong in this repository. The API writes user files\nto `sample_docs/<user_id>/uploads/`, which is gitignored \u2014 personal documents\nmust not be committed (this repository's history was scrubbed once already for\nexactly that reason, see `docs/TOPTIER_ROADMAP.md`, Phase 0).",
+          "fused_score": 0.014673113306705905,
+          "rerank_score": 5.0,
+          "dense_score": 0.5576025246519136
+        }
+      ],
+      "latency_ms": 6772.720250010025,
+      "correctness": 1.0,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 0.0,
+      "retrieved_flags": [
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "relevant_rank": 1
+    },
+    {
+      "question": "When should you increase the memory request per pod beyond the default?",
+      "expected_answer": "Increase to 1Gi+ for workspaces indexing more than 1M documents.",
+      "actual_answer": "You should increase the memory request per pod beyond the default (512Mi) when indexing more than 1M documents [1].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.706,
+        "citation_coverage": 1.0,
+        "completeness": 0.8,
+        "composite": 0.835
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What is the default memory request per pod in the Helm chart",
+          "text": "resources.requests.memory: default is 512Mi per pod; increase to 1Gi+ for workspaces indexing more than 1M documents.",
+          "fused_score": 0.01639344262295082,
+          "rerank_score": 5.0,
+          "dense_score": 0.8369473848652487
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/deployment.md",
+          "section_heading": "What is the default replica count for API server pods in the Helm chart",
+          "text": "replicaCount: number of API server pods. Default is 3.",
+          "fused_score": 0.015835777126099706,
+          "rerank_score": 5.0,
+          "dense_score": 0.680908026571591
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/rate_limits.md",
+          "section_heading": "What HTTP status code does RATE_LIMITED return",
+          "text": "RATE_LIMITED (429): request quota exceeded.",
+          "fused_score": 0.015396825396825395,
+          "rerank_score": 5.0,
+          "dense_score": 0.6005702355013003
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/rate_limits.md",
+          "section_heading": "What does the RATE_LIMITED error code mean and how should you handle it",
+          "text": "RATE_LIMITED (429): request quota exceeded. See the Retry-After header. RATE_LIMITED and INTERNAL_ERROR are safe to retry with exponential backoff.",
+          "fused_score": 0.015083672546359112,
+          "rerank_score": 5.0,
+          "dense_score": 0.5750216104820893
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/error_codes.md",
+          "section_heading": "Which error codes will NOT succeed on retry without changing the request",
+          "text": "VALIDATION_ERROR, PERMISSION_DENIED, and CONFLICT will not succeed on retry without changing the request itself.",
+          "fused_score": 0.014615384615384613,
+          "rerank_score": 5.0,
+          "dense_score": 0.5537763546198633
+        }
+      ],
+      "latency_ms": 15065.722290979465,
+      "correctness": 0.8,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 0.0,
+      "retrieved_flags": [
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "relevant_rank": 1
+    },
+    {
+      "question": "What is required if ingress is enabled in the Helm chart?",
+      "expected_answer": "ingress.tlsSecretName is required if ingress.enabled is true.",
+      "actual_answer": "If ingress is enabled in the Helm chart, the `ingress.tlsSecretName` is required [1].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.687,
+        "citation_coverage": 1.0,
+        "completeness": 1.0,
+        "composite": 0.896
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/deployment.md",
+          "section_heading": "What is required if ingress is enabled in the Helm chart",
+          "text": "ingress.tlsSecretName: required if ingress.enabled is true.",
+          "fused_score": 0.016314119513484927,
+          "rerank_score": 5.0,
+          "dense_score": 0.7377574193542249
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/deployment.md",
+          "section_heading": "Where is the Helm chart for Aegis Kubernetes deployment published",
+          "text": "The Helm chart is published at charts.aegis.example.com/aegis-platform.",
+          "fused_score": 0.016208355367530406,
+          "rerank_score": 5.0,
+          "dense_score": 0.6864106119371978
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/deployment.md",
+          "section_heading": "How do you deploy or update Aegis using Helm",
+          "text": "Run helm upgrade --install aegis aegis/aegis-platform -f values.yaml to deploy or update.",
+          "fused_score": 0.015726495726495725,
+          "rerank_score": 5.0,
+          "dense_score": 0.6374741994833759
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "How do you authenticate with an API key in the Aegis API",
+          "text": "To authenticate with an API key, include it in the Authorization header: Authorization: Bearer aegis_live_xxxxxxxxxxxx",
+          "fused_score": 0.01451946975973488,
+          "rerank_score": 5.0,
+          "dense_score": 0.5506098094111094
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/deployment.md",
+          "section_heading": "What are the minimum Kubernetes and PostgreSQL versions for Aegis deployment",
+          "text": "Minimum requirements are Kubernetes 1.27+ and a PostgreSQL 14+ instance reachable from the cluster.",
+          "fused_score": 0.014270833333333333,
+          "rerank_score": 5.0,
+          "dense_score": 0.5956393393292927
+        }
+      ],
+      "latency_ms": 3394.0366660244763,
+      "correctness": 0.8,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 1.0,
+      "retrieved_flags": [
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "relevant_rank": 1
+    },
+    {
+      "question": "How do you deploy or update Aegis using Helm?",
+      "expected_answer": "Run helm upgrade --install aegis aegis/aegis-platform -f values.yaml.",
+      "actual_answer": "To deploy or update Aegis using Helm, run the command `helm upgrade --install aegis aegis/aegis-platform -f values.yaml`.",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.752,
+        "citation_coverage": 0.0,
+        "completeness": 0.6,
+        "composite": 0.451
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/deployment.md",
+          "section_heading": "How do you deploy or update Aegis using Helm",
+          "text": "Run helm upgrade --install aegis aegis/aegis-platform -f values.yaml to deploy or update.",
+          "fused_score": 0.01639344262295082,
+          "rerank_score": 5.0,
+          "dense_score": 0.850304804325435
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/deployment.md",
+          "section_heading": "Where is the Helm chart for Aegis Kubernetes deployment published",
+          "text": "The Helm chart is published at charts.aegis.example.com/aegis-platform.",
+          "fused_score": 0.01605222734254992,
+          "rerank_score": 5.0,
+          "dense_score": 0.7299869181378567
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/deployment.md",
+          "section_heading": "What are the supported deployment environments for Aegis",
+          "text": "Aegis can be deployed on Kubernetes (recommended for production), Docker Compose (recommended for staging/local), or as a managed service via Aegis Cloud.",
+          "fused_score": 0.015949820788530463,
+          "rerank_score": 5.0,
+          "dense_score": 0.6754135230575127
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/general.md",
+          "section_heading": "Does Aegis support zero-downtime upgrades",
+          "text": "Aegis supports rolling upgrades between minor versions without downtime.",
+          "fused_score": 0.015482954545454545,
+          "rerank_score": 5.0,
+          "dense_score": 0.6753116778139385
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "Aegis API \u2014 Authentication",
+          "text": "Reference documentation for the Aegis platform API. Every statement below is normative for the current API version.",
+          "fused_score": 0.015017825311942958,
+          "rerank_score": 5.0,
+          "dense_score": 0.5878103388430909
+        }
+      ],
+      "latency_ms": 1838.7440840015188,
+      "correctness": 0.8,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 0.8,
+      "retrieved_flags": [
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "relevant_rank": 1
+    },
+    {
+      "question": "What services are included in the Docker Compose setup?",
+      "expected_answer": "The API server, worker, and a bundled PostgreSQL instance.",
+      "actual_answer": "The Docker Compose setup bundles the API server, worker, and a bundled PostgreSQL instance [4].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.662,
+        "citation_coverage": 1.0,
+        "completeness": 1.0,
+        "composite": 0.887
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/deployment.md",
+          "section_heading": "What are the supported deployment environments for Aegis",
+          "text": "Aegis can be deployed on Kubernetes (recommended for production), Docker Compose (recommended for staging/local), or as a managed service via Aegis Cloud.",
+          "fused_score": 0.016208355367530406,
+          "rerank_score": 5.0,
+          "dense_score": 0.6835308718790668
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/README.md",
+          "section_heading": "Demo corpus",
+          "text": "Nine short documents on retrieval-augmented generation and adjacent ML topics.\nThey exist so a fresh clone can run the full pipeline end to end with no setup:\n\n```bash\npython cli.py ingest ./sample_docs\npython cli.py ask \"What does the RAG pipeline combine?\"\n```\n\nRuntime uploads **never** belong in this repository. The API writes user files\nto `sample_docs/<user_id>/uploads/`, which is gitignored \u2014 personal documents\nmust not be committed (this repository's history was scrubbed once already for\nexactly that reason, see `docs/TOPTIER_ROADMAP.md`, Phase 0).",
+          "fused_score": 0.015625,
+          "rerank_score": 5.0,
+          "dense_score": 0.5488262125204278
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/deployment.md",
+          "section_heading": "What are the minimum Kubernetes and PostgreSQL versions for Aegis deployment",
+          "text": "Minimum requirements are Kubernetes 1.27+ and a PostgreSQL 14+ instance reachable from the cluster.",
+          "fused_score": 0.015246842709529276,
+          "rerank_score": 5.0,
+          "dense_score": 0.5474729913170032
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/deployment.md",
+          "section_heading": "What services are included in the Docker Compose setup",
+          "text": "For local or staging use, docker-compose.yml bundles the API server, worker, and a bundled PostgreSQL instance.",
+          "fused_score": 0.014808743169398907,
+          "rerank_score": 5.0,
+          "dense_score": 0.7548857545320389
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/error_codes.md",
+          "section_heading": "What does the INTERNAL_ERROR error code mean",
+          "text": "INTERNAL_ERROR (500): an unexpected server error. These are logged with a request_id -- include it when contacting support.",
+          "fused_score": 0.014166666666666664,
+          "rerank_score": 5.0,
+          "dense_score": 0.5334383210745929
+        }
+      ],
+      "latency_ms": 2255.377416993724,
+      "correctness": 1.0,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 0.5,
+      "retrieved_flags": [
+        false,
+        false,
+        false,
+        true,
+        false
+      ],
+      "relevant_rank": 4
+    },
+    {
+      "question": "Why is Docker Compose not recommended for production?",
+      "expected_answer": "The bundled PostgreSQL has no automated backups.",
+      "actual_answer": "Docker Compose is not recommended for production because the bundled PostgreSQL has no automated backups [2].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.679,
+        "citation_coverage": 1.0,
+        "completeness": 0.8,
+        "composite": 0.826
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/deployment.md",
+          "section_heading": "What are the supported deployment environments for Aegis",
+          "text": "Aegis can be deployed on Kubernetes (recommended for production), Docker Compose (recommended for staging/local), or as a managed service via Aegis Cloud.",
+          "fused_score": 0.016208355367530406,
+          "rerank_score": 5.0,
+          "dense_score": 0.7009152152770675
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/deployment.md",
+          "section_heading": "Why is Docker Compose not recommended for production",
+          "text": "This configuration is not recommended for production because the bundled PostgreSQL has no automated backups.",
+          "fused_score": 0.015949820788530463,
+          "rerank_score": 5.0,
+          "dense_score": 0.6066922187650092
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/deployment.md",
+          "section_heading": "What services are included in the Docker Compose setup",
+          "text": "For local or staging use, docker-compose.yml bundles the API server, worker, and a bundled PostgreSQL instance.",
+          "fused_score": 0.015529463890119628,
+          "rerank_score": 5.0,
+          "dense_score": 0.7288598221309454
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What is the default memory request per pod in the Helm chart",
+          "text": "resources.requests.memory: default is 512Mi per pod; increase to 1Gi+ for workspaces indexing more than 1M documents.",
+          "fused_score": 0.015063145809414466,
+          "rerank_score": 5.0,
+          "dense_score": 0.5616983086401215
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What does the RESOURCE_NOT_FOUND error code mean",
+          "text": "RESOURCE_NOT_FOUND (404): the requested resource ID does not exist in this workspace.",
+          "fused_score": 0.01462253947653039,
+          "rerank_score": 5.0,
+          "dense_score": 0.5583218977523325
+        }
+      ],
+      "latency_ms": 9582.594999985304,
+      "correctness": 0.0,
+      "faithfulness": 1.0,
+      "citation_accuracy": 0.0,
+      "retrieval_relevance": 0.5,
+      "retrieved_flags": [
+        false,
+        true,
+        false,
+        false,
+        false
+      ],
+      "relevant_rank": 2
+    },
+    {
+      "question": "What are the health check endpoints exposed by the API server?",
+      "expected_answer": "GET /healthz (liveness) and GET /readyz (readiness, checks database connectivity).",
+      "actual_answer": "The API server exposes GET /healthz (liveness) and GET /readyz (readiness, checks database connectivity) [1].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.636,
+        "citation_coverage": 1.0,
+        "completeness": 0.8,
+        "composite": 0.812
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/general.md",
+          "section_heading": "What are the health check endpoints exposed by the API server",
+          "text": "The API server exposes GET /healthz (liveness) and GET /readyz (readiness, checks database connectivity).",
+          "fused_score": 0.016314119513484927,
+          "rerank_score": 5.0,
+          "dense_score": 0.7187484269062007
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "Where are API keys generated in the Aegis dashboard",
+          "text": "API keys are generated in the dashboard under Settings > API Keys.",
+          "fused_score": 0.016208355367530406,
+          "rerank_score": 5.0,
+          "dense_score": 0.5978759440483852
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What does the AUTH_INVALID_KEY error code mean",
+          "text": "AUTH_INVALID_KEY (401): the provided API key does not exist or has been revoked.",
+          "fused_score": 0.015162852112676055,
+          "rerank_score": 5.0,
+          "dense_score": 0.5924916790906564
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/deployment.md",
+          "section_heading": "What is the default replica count for API server pods in the Helm chart",
+          "text": "replicaCount: number of API server pods. Default is 3.",
+          "fused_score": 0.015135261194029848,
+          "rerank_score": 5.0,
+          "dense_score": 0.5890978440699803
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/error_codes.md",
+          "section_heading": "What does the INTERNAL_ERROR error code mean",
+          "text": "INTERNAL_ERROR (500): an unexpected server error. These are logged with a request_id -- include it when contacting support.",
+          "fused_score": 0.015083672546359112,
+          "rerank_score": 5.0,
+          "dense_score": 0.5903657890086569
+        }
+      ],
+      "latency_ms": 3702.943917014636,
+      "correctness": 1.0,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 0.5,
+      "retrieved_flags": [
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "relevant_rank": 1
+    },
+    {
+      "question": "What does a 503 from /readyz indicate?",
+      "expected_answer": "The database connection pool is exhausted or unreachable.",
+      "actual_answer": "A 503 from /readyz indicates the database connection pool is exhausted or unreachable [1].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.667,
+        "citation_coverage": 0.0,
+        "completeness": 1.0,
+        "composite": 0.556
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/general.md",
+          "section_heading": "What does a 503 from /readyz indicate",
+          "text": "A 503 from /readyz indicates the database connection pool is exhausted or unreachable.",
+          "fused_score": 0.01639344262295082,
+          "rerank_score": 5.0,
+          "dense_score": 0.7812922785200631
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/general.md",
+          "section_heading": "What are the health check endpoints exposed by the API server",
+          "text": "The API server exposes GET /healthz (liveness) and GET /readyz (readiness, checks database connectivity).",
+          "fused_score": 0.016129032258064516,
+          "rerank_score": 5.0,
+          "dense_score": 0.6365386422357768
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/error_codes.md",
+          "section_heading": "What does the INTERNAL_ERROR error code mean",
+          "text": "INTERNAL_ERROR (500): an unexpected server error. These are logged with a request_id -- include it when contacting support.",
+          "fused_score": 0.014640522875816991,
+          "rerank_score": 5.0,
+          "dense_score": 0.5832769376941679
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What happens when you make a request without a valid API key",
+          "text": "Requests without a valid key return 401 Unauthorized.",
+          "fused_score": 0.014041031432335779,
+          "rerank_score": 5.0,
+          "dense_score": 0.5317750664652399
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What happens when a read-only API key attempts a write operation",
+          "text": "Requests with a valid but read-only key attempting a write operation return 403 Forbidden.",
+          "fused_score": 0.013947368421052628,
+          "rerank_score": 5.0,
+          "dense_score": 0.5311207482109654
+        }
+      ],
+      "latency_ms": 1538.247875025263,
+      "correctness": 1.0,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 0.0,
+      "retrieved_flags": [
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "relevant_rank": 1
+    },
+    {
+      "question": "Does Aegis support zero-downtime upgrades?",
+      "expected_answer": "Aegis supports rolling upgrades between minor versions without downtime.",
+      "actual_answer": "Aegis supports rolling upgrades between minor versions without downtime [1]. However, major version upgrades may require brief read-only downtime depending on the size of the schema change [3].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.765,
+        "citation_coverage": 1.0,
+        "completeness": 0.8,
+        "composite": 0.855
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/general.md",
+          "section_heading": "Does Aegis support zero-downtime upgrades",
+          "text": "Aegis supports rolling upgrades between minor versions without downtime.",
+          "fused_score": 0.01639344262295082,
+          "rerank_score": 5.0,
+          "dense_score": 0.8304231584923728
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/deployment.md",
+          "section_heading": "What are the supported deployment environments for Aegis",
+          "text": "Aegis can be deployed on Kubernetes (recommended for production), Docker Compose (recommended for staging/local), or as a managed service via Aegis Cloud.",
+          "fused_score": 0.015776209677419353,
+          "rerank_score": 5.0,
+          "dense_score": 0.6364048503218963
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/deployment.md",
+          "section_heading": "What is required for major version upgrades",
+          "text": "Major version upgrades require running the migration tool (aegis-migrate) before deploying the new version, and may require brief read-only downtime depending on the size of the schema change.",
+          "fused_score": 0.015767934520943667,
+          "rerank_score": 5.0,
+          "dense_score": 0.7466569771652012
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/deployment.md",
+          "section_heading": "How do you deploy or update Aegis using Helm",
+          "text": "Run helm upgrade --install aegis aegis/aegis-platform -f values.yaml to deploy or update.",
+          "fused_score": 0.015656565656565653,
+          "rerank_score": 5.0,
+          "dense_score": 0.7192419693118792
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "Aegis API \u2014 Authentication",
+          "text": "Reference documentation for the Aegis platform API. Every statement below is normative for the current API version.",
+          "fused_score": 0.015117056856187291,
+          "rerank_score": 5.0,
+          "dense_score": 0.584907132044183
+        }
+      ],
+      "latency_ms": 2018.43562501017,
+      "correctness": 0.5,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 0.8,
+      "retrieved_flags": [
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "relevant_rank": 1
+    },
+    {
+      "question": "What is required for major version upgrades?",
+      "expected_answer": "Running the migration tool (aegis-migrate) before deploying the new version, and may require brief read-only downtime.",
+      "actual_answer": "Major version upgrades require running the migration tool (aegis-migrate) before deploying the new version, and may require brief read-only downtime depending on the size of the schema change [1].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.628,
+        "citation_coverage": 1.0,
+        "completeness": 0.8,
+        "composite": 0.809
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/deployment.md",
+          "section_heading": "What is required for major version upgrades",
+          "text": "Major version upgrades require running the migration tool (aegis-migrate) before deploying the new version, and may require brief read-only downtime depending on the size of the schema change.",
+          "fused_score": 0.01639344262295082,
+          "rerank_score": 5.0,
+          "dense_score": 0.7228088027266755
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/general.md",
+          "section_heading": "Does Aegis support zero-downtime upgrades",
+          "text": "Aegis supports rolling upgrades between minor versions without downtime.",
+          "fused_score": 0.01579861111111111,
+          "rerank_score": 5.0,
+          "dense_score": 0.6265754754041186
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "Aegis API \u2014 Authentication",
+          "text": "Reference documentation for the Aegis platform API. Every statement below is normative for the current API version.",
+          "fused_score": 0.01522144522144522,
+          "rerank_score": 5.0,
+          "dense_score": 0.5335565424232979
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What is the default memory request per pod in the Helm chart",
+          "text": "resources.requests.memory: default is 512Mi per pod; increase to 1Gi+ for workspaces indexing more than 1M documents.",
+          "fused_score": 0.01462253947653039,
+          "rerank_score": 5.0,
+          "dense_score": 0.5121203119051881
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/deployment.md",
+          "section_heading": "What is required if ingress is enabled in the Helm chart",
+          "text": "ingress.tlsSecretName: required if ingress.enabled is true.",
+          "fused_score": 0.014560931899641576,
+          "rerank_score": 5.0,
+          "dense_score": 0.5025635990732035
+        }
+      ],
+      "latency_ms": 2106.2299580080435,
+      "correctness": 0.8,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 0.0,
+      "retrieved_flags": [
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "relevant_rank": 1
+    },
+    {
+      "question": "Where are API keys generated in the Aegis dashboard?",
+      "expected_answer": "Settings > API Keys.",
+      "actual_answer": "API keys are generated in the dashboard under Settings > API Keys [1].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.734,
+        "citation_coverage": 1.0,
+        "completeness": 1.0,
+        "composite": 0.911
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "Where are API keys generated in the Aegis dashboard",
+          "text": "API keys are generated in the dashboard under Settings > API Keys.",
+          "fused_score": 0.01639344262295082,
+          "rerank_score": 5.0,
+          "dense_score": 0.798191118775176
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What are the two authentication methods supported by the Aegis API",
+          "text": "The Aegis API supports two authentication methods: OAuth2 and static API keys. Choose OAuth2 for user-facing applications and API keys for server-to-server integrations.",
+          "fused_score": 0.015949820788530463,
+          "rerank_score": 5.0,
+          "dense_score": 0.6987358337841432
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "How do you authenticate with an API key in the Aegis API",
+          "text": "To authenticate with an API key, include it in the Authorization header: Authorization: Bearer aegis_live_xxxxxxxxxxxx",
+          "fused_score": 0.015905707196029777,
+          "rerank_score": 5.0,
+          "dense_score": 0.7059522410497023
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "Aegis API \u2014 Authentication",
+          "text": "Reference documentation for the Aegis platform API. Every statement below is normative for the current API version.",
+          "fused_score": 0.015456730769230768,
+          "rerank_score": 5.0,
+          "dense_score": 0.6510721560964047
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "Do API keys expire automatically",
+          "text": "Keys do not expire automatically, but can be revoked at any time from the dashboard.",
+          "fused_score": 0.014925373134328356,
+          "rerank_score": 5.0,
+          "dense_score": 0.6321488442048324
+        }
+      ],
+      "latency_ms": 2275.8659170067403,
+      "correctness": 1.0,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 1.0,
+      "retrieved_flags": [
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "relevant_rank": 1
+    },
+    {
+      "question": "What scopes can an API key have?",
+      "expected_answer": "Each key is scoped to a single workspace and can be restricted to read-only or read-write access.",
+      "actual_answer": "Each key is scoped to a single workspace and can be restricted to read-only or read-write access [2].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.683,
+        "citation_coverage": 1.0,
+        "completeness": 0.8,
+        "composite": 0.828
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What does the AUTH_INVALID_KEY error code mean",
+          "text": "AUTH_INVALID_KEY (401): the provided API key does not exist or has been revoked.",
+          "fused_score": 0.01597782258064516,
+          "rerank_score": 5.0,
+          "dense_score": 0.6835914804578391
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What scopes can an API key have",
+          "text": "Each key is scoped to a single workspace and can be restricted to read-only or read-write access.",
+          "fused_score": 0.015949820788530463,
+          "rerank_score": 5.0,
+          "dense_score": 0.6812422289139991
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "How do you authenticate with an API key in the Aegis API",
+          "text": "To authenticate with an API key, include it in the Authorization header: Authorization: Bearer aegis_live_xxxxxxxxxxxx",
+          "fused_score": 0.015855532786885247,
+          "rerank_score": 5.0,
+          "dense_score": 0.6744471359862656
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "Where are API keys generated in the Aegis dashboard",
+          "text": "API keys are generated in the dashboard under Settings > API Keys.",
+          "fused_score": 0.015823235923022094,
+          "rerank_score": 5.0,
+          "dense_score": 0.6845599773393864
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What happens when you make a request without a valid API key",
+          "text": "Requests without a valid key return 401 Unauthorized.",
+          "fused_score": 0.015180995475113122,
+          "rerank_score": 5.0,
+          "dense_score": 0.670777792351565
+        }
+      ],
+      "latency_ms": 1498.1968329811934,
+      "correctness": 1.0,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 1.0,
+      "retrieved_flags": [
+        false,
+        true,
+        false,
+        false,
+        false
+      ],
+      "relevant_rank": 2
+    },
+    {
+      "question": "Do API keys expire automatically?",
+      "expected_answer": "Keys do not expire automatically, but can be revoked at any time from the dashboard.",
+      "actual_answer": "No, API keys do not expire automatically [1].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.736,
+        "citation_coverage": 0.0,
+        "completeness": 0.8,
+        "composite": 0.512
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "Do API keys expire automatically",
+          "text": "Keys do not expire automatically, but can be revoked at any time from the dashboard.",
+          "fused_score": 0.01639344262295082,
+          "rerank_score": 5.0,
+          "dense_score": 0.8105357781140738
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What does the AUTH_INVALID_KEY error code mean",
+          "text": "AUTH_INVALID_KEY (401): the provided API key does not exist or has been revoked.",
+          "fused_score": 0.015835777126099706,
+          "rerank_score": 5.0,
+          "dense_score": 0.7141147935888277
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "Where are API keys generated in the Aegis dashboard",
+          "text": "API keys are generated in the dashboard under Settings > API Keys.",
+          "fused_score": 0.015776209677419353,
+          "rerank_score": 5.0,
+          "dense_score": 0.6846015794256292
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "How long do OAuth2 access tokens last before expiring",
+          "text": "Access tokens expire after 1 hour. Use the returned refresh_token to obtain a new access token without requiring the user to log in again.",
+          "fused_score": 0.015456730769230768,
+          "rerank_score": 5.0,
+          "dense_score": 0.6385486630882222
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "How do you authenticate with an API key in the Aegis API",
+          "text": "To authenticate with an API key, include it in the Authorization header: Authorization: Bearer aegis_live_xxxxxxxxxxxx",
+          "fused_score": 0.015083672546359112,
+          "rerank_score": 5.0,
+          "dense_score": 0.6277739816017798
+        }
+      ],
+      "latency_ms": 1719.180874992162,
+      "correctness": 1.0,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 1.0,
+      "retrieved_flags": [
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "relevant_rank": 1
+    },
+    {
+      "question": "Where do you register an OAuth2 application in the Aegis dashboard?",
+      "expected_answer": "Settings > OAuth Apps.",
+      "actual_answer": "You can register an OAuth2 application in the Aegis dashboard at Settings > OAuth Apps to receive a client_id and client_secret [2].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.713,
+        "citation_coverage": 1.0,
+        "completeness": 1.0,
+        "composite": 0.904
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What are the two authentication methods supported by the Aegis API",
+          "text": "The Aegis API supports two authentication methods: OAuth2 and static API keys. Choose OAuth2 for user-facing applications and API keys for server-to-server integrations.",
+          "fused_score": 0.016162909836065574,
+          "rerank_score": 5.0,
+          "dense_score": 0.7317381467864796
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "Where do you register an OAuth2 application in the Aegis dashboard",
+          "text": "Register your application at Settings > OAuth Apps to receive a client_id and client_secret.",
+          "fused_score": 0.015855532786885247,
+          "rerank_score": 5.0,
+          "dense_score": 0.669566261973179
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "How do you authenticate with an API key in the Aegis API",
+          "text": "To authenticate with an API key, include it in the Authorization header: Authorization: Bearer aegis_live_xxxxxxxxxxxx",
+          "fused_score": 0.015726495726495725,
+          "rerank_score": 5.0,
+          "dense_score": 0.6917902387593575
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "Aegis API \u2014 Authentication",
+          "text": "Reference documentation for the Aegis platform API. Every statement below is normative for the current API version.",
+          "fused_score": 0.015017825311942958,
+          "rerank_score": 5.0,
+          "dense_score": 0.6202154553186198
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What is the OAuth2 authorization endpoint for Aegis",
+          "text": "The authorization endpoint is https://auth.aegis.example.com/oauth/authorize and the token endpoint is https://auth.aegis.example.com/oauth/token.",
+          "fused_score": 0.014948859166011014,
+          "rerank_score": 5.0,
+          "dense_score": 0.7154187790016837
+        }
+      ],
+      "latency_ms": 13938.056957995286,
+      "correctness": 0.0,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 1.0,
+      "retrieved_flags": [
+        false,
+        true,
+        false,
+        false,
+        false
+      ],
+      "relevant_rank": 2
+    },
+    {
+      "question": "What information do you receive when registering an OAuth2 application?",
+      "expected_answer": "A client_id and client_secret.",
+      "actual_answer": "When registering an OAuth2 application in the Aegis dashboard, you receive a client_id and client_secret [1].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.644,
+        "citation_coverage": 1.0,
+        "completeness": 0.8,
+        "composite": 0.815
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "Where do you register an OAuth2 application in the Aegis dashboard",
+          "text": "Register your application at Settings > OAuth Apps to receive a client_id and client_secret.",
+          "fused_score": 0.01639344262295082,
+          "rerank_score": 5.0,
+          "dense_score": 0.7391990103818609
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What are the two authentication methods supported by the Aegis API",
+          "text": "The Aegis API supports two authentication methods: OAuth2 and static API keys. Choose OAuth2 for user-facing applications and API keys for server-to-server integrations.",
+          "fused_score": 0.015625,
+          "rerank_score": 5.0,
+          "dense_score": 0.6031149343651854
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "How do you authenticate with an API key in the Aegis API",
+          "text": "To authenticate with an API key, include it in the Authorization header: Authorization: Bearer aegis_live_xxxxxxxxxxxx",
+          "fused_score": 0.014953886693017126,
+          "rerank_score": 5.0,
+          "dense_score": 0.5894785544437611
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What does the AUTH_EXPIRED_TOKEN error code mean",
+          "text": "AUTH_EXPIRED_TOKEN (401): the OAuth2 access token has expired. Use the refresh token to obtain a new one.",
+          "fused_score": 0.014925373134328356,
+          "rerank_score": 5.0,
+          "dense_score": 0.5788937862409838
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What is the rate limit for authenticated requests per API key",
+          "text": "Authenticated requests are limited to 1000 requests per minute per API key, and 100 requests per minute per OAuth2 access token.",
+          "fused_score": 0.014556692242114236,
+          "rerank_score": 5.0,
+          "dense_score": 0.5670183151263626
+        }
+      ],
+      "latency_ms": 7488.284833991202,
+      "correctness": 0.8,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 0.0,
+      "retrieved_flags": [
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "relevant_rank": 1
+    },
+    {
+      "question": "What HTTP status code does AUTH_INVALID_KEY return?",
+      "expected_answer": "401",
+      "actual_answer": "The AUTH_INVALID_KEY error code returns a 401 HTTP status code [1].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.771,
+        "citation_coverage": 0.0,
+        "completeness": 0.8,
+        "composite": 0.524
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What does the AUTH_INVALID_KEY error code mean",
+          "text": "AUTH_INVALID_KEY (401): the provided API key does not exist or has been revoked.",
+          "fused_score": 0.01639344262295082,
+          "rerank_score": 5.0,
+          "dense_score": 0.8439165877681323
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What happens when you make a request without a valid API key",
+          "text": "Requests without a valid key return 401 Unauthorized.",
+          "fused_score": 0.016129032258064516,
+          "rerank_score": 5.0,
+          "dense_score": 0.7797981864142041
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What happens when a read-only API key attempts a write operation",
+          "text": "Requests with a valid but read-only key attempting a write operation return 403 Forbidden.",
+          "fused_score": 0.01569940476190476,
+          "rerank_score": 5.0,
+          "dense_score": 0.6886923910641503
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What does the PERMISSION_DENIED error code mean",
+          "text": "PERMISSION_DENIED (403): the authenticated principal does not have the required scope for this operation.",
+          "fused_score": 0.01447453954496208,
+          "rerank_score": 5.0,
+          "dense_score": 0.6333853796210823
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What does the RESOURCE_NOT_FOUND error code mean",
+          "text": "RESOURCE_NOT_FOUND (404): the requested resource ID does not exist in this workspace.",
+          "fused_score": 0.01282703488372093,
+          "rerank_score": 5.0,
+          "dense_score": 0.5441674951313803
+        }
+      ],
+      "latency_ms": 2169.1573330026586,
+      "correctness": 1.0,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 1.0,
+      "retrieved_flags": [
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "relevant_rank": 1
+    },
+    {
+      "question": "What HTTP status code does PERMISSION_DENIED return?",
+      "expected_answer": "403",
+      "actual_answer": "The PERMISSION_DENIED error code returns a 403 HTTP status code [1].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.748,
+        "citation_coverage": 0.0,
+        "completeness": 0.8,
+        "composite": 0.516
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What does the PERMISSION_DENIED error code mean",
+          "text": "PERMISSION_DENIED (403): the authenticated principal does not have the required scope for this operation.",
+          "fused_score": 0.016208355367530406,
+          "rerank_score": 5.0,
+          "dense_score": 0.7583389186589756
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/error_codes.md",
+          "section_heading": "Which error codes will NOT succeed on retry without changing the request",
+          "text": "VALIDATION_ERROR, PERMISSION_DENIED, and CONFLICT will not succeed on retry without changing the request itself.",
+          "fused_score": 0.016162909836065574,
+          "rerank_score": 5.0,
+          "dense_score": 0.77926032946642
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What happens when a read-only API key attempts a write operation",
+          "text": "Requests with a valid but read-only key attempting a write operation return 403 Forbidden.",
+          "fused_score": 0.015873015873015872,
+          "rerank_score": 5.0,
+          "dense_score": 0.7068935527909569
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What happens when you make a request without a valid API key",
+          "text": "Requests without a valid key return 401 Unauthorized.",
+          "fused_score": 0.015776209677419353,
+          "rerank_score": 5.0,
+          "dense_score": 0.6963962835280335
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What does the AUTH_INVALID_KEY error code mean",
+          "text": "AUTH_INVALID_KEY (401): the provided API key does not exist or has been revoked.",
+          "fused_score": 0.015314685314685314,
+          "rerank_score": 5.0,
+          "dense_score": 0.6923026960167571
+        }
+      ],
+      "latency_ms": 5016.842915996676,
+      "correctness": 1.0,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 1.0,
+      "retrieved_flags": [
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "relevant_rank": 1
+    },
+    {
+      "question": "What HTTP status code does VALIDATION_ERROR return?",
+      "expected_answer": "422",
+      "actual_answer": "VALIDATION_ERROR returns the HTTP status code 422 [1].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.742,
+        "citation_coverage": 0.0,
+        "completeness": 0.8,
+        "composite": 0.514
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/error_codes.md",
+          "section_heading": "What HTTP status code does VALIDATION_ERROR return",
+          "text": "VALIDATION_ERROR (422): the request body failed schema validation.",
+          "fused_score": 0.016237314597970336,
+          "rerank_score": 5.0,
+          "dense_score": 0.7527880082794511
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/error_codes.md",
+          "section_heading": "Which error codes will NOT succeed on retry without changing the request",
+          "text": "VALIDATION_ERROR, PERMISSION_DENIED, and CONFLICT will not succeed on retry without changing the request itself.",
+          "fused_score": 0.015767934520943667,
+          "rerank_score": 5.0,
+          "dense_score": 0.7491711903355756
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/error_codes.md",
+          "section_heading": "What does the VALIDATION_ERROR error code mean",
+          "text": "VALIDATION_ERROR (422): the request body failed schema validation. The details field lists each failing field and why.",
+          "fused_score": 0.01528532608695652,
+          "rerank_score": 5.0,
+          "dense_score": 0.7246589019143733
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What does the AUTH_INVALID_KEY error code mean",
+          "text": "AUTH_INVALID_KEY (401): the provided API key does not exist or has been revoked.",
+          "fused_score": 0.01522144522144522,
+          "rerank_score": 5.0,
+          "dense_score": 0.6780351813839525
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What happens when you make a request without a valid API key",
+          "text": "Requests without a valid key return 401 Unauthorized.",
+          "fused_score": 0.01506296032311713,
+          "rerank_score": 5.0,
+          "dense_score": 0.6374317649005588
+        }
+      ],
+      "latency_ms": 1519.5656249998137,
+      "correctness": 1.0,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 0.0,
+      "retrieved_flags": [
+        true,
+        false,
+        true,
+        false,
+        false
+      ],
+      "relevant_rank": 1
+    },
+    {
+      "question": "What HTTP status code does RATE_LIMITED return?",
+      "expected_answer": "429",
+      "actual_answer": "The RATE_LIMITED error returns HTTP status code 429 [2].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.766,
+        "citation_coverage": 0.0,
+        "completeness": 0.8,
+        "composite": 0.522
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/rate_limits.md",
+          "section_heading": "What does the RATE_LIMITED error code mean and how should you handle it",
+          "text": "RATE_LIMITED (429): request quota exceeded. See the Retry-After header. RATE_LIMITED and INTERNAL_ERROR are safe to retry with exponential backoff.",
+          "fused_score": 0.016237314597970336,
+          "rerank_score": 5.0,
+          "dense_score": 0.806438146255782
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/rate_limits.md",
+          "section_heading": "What HTTP status code does RATE_LIMITED return",
+          "text": "RATE_LIMITED (429): request quota exceeded.",
+          "fused_score": 0.016129032258064516,
+          "rerank_score": 5.0,
+          "dense_score": 0.7717175645634109
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/error_codes.md",
+          "section_heading": "Which error codes are safe to retry with exponential backoff",
+          "text": "RATE_LIMITED and INTERNAL_ERROR are safe to retry with exponential backoff. VALIDATION_ERROR, PERMISSION_DENIED, and CONFLICT will not succeed on retry without changing the request itself.",
+          "fused_score": 0.01545893719806763,
+          "rerank_score": 5.0,
+          "dense_score": 0.7204128011480619
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What happens when a read-only API key attempts a write operation",
+          "text": "Requests with a valid but read-only key attempting a write operation return 403 Forbidden.",
+          "fused_score": 0.015293560606060606,
+          "rerank_score": 5.0,
+          "dense_score": 0.6576850831905398
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What happens when you make a request without a valid API key",
+          "text": "Requests without a valid key return 401 Unauthorized.",
+          "fused_score": 0.01506296032311713,
+          "rerank_score": 5.0,
+          "dense_score": 0.6299589627395047
+        }
+      ],
+      "latency_ms": 6456.89758300432,
+      "correctness": 1.0,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 0.0,
+      "retrieved_flags": [
+        true,
+        true,
+        false,
+        false,
+        false
+      ],
+      "relevant_rank": 1
+    },
+    {
+      "question": "What HTTP status code does RESOURCE_NOT_FOUND return?",
+      "expected_answer": "404",
+      "actual_answer": "The RESOURCE_NOT_FOUND error code returns a 404 HTTP status code [1].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.688,
+        "citation_coverage": 1.0,
+        "completeness": 0.8,
+        "composite": 0.829
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What does the RESOURCE_NOT_FOUND error code mean",
+          "text": "RESOURCE_NOT_FOUND (404): the requested resource ID does not exist in this workspace.",
+          "fused_score": 0.01639344262295082,
+          "rerank_score": 5.0,
+          "dense_score": 0.7528988597976872
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What does the AUTH_INVALID_KEY error code mean",
+          "text": "AUTH_INVALID_KEY (401): the provided API key does not exist or has been revoked.",
+          "fused_score": 0.015456730769230768,
+          "rerank_score": 5.0,
+          "dense_score": 0.6631917170824329
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What happens when you make a request without a valid API key",
+          "text": "Requests without a valid key return 401 Unauthorized.",
+          "fused_score": 0.015286470871449204,
+          "rerank_score": 5.0,
+          "dense_score": 0.6477292192837442
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What happens when a read-only API key attempts a write operation",
+          "text": "Requests with a valid but read-only key attempting a write operation return 403 Forbidden.",
+          "fused_score": 0.014221364221364222,
+          "rerank_score": 5.0,
+          "dense_score": 0.6000103314183445
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What does the PERMISSION_DENIED error code mean",
+          "text": "PERMISSION_DENIED (403): the authenticated principal does not have the required scope for this operation.",
+          "fused_score": 0.01394871794871795,
+          "rerank_score": 5.0,
+          "dense_score": 0.5887978996869092
+        }
+      ],
+      "latency_ms": 5196.857208997244,
+      "correctness": 1.0,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 0.0,
+      "retrieved_flags": [
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "relevant_rank": 1
+    },
+    {
+      "question": "What HTTP status code does CONFLICT return?",
+      "expected_answer": "409",
+      "actual_answer": "I'm unable to determine the HTTP status code for the CONFLICT error code based on the provided context. The context only mentions the meaning of the CONFLICT error code [5], but not the corresponding HTTP status code.",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.672,
+        "citation_coverage": 0.5,
+        "completeness": 0.8,
+        "composite": 0.657
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/error_codes.md",
+          "section_heading": "Which error codes will NOT succeed on retry without changing the request",
+          "text": "VALIDATION_ERROR, PERMISSION_DENIED, and CONFLICT will not succeed on retry without changing the request itself.",
+          "fused_score": 0.015953021776364082,
+          "rerank_score": 5.0,
+          "dense_score": 0.7504727736214252
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What does the AUTH_INVALID_KEY error code mean",
+          "text": "AUTH_INVALID_KEY (401): the provided API key does not exist or has been revoked.",
+          "fused_score": 0.015384615384615385,
+          "rerank_score": 5.0,
+          "dense_score": 0.6262991718938156
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What happens when you make a request without a valid API key",
+          "text": "Requests without a valid key return 401 Unauthorized.",
+          "fused_score": 0.015212150433944069,
+          "rerank_score": 5.0,
+          "dense_score": 0.6068246606907097
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/error_codes.md",
+          "section_heading": "Which error codes are safe to retry with exponential backoff",
+          "text": "RATE_LIMITED and INTERNAL_ERROR are safe to retry with exponential backoff. VALIDATION_ERROR, PERMISSION_DENIED, and CONFLICT will not succeed on retry without changing the request itself.",
+          "fused_score": 0.015162852112676055,
+          "rerank_score": 5.0,
+          "dense_score": 0.6390555336774367
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What does the CONFLICT error code mean",
+          "text": "CONFLICT (409): the operation would violate a uniqueness constraint, e.g. creating a workspace with a name that's already taken.",
+          "fused_score": 0.01489177489177489,
+          "rerank_score": 5.0,
+          "dense_score": 0.6136739363935503
+        }
+      ],
+      "latency_ms": 3268.3187919901684,
+      "correctness": 0.0,
+      "faithfulness": 0.0,
+      "citation_accuracy": 0.0,
+      "retrieval_relevance": 1.0,
+      "retrieved_flags": [
+        false,
+        false,
+        false,
+        false,
+        true
+      ],
+      "relevant_rank": 5
+    },
+    {
+      "question": "What HTTP status code does INTERNAL_ERROR return?",
+      "expected_answer": "500",
+      "actual_answer": "The INTERNAL_ERROR returns a 500 HTTP status code [1][2].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.76,
+        "citation_coverage": 1.0,
+        "completeness": 0.8,
+        "composite": 0.853
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/error_codes.md",
+          "section_heading": "What HTTP status code does INTERNAL_ERROR return",
+          "text": "INTERNAL_ERROR (500): an unexpected server error.",
+          "fused_score": 0.016314119513484927,
+          "rerank_score": 5.0,
+          "dense_score": 0.7929522377947588
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/error_codes.md",
+          "section_heading": "What does the INTERNAL_ERROR error code mean",
+          "text": "INTERNAL_ERROR (500): an unexpected server error. These are logged with a request_id -- include it when contacting support.",
+          "fused_score": 0.015702087286527514,
+          "rerank_score": 5.0,
+          "dense_score": 0.7893042064740496
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/rate_limits.md",
+          "section_heading": "What does the RATE_LIMITED error code mean and how should you handle it",
+          "text": "RATE_LIMITED (429): request quota exceeded. See the Retry-After header. RATE_LIMITED and INTERNAL_ERROR are safe to retry with exponential backoff.",
+          "fused_score": 0.01528532608695652,
+          "rerank_score": 5.0,
+          "dense_score": 0.6977743579092304
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What happens when you make a request without a valid API key",
+          "text": "Requests without a valid key return 401 Unauthorized.",
+          "fused_score": 0.015212150433944069,
+          "rerank_score": 5.0,
+          "dense_score": 0.6485401501197288
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What does the AUTH_INVALID_KEY error code mean",
+          "text": "AUTH_INVALID_KEY (401): the provided API key does not exist or has been revoked.",
+          "fused_score": 0.015063145809414466,
+          "rerank_score": 5.0,
+          "dense_score": 0.6636741849829209
+        }
+      ],
+      "latency_ms": 2444.857916998444,
+      "correctness": 1.0,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 0.0,
+      "retrieved_flags": [
+        true,
+        true,
+        false,
+        false,
+        false
+      ],
+      "relevant_rank": 1
+    },
+    {
+      "question": "What should you include when contacting support about an INTERNAL_ERROR?",
+      "expected_answer": "Include the request_id that is logged with the error.",
+      "actual_answer": "When contacting support about an INTERNAL_ERROR, you should include the request_id [1].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.746,
+        "citation_coverage": 1.0,
+        "completeness": 1.0,
+        "composite": 0.915
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/error_codes.md",
+          "section_heading": "What does the INTERNAL_ERROR error code mean",
+          "text": "INTERNAL_ERROR (500): an unexpected server error. These are logged with a request_id -- include it when contacting support.",
+          "fused_score": 0.01639344262295082,
+          "rerank_score": 5.0,
+          "dense_score": 0.8004719242261695
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/error_codes.md",
+          "section_heading": "What HTTP status code does INTERNAL_ERROR return",
+          "text": "INTERNAL_ERROR (500): an unexpected server error.",
+          "fused_score": 0.016129032258064516,
+          "rerank_score": 5.0,
+          "dense_score": 0.7828235629548881
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/rate_limits.md",
+          "section_heading": "What does the RATE_LIMITED error code mean and how should you handle it",
+          "text": "RATE_LIMITED (429): request quota exceeded. See the Retry-After header. RATE_LIMITED and INTERNAL_ERROR are safe to retry with exponential backoff.",
+          "fused_score": 0.015482954545454545,
+          "rerank_score": 5.0,
+          "dense_score": 0.6556354707094809
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/error_codes.md",
+          "section_heading": "Which error codes are safe to retry with exponential backoff",
+          "text": "RATE_LIMITED and INTERNAL_ERROR are safe to retry with exponential backoff. VALIDATION_ERROR, PERMISSION_DENIED, and CONFLICT will not succeed on retry without changing the request itself.",
+          "fused_score": 0.014641943734015346,
+          "rerank_score": 5.0,
+          "dense_score": 0.6316862557453431
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/user_test_a/uploads/2c06a2be_doc_a.txt",
+          "section_heading": null,
+          "text": "User A's private document about project alpha",
+          "fused_score": 0.013898026315789472,
+          "rerank_score": 5.0,
+          "dense_score": 0.5465615030870443
+        }
+      ],
+      "latency_ms": 5368.098874983843,
+      "correctness": 1.0,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 0.8,
+      "retrieved_flags": [
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "relevant_rank": 1
+    },
+    {
+      "question": "What is the Aegis Cloud deployment option?",
+      "expected_answer": "A managed service via Aegis Cloud.",
+      "actual_answer": "Aegis can be deployed as a managed service via Aegis Cloud [1].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.731,
+        "citation_coverage": 1.0,
+        "completeness": 0.8,
+        "composite": 0.844
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/deployment.md",
+          "section_heading": "What are the supported deployment environments for Aegis",
+          "text": "Aegis can be deployed on Kubernetes (recommended for production), Docker Compose (recommended for staging/local), or as a managed service via Aegis Cloud.",
+          "fused_score": 0.016314119513484927,
+          "rerank_score": 5.0,
+          "dense_score": 0.7783972990594216
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/general.md",
+          "section_heading": "Does Aegis support zero-downtime upgrades",
+          "text": "Aegis supports rolling upgrades between minor versions without downtime.",
+          "fused_score": 0.015873015873015872,
+          "rerank_score": 5.0,
+          "dense_score": 0.683001042969106
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/deployment.md",
+          "section_heading": "How do you deploy or update Aegis using Helm",
+          "text": "Run helm upgrade --install aegis aegis/aegis-platform -f values.yaml to deploy or update.",
+          "fused_score": 0.015835777126099706,
+          "rerank_score": 5.0,
+          "dense_score": 0.7311160495901085
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "Aegis API \u2014 Authentication",
+          "text": "Reference documentation for the Aegis platform API. Every statement below is normative for the current API version.",
+          "fused_score": 0.015365793980915095,
+          "rerank_score": 5.0,
+          "dense_score": 0.610911064685256
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/deployment.md",
+          "section_heading": "Where is the Helm chart for Aegis Kubernetes deployment published",
+          "text": "The Helm chart is published at charts.aegis.example.com/aegis-platform.",
+          "fused_score": 0.015349264705882352,
+          "rerank_score": 5.0,
+          "dense_score": 0.6546377319607434
+        }
+      ],
+      "latency_ms": 6565.97779202275,
+      "correctness": 0.8,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 1.0,
+      "retrieved_flags": [
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "relevant_rank": 1
+    },
+    {
+      "question": "What error code is returned when creating a workspace with a name that already exists?",
+      "expected_answer": "CONFLICT (409)",
+      "actual_answer": "The CONFLICT error code is returned when creating a workspace with a name that already exists [1].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.684,
+        "citation_coverage": 1.0,
+        "completeness": 1.0,
+        "composite": 0.895
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What does the CONFLICT error code mean",
+          "text": "CONFLICT (409): the operation would violate a uniqueness constraint, e.g. creating a workspace with a name that's already taken.",
+          "fused_score": 0.01639344262295082,
+          "rerank_score": 5.0,
+          "dense_score": 0.8296959784628599
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/error_codes.md",
+          "section_heading": "What does the INTERNAL_ERROR error code mean",
+          "text": "INTERNAL_ERROR (500): an unexpected server error. These are logged with a request_id -- include it when contacting support.",
+          "fused_score": 0.015444770283479958,
+          "rerank_score": 5.0,
+          "dense_score": 0.6109944375676168
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What scopes can an API key have",
+          "text": "Each key is scoped to a single workspace and can be restricted to read-only or read-write access.",
+          "fused_score": 0.015056022408963584,
+          "rerank_score": 5.0,
+          "dense_score": 0.6054133319021964
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/README.md",
+          "section_heading": "Demo corpus",
+          "text": "Nine short documents on retrieval-augmented generation and adjacent ML topics.\nThey exist so a fresh clone can run the full pipeline end to end with no setup:\n\n```bash\npython cli.py ingest ./sample_docs\npython cli.py ask \"What does the RAG pipeline combine?\"\n```\n\nRuntime uploads **never** belong in this repository. The API writes user files\nto `sample_docs/<user_id>/uploads/`, which is gitignored \u2014 personal documents\nmust not be committed (this repository's history was scrubbed once already for\nexactly that reason, see `docs/TOPTIER_ROADMAP.md`, Phase 0).",
+          "fused_score": 0.01440972222222222,
+          "rerank_score": 5.0,
+          "dense_score": 0.5620439449358425
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/error_codes.md",
+          "section_heading": "What HTTP status code does CONFLICT return",
+          "text": "CONFLICT (409): the operation would violate a uniqueness constraint.",
+          "fused_score": 0.014217506631299734,
+          "rerank_score": 5.0,
+          "dense_score": 0.6124369232260782
+        }
+      ],
+      "latency_ms": 2058.3269580092747,
+      "correctness": 0.0,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 0.5,
+      "retrieved_flags": [
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "relevant_rank": 1
+    },
+    {
+      "question": "What should you do if you get a VALIDATION_ERROR?",
+      "expected_answer": "Check the details field which lists each failing field and why. Fix the request before retrying.",
+      "actual_answer": "If you get a VALIDATION_ERROR, you should change the request itself. This is because VALIDATION_ERROR, along with PERMISSION_DENIED and CONFLICT, will not succeed on retry without changing the request [2]. The error code indicates that the request body failed schema validation, and the details field lists each failing field and why [3].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.743,
+        "citation_coverage": 0.667,
+        "completeness": 0.8,
+        "composite": 0.737
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/error_codes.md",
+          "section_heading": "What HTTP status code does VALIDATION_ERROR return",
+          "text": "VALIDATION_ERROR (422): the request body failed schema validation.",
+          "fused_score": 0.016162909836065574,
+          "rerank_score": 5.0,
+          "dense_score": 0.7694890194182551
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/error_codes.md",
+          "section_heading": "Which error codes will NOT succeed on retry without changing the request",
+          "text": "VALIDATION_ERROR, PERMISSION_DENIED, and CONFLICT will not succeed on retry without changing the request itself.",
+          "fused_score": 0.015726495726495725,
+          "rerank_score": 5.0,
+          "dense_score": 0.7275760625774095
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/error_codes.md",
+          "section_heading": "What does the VALIDATION_ERROR error code mean",
+          "text": "VALIDATION_ERROR (422): the request body failed schema validation. The details field lists each failing field and why.",
+          "fused_score": 0.015482954545454545,
+          "rerank_score": 5.0,
+          "dense_score": 0.7271781990934311
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/error_codes.md",
+          "section_heading": "What does the INTERNAL_ERROR error code mean",
+          "text": "INTERNAL_ERROR (500): an unexpected server error. These are logged with a request_id -- include it when contacting support.",
+          "fused_score": 0.014948859166011014,
+          "rerank_score": 5.0,
+          "dense_score": 0.733209540268557
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/error_codes.md",
+          "section_heading": "Which error codes are safe to retry with exponential backoff",
+          "text": "RATE_LIMITED and INTERNAL_ERROR are safe to retry with exponential backoff. VALIDATION_ERROR, PERMISSION_DENIED, and CONFLICT will not succeed on retry without changing the request itself.",
+          "fused_score": 0.014925373134328356,
+          "rerank_score": 5.0,
+          "dense_score": 0.6373079727228377
+        }
+      ],
+      "latency_ms": 35712.50433300156,
+      "correctness": 0.0,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 1.0,
+      "retrieved_flags": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "relevant_rank": null
+    },
+    {
+      "question": "How do you know what your current rate limit quota is?",
+      "expected_answer": "The current limit and remaining quota are returned in the X-RateLimit-Limit and X-RateLimit-Remaining response headers.",
+      "actual_answer": "You can determine your current rate limit quota by checking the X-RateLimit-Limit response header [1].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.679,
+        "citation_coverage": 1.0,
+        "completeness": 0.8,
+        "composite": 0.826
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/rate_limits.md",
+          "section_heading": "What headers indicate rate limit status",
+          "text": "The current limit and remaining quota are returned in the X-RateLimit-Limit and X-RateLimit-Remaining response headers.",
+          "fused_score": 0.016208355367530406,
+          "rerank_score": 5.0,
+          "dense_score": 0.6795979595136505
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/rate_limits.md",
+          "section_heading": "What HTTP status code does RATE_LIMITED return",
+          "text": "RATE_LIMITED (429): request quota exceeded.",
+          "fused_score": 0.01609079445145019,
+          "rerank_score": 5.0,
+          "dense_score": 0.687540932418369
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/rate_limits.md",
+          "section_heading": "What happens when you exceed the rate limit",
+          "text": "Exceeding the limit returns 429 Too Many Requests with a Retry-After header indicating how many seconds to wait.",
+          "fused_score": 0.015607940446650124,
+          "rerank_score": 5.0,
+          "dense_score": 0.5546407446932509
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/rate_limits.md",
+          "section_heading": "What does the RATE_LIMITED error code mean and how should you handle it",
+          "text": "RATE_LIMITED (429): request quota exceeded. See the Retry-After header. RATE_LIMITED and INTERNAL_ERROR are safe to retry with exponential backoff.",
+          "fused_score": 0.015588723051409617,
+          "rerank_score": 5.0,
+          "dense_score": 0.6689506060240575
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/general.md",
+          "section_heading": "What does a 503 from /readyz indicate",
+          "text": "A 503 from /readyz indicates the database connection pool is exhausted or unreachable.",
+          "fused_score": 0.014403706688154713,
+          "rerank_score": 5.0,
+          "dense_score": 0.4983060624801955
+        }
+      ],
+      "latency_ms": 9157.626625004923,
+      "correctness": 0.8,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 1.0,
+      "retrieved_flags": [
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "relevant_rank": 1
+    },
+    {
+      "question": "Can you use the same API key across multiple workspaces?",
+      "expected_answer": "No, each key is scoped to a single workspace.",
+      "actual_answer": "No, each API key is scoped to a single workspace [1].",
+      "refused": false,
+      "confidence": {
+        "retrieval_confidence": 0.656,
+        "citation_coverage": 1.0,
+        "completeness": 0.2,
+        "composite": 0.619
+      },
+      "sources": [
+        {
+          "block": 1,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What scopes can an API key have",
+          "text": "Each key is scoped to a single workspace and can be restricted to read-only or read-write access.",
+          "fused_score": 0.016162909836065574,
+          "rerank_score": 5.0,
+          "dense_score": 0.7033909886442657
+        },
+        {
+          "block": 2,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "What does the AUTH_INVALID_KEY error code mean",
+          "text": "AUTH_INVALID_KEY (401): the provided API key does not exist or has been revoked.",
+          "fused_score": 0.015607940446650124,
+          "rerank_score": 5.0,
+          "dense_score": 0.6151343076003133
+        },
+        {
+          "block": 3,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "Where are API keys generated in the Aegis dashboard",
+          "text": "API keys are generated in the dashboard under Settings > API Keys.",
+          "fused_score": 0.015522875816993463,
+          "rerank_score": 5.0,
+          "dense_score": 0.6469216371110275
+        },
+        {
+          "block": 4,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "Do API keys expire automatically",
+          "text": "Keys do not expire automatically, but can be revoked at any time from the dashboard.",
+          "fused_score": 0.015223214285714284,
+          "rerank_score": 5.0,
+          "dense_score": 0.6189705597761883
+        },
+        {
+          "block": 5,
+          "source": "/Users/maheshboda/Projects/RAG-Pipeline-With-Hybrid-Search/sample_docs/aegis/authentication.md",
+          "section_heading": "How do you authenticate with an API key in the Aegis API",
+          "text": "To authenticate with an API key, include it in the Authorization header: Authorization: Bearer aegis_live_xxxxxxxxxxxx",
+          "fused_score": 0.015056022408963584,
+          "rerank_score": 5.0,
+          "dense_score": 0.5811911529025245
+        }
+      ],
+      "latency_ms": 4367.80183299561,
+      "correctness": 1.0,
+      "faithfulness": 1.0,
+      "citation_accuracy": 1.0,
+      "retrieval_relevance": 1.0,
+      "retrieved_flags": [
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "relevant_rank": 1
+    }
+  ]
+}

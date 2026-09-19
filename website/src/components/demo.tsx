@@ -5,8 +5,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Loader2, Copy, Check, AlertCircle, Info, Sparkles, Upload, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { VectorSpace3D } from "@/components/vector-space-3d";
 import { DocumentUploader } from "@/components/DocumentUploader";
+import { PipelineConsole, type PipelineTrace } from "@/components/pipeline-console";
+import { ConfidenceDial, CitedAnswer } from "@/components/confidence-dial";
 
 const sampleQuestions = [
   "How do I authenticate with the API?",
@@ -40,6 +41,7 @@ export function Demo() {
   const [query, setQuery] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(false);
   const [response, setResponse] = React.useState<AskResponse | null>(null);
+  const [trace, setTrace] = React.useState<PipelineTrace | null>(null);
   const [error, setError] = React.useState<string | null>(null);
   const [config, setConfig] = React.useState({ denseWeight: 0.7, sparseWeight: 0.3 });
 
@@ -49,10 +51,14 @@ export function Demo() {
 
     setIsLoading(true);
     setResponse(null);
+    setTrace(null);
     setError(null);
 
     try {
-      const res = await fetch("/api/demo/ask", {
+      // One backend call returns BOTH the answer and the execution trace
+      // (timings, lanes, confidence) — the console below renders the real
+      // pipeline run, not a simulation.
+      const res = await fetch("/api/demo/pipeline", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question: query.trim() }),
@@ -63,6 +69,8 @@ export function Demo() {
       if (!res.ok) {
         throw new Error(data.error || data.detail || "Query failed");
       }
+
+      setTrace(data);
 
       // Transform API response to match expected format
       setResponse({
@@ -86,6 +94,7 @@ export function Demo() {
     } catch (err) {
       setError(err instanceof Error ? err.message : "Query failed");
       setResponse(null);
+      setTrace(null);
     } finally {
       setIsLoading(false);
     }
@@ -312,13 +321,15 @@ export function Demo() {
                       </div>
                     </div>
 
-                    <div className="prose prose-sm dark:prose-invert max-w-none text-foreground">
-                      {response.answer.split("\n").map((line, i) => (
-                        <p key={i} className="whitespace-pre-wrap font-mono text-sm leading-relaxed">
-                          {line}
-                        </p>
-                      ))}
-                    </div>
+                    {/* Composite confidence: animated dial + per-component bars */}
+                    {trace?.confidence && (
+                      <div className="mb-5 rounded-lg border p-4" style={{ borderColor: 'var(--color-hairline)', backgroundColor: 'var(--color-surface-soft)' }}>
+                        <ConfidenceDial confidence={trace.confidence} refused={response.refused} />
+                      </div>
+                    )}
+
+                    {/* Answer text with [N] markers as citation hovercards */}
+                    <CitedAnswer answer={response.answer} sources={response.sources} />
                   </div>
 
                   <div className="p-6 space-y-6">
@@ -357,6 +368,29 @@ export function Demo() {
                     </div>
                   </div>
                 </motion.div>
+              ) : response?.refused ? (
+                <motion.div
+                  key="refused"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  className="bg-warning/10 border border-warning/30 rounded-xl p-6"
+                >
+                  <div className="text-center">
+                    <AlertTriangle className="w-8 h-8 mx-auto mb-3 text-warning" />
+                    <h3 className="text-lg font-semibold text-warning mb-2">Could not find enough information</h3>
+                    <p className="text-muted-foreground">{response.answer}</p>
+                    {response.refusal_reason && (
+                      <p className="text-sm text-muted-foreground mt-2 font-mono">{response.refusal_reason}</p>
+                    )}
+                  </div>
+                  {/* Even a refusal shows its real trace — "say so, don't cite" is a designed outcome */}
+                  {trace && (
+                    <div className="mt-5">
+                      <PipelineConsole trace={trace} />
+                    </div>
+                  )}
+                </motion.div>
               ) : error ? (
                 <motion.div
                   key="error"
@@ -371,21 +405,6 @@ export function Demo() {
                   <Button variant="outline" size="sm" onClick={() => setError(null)} className="mt-4">
                     Dismiss
                   </Button>
-                </motion.div>
-              ) : response?.refused ? (
-                <motion.div
-                  key="refused"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  className="bg-warning/10 border border-warning/30 rounded-xl p-6 text-center"
-                >
-                  <AlertTriangle className="w-8 h-8 mx-auto mb-3 text-warning" />
-                  <h3 className="text-lg font-semibold text-warning mb-2">Could not find enough information</h3>
-                  <p className="text-muted-foreground">{response.answer}</p>
-                  {response.refusal_reason && (
-                    <p className="text-sm text-muted-foreground mt-2 font-mono">{response.refusal_reason}</p>
-                  )}
                 </motion.div>
               ) : (
                 <motion.div
@@ -403,6 +422,11 @@ export function Demo() {
                 </motion.div>
               )}
           </AnimatePresence>
+
+          {/* The real pipeline, exposed: stage timings, lanes, confidence */}
+          {trace && !response?.refused && (
+            <PipelineConsole trace={trace} />
+          )}
           </motion.div>
         </div>
       </div>

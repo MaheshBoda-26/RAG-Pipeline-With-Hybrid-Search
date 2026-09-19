@@ -1,21 +1,27 @@
 "use client";
 
+import * as React from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, Zap, Shield, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-const sampleChunks = [
-  { id: "1", x: -2.1, y: 0.5, z: -1.2, source: "authentication.md", strategy: "recursive", text: "API authentication uses Bearer tokens with JWT validation...", role: "dense" as const },
-  { id: "2", x: 1.8, y: -0.3, z: 0.8, source: "deployment.md", strategy: "semantic", text: "Kubernetes deployment requires Helm charts and ingress configuration...", role: "reranked" as const },
-  { id: "3", x: -0.5, y: 1.2, z: 2.1, source: "error_codes.md", strategy: "fixed", text: "Rate limit exceeded returns 429 with retry-after header...", role: "sparse" as const },
-  { id: "4", x: 2.5, y: 0.8, z: -1.5, source: "authentication.md", strategy: "recursive", text: "Token refresh endpoint accepts valid refresh tokens...", role: "unretrieved" as const },
-  { id: "5", x: -1.8, y: -1.0, z: 1.0, source: "deployment.md", strategy: "semantic", text: "Docker images built with multi-stage builds for production...", role: "unretrieved" as const },
-  { id: "6", x: 0.3, y: 0.2, z: -0.8, source: "error_codes.md", strategy: "fixed", text: "Authentication failed returns 401 with WWW-Authenticate header...", role: "reranked" as const },
-  { id: "7", x: -2.8, y: 1.5, z: 0.5, source: "authentication.md", strategy: "recursive", text: "OAuth 2.0 flow supports authorization code grant type...", role: "dense" as const },
-  { id: "8", x: 1.2, y: -1.8, z: -0.3, source: "deployment.md", strategy: "semantic", text: "Horizontal pod autoscaler configured for CPU and memory metrics...", role: "unretrieved" as const },
-  { id: "9", x: -0.8, y: 0.8, z: 1.8, source: "error_codes.md", strategy: "fixed", text: "Internal server error 500 logged with correlation ID...", role: "unretrieved" as const },
-  { id: "10", x: 3.0, y: -0.5, z: 1.2, source: "authentication.md", strategy: "recursive", text: "API keys rotated quarterly with automated notifications...", role: "sparse" as const },
+// A small preview of the corpus map. The full, interactive version — wired to
+// real embeddings via /api/demo/viz — lives in the demo section below.
+const previewChunks = [
+  { x: -2.1, y: 0.5, z: -1.2, source: "authentication.md", role: "dense" as const },
+  { x: 1.8, y: -0.3, z: 0.8, source: "deployment.md", role: "reranked" as const },
+  { x: -0.5, y: 1.2, z: 2.1, source: "error_codes.md", role: "sparse" as const },
+  { x: 2.5, y: 0.8, z: -1.5, source: "authentication.md", role: "unretrieved" as const },
+  { x: -1.8, y: -1.0, z: 1.0, source: "deployment.md", role: "unretrieved" as const },
+  { x: 0.3, y: 0.2, z: -0.8, source: "error_codes.md", role: "reranked" as const },
 ];
+
+const PREVIEW_COLORS: Record<string, string> = {
+  unretrieved: "#a39c8d",
+  dense: "#cc785c",
+  sparse: "#e8a55a",
+  reranked: "#5db8a6",
+};
 
 export function Hero() {
   return (
@@ -59,8 +65,8 @@ export function Hero() {
               style={{ color: 'var(--color-body)' }}
             >
               Production-grade RAG pipeline with dense vector search, BM25 sparse retrieval,
-              reciprocal rank fusion, LLM-as-judge reranking, and grounded generation
-              with verified inline citations.
+              reciprocal rank fusion, cross-encoder reranking with an LLM-judge fallback, and
+              grounded generation with verified inline citations.
             </motion.p>
 
             <motion.div
@@ -99,7 +105,7 @@ export function Hero() {
             >
               <div className="flex items-center gap-2">
                 <Zap className="w-4 h-4 text-coral" />
-                <span>Sub-50ms latency</span>
+                <span>Refuses to guess</span>
               </div>
               <div className="flex items-center gap-2">
                 <Shield className="w-4 h-4 text-accent-teal" />
@@ -107,7 +113,7 @@ export function Hero() {
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-4 h-4 text-accent-amber" />
-                <span>99.9% uptime SLA</span>
+                <span>Every number benchmarked</span>
               </div>
             </motion.div>
           </motion.div>
@@ -125,25 +131,53 @@ export function Hero() {
                   <div className="w-3 h-3 rounded-full bg-accent-amber" />
                   <div className="w-3 h-3 rounded-full bg-accent-teal" />
                 </div>
-                <span className="text-xs font-mono" style={{ color: 'var(--color-on-dark-soft)' }}>pipeline.ask()</span>
+                <span className="text-xs font-mono" style={{ color: 'var(--color-on-dark-soft)' }}>vector space · projected embeddings</span>
               </div>
-              <pre className="text-xs font-mono p-5 overflow-x-auto leading-relaxed" style={{ backgroundColor: 'var(--color-surface-dark-soft)', color: 'var(--color-on-dark)' }}><code>{`const pipeline = new RAGPipeline(settings);
-await pipeline.ingest_directory("./docs");
-
-const response = await pipeline.ask(
-  "How do I authenticate?"
-);
-
-// Response with citations & confidence
-console.log(response.answer);
-console.log(response.confidence);
-console.log(response.sources);`}</code></pre>
+              <div className="relative h-64 sm:h-72" style={{ backgroundColor: 'var(--color-surface-dark-soft)' }}>
+                {/* Dot grid backdrop */}
+                <div
+                  className="absolute inset-0 opacity-[0.15]"
+                  style={{
+                    backgroundImage: "radial-gradient(circle, #a09d96 1px, transparent 1px)",
+                    backgroundSize: "24px 24px",
+                  }}
+                />
+                {previewChunks.map((chunk, i) => {
+                  // Project the 3D preview coordinates to 2D for the flat hero card.
+                  const left = 50 + chunk.x * 16;
+                  const top = 50 + chunk.y * 14;
+                  const size = chunk.role === "reranked" ? 14 : chunk.role === "unretrieved" ? 8 : 11;
+                  return (
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, scale: 0 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.5 + i * 0.12, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                      className="absolute rounded-full"
+                      style={{
+                        left: `${left}%`,
+                        top: `${top}%`,
+                        width: size,
+                        height: size,
+                        backgroundColor: PREVIEW_COLORS[chunk.role],
+                        opacity: chunk.role === "unretrieved" ? 0.35 : 1,
+                        transform: "translate(-50%, -50%)",
+                      }}
+                      title={`${chunk.source} · ${chunk.role}`}
+                    />
+                  );
+                })}
+                <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between">
+                  <div className="flex items-center gap-3 text-[10px] font-mono" style={{ color: 'var(--color-on-dark-soft)' }}>
+                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full" style={{ backgroundColor: '#cc785c' }} />dense</span>
+                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full" style={{ backgroundColor: '#e8a55a' }} />sparse</span>
+                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full" style={{ backgroundColor: '#5db8a6' }} />reranked</span>
+                  </div>
+                </div>
+              </div>
               <div className="flex items-center justify-between px-5 py-3" style={{ backgroundColor: 'var(--color-surface-dark-elevated)' }}>
-                <p className="flex items-center gap-2 text-sm font-mono text-accent-teal">
-                  <span className="w-2 h-2 bg-accent-teal rounded-full" />
-                  confidence: 0.94
-                </p>
-                <p className="text-xs" style={{ color: 'var(--color-on-dark-soft)' }}>3 sources · reranked</p>
+                <p className="text-xs" style={{ color: 'var(--color-on-dark-soft)' }}>real embeddings, not an illustration</p>
+                <a href="#demo" className="text-xs font-mono text-accent-teal hover:underline">explore the full map ↓</a>
               </div>
             </div>
           </motion.div>

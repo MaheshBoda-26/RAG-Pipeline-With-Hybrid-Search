@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     template: "%s | RAG Pipeline",
   },
   description:
-    "Production-grade RAG pipeline with dense vector search, BM25 sparse retrieval, reciprocal rank fusion, LLM-as-judge reranking, and grounded generation with verified inline citations.",
+    "Production-grade RAG pipeline with dense vector search, BM25 sparse retrieval, reciprocal rank fusion, cross-encoder reranking, and grounded generation with verified inline citations.",
   keywords: [
     "RAG",
     "retrieval-augmented generation",
@@ -62,7 +62,7 @@ export const metadata: Metadata = {
     siteName: "RAG Pipeline",
     title: "RAG Pipeline | Hybrid Search Over Internal Docs",
     description:
-      "Production-grade RAG pipeline with dense vector search, BM25 sparse retrieval, reciprocal rank fusion, LLM-as-judge reranking, and grounded generation with verified inline citations.",
+      "Production-grade RAG pipeline with dense vector search, BM25 sparse retrieval, reciprocal rank fusion, cross-encoder reranking, and grounded generation with verified inline citations.",
     images: [
       {
         url: "/og-image.svg",

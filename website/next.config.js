@@ -6,6 +6,16 @@ const nextConfig = {
   images: {
     formats: ['image/avif', 'image/webp'],
   },
+  // The benchmark band reads the CI-generated eval artifact verbatim, so the
+  // site's numbers can never drift from what CI measured.
+  async rewrites() {
+    return [
+      {
+        source: '/eval/results.json',
+        destination: '/eval-benchmark-results.json',
+      },
+    ];
+  },
   async headers() {
     return [
       {

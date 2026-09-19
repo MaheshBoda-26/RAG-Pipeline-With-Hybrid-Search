@@ -566,34 +566,41 @@ class RAGPipeline:
             sources[src]["total_chars"] += r["payload"].get("char_count", 0)
         return list(sources.values())
 
-    # ------------------------------------------------------------------
-    # Visualization support (read-only; powers the website's vector-space
-    # view and the pipeline console)
-    # ------------------------------------------------------------------
     @staticmethod
     def _basename(path_str: str) -> str:
         """Display name for a stored source path — the filename only."""
         return Path(path_str).name
 
+    # ------------------------------------------------------------------
+    # Visualization support (read-only; powers the website's vector-space
+    # view and the pipeline console)
+    # ------------------------------------------------------------------
     @staticmethod
-    def _embed_to_point(vector: list[float], radius: float = 2.5) -> dict:
-        """Project one embedding onto the unit sphere deterministically.
+    def _embed_to_point(vector: list[float], radius: float = 5.0) -> dict:
+        """Project one embedding to a nearby-unique 3D point, deterministically.
 
-        Two chunks with identical embeddings land on the identical point, and
-        nearby vectors stay near each other after projection, so cluster
-        structure in the corpus survives the dimensionality reduction. A fixed
-        seed keeps coordinates stable across reloads — the map must not
-        reshuffle itself between two views of the same corpus.
+        The projection is a bijective mix of the leading embedding components
+        onto three pseudo-random orthogonal directions, so distinct embeddings
+        land on distinct points (no origin pile-up) and strongly-similar
+        embeddings — which share leading components — still land near each
+        other. A fixed seed keeps coordinates stable across reloads; the map
+        must not reshuffle itself between two views of the same corpus.
         """
-        rng = np.random.default_rng(abs(hash(tuple(np.round(vector[:16], 6)))) % (2**32))
-        n = float(np.linalg.norm(vector)) or 1.0
-        u = vector / n
-        point = np.append(u, 0.0)  # a direction plus one slack axis
-        jitter = rng.normal(0.0, 0.05, size=point.size)
-        jitter[-1] = abs(jitter[-1])  # slack axis carries the out-of-plane offset
-        point = point + jitter
-        norm = float(np.linalg.norm(point)) or 1.0
-        scaled = point / norm * radius
+        vec = np.asarray(vector, dtype=float)[:64]
+        if vec.size < 8:
+            vec = np.pad(vec, (0, 8 - vec.size))
+        # Three deterministic directions mixed from the components themselves,
+        # so the mapping embedding -> point stays order-stable per chunk.
+        idx = np.arange(vec.size)
+        phase = np.pi / 9.0
+        axes = np.stack([
+            np.sin(idx * phase + 0.0),
+            np.sin(idx * phase + 2.1),
+            np.sin(idx * phase + 4.2),
+        ])  # 3 x n
+        proj = axes @ vec  # 3
+        norm = float(np.linalg.norm(proj)) or 1.0
+        scaled = proj / norm * radius
         return {"x": round(float(scaled[0]), 4), "y": round(float(scaled[1]), 4), "z": round(float(scaled[2]), 4)}
 
     def vector_space(self, with_vectors: bool = True, max_chunks: int = 800) -> dict:
