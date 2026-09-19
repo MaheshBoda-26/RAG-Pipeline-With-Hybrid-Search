@@ -268,7 +268,7 @@ function StageCard({ stage, index }: { stage: PipelineStage; index: number }) {
               onClick={() => setIsExpanded(!isExpanded)}
               className="w-full flex items-center gap-4 p-4 rounded-xl border transition-all duration-200 text-left focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
               aria-expanded={isExpanded}
-              style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)', hoverBorderColor: 'color-mix(in srgb, var(--color-border) 50%, transparent)' }}
+              style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}
             >
               <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: stage.color }}>
                 <Icon className="w-6 h-6 text-white" aria-hidden="true" />

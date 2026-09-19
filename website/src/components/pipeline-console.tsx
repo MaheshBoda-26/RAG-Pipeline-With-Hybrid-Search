@@ -24,7 +24,7 @@ interface TraceSource {
   dense_score?: number | null;
 }
 
-interface PipelineTrace {
+export interface PipelineTrace {
   question: string;
   answer: string;
   sources: TraceSource[];

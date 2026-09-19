@@ -236,7 +236,7 @@ export function Docs() {
                           "border-b transition-colors",
                           i === configTable.length - 1 && "border-0"
                         )}
-                        style={{ borderColor: 'color-mix(in srgb, var(--color-border) 50%, transparent)', backgroundColor: 'var(--color-surface)', hoverBackgroundColor: 'var(--color-surface-soft)' }}
+                        style={{ borderColor: 'color-mix(in srgb, var(--color-border) 50%, transparent)', backgroundColor: 'var(--color-surface)' }}
                       >
                         <td className="px-6 py-3 font-mono" style={{ color: 'var(--color-foreground)' }}>{row.variable}</td>
                         <td className="px-6 py-3 font-mono" style={{ color: 'var(--color-muted-foreground)' }}>{row.default}</td>
