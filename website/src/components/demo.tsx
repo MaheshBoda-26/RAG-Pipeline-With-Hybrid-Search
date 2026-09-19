@@ -11,9 +11,7 @@ interface DemoDocument {
 }
 
 /** Files bundled with the repo — sample corpus is protected from deletion. */
-const SAMPLE_DOC_NAMES = new Set([
-  "readme.md", "computer_vision.txt", "data_science.txt", "rag_basics.md", "ml_fundamentals.txt",
-]);
+const isSampleDoc = (source: string) => source.split("/").includes("sample_docs");
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { DocumentUploader } from "@/components/DocumentUploader";
@@ -349,7 +347,7 @@ export function Demo() {
                 <ul className="space-y-1.5 max-h-48 overflow-y-auto" role="list">
                   {documents.map(doc => {
                     const name = doc.source.split("/").pop() || doc.source;
-                    const deletable = !SAMPLE_DOC_NAMES.has(name.toLowerCase());
+                    const deletable = !isSampleDoc(doc.source);
                     return (
                       <li
                         key={doc.source}
