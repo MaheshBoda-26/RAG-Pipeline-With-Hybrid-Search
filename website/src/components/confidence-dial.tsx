@@ -159,7 +159,7 @@ export function CitedAnswer({ answer, sources }: { answer: string; sources: Hove
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
                 role="tooltip"
-                className="absolute bottom-7 left-1/2 z-20 w-72 -translate-x-1/2 rounded-lg border p-3 text-left shadow-xl"
+                className="citation-popover absolute bottom-7 left-1/2 z-20 -translate-x-1/2 rounded-lg border p-3 text-left shadow-xl"
                 style={{
                   backgroundColor: "var(--color-canvas)",
                   borderColor: "var(--color-hairline)",

@@ -214,7 +214,7 @@ export function Demo() {
   return (
     <section
       id="demo"
-      className="py-24 sm:py-32 lg:py-40"
+      className="overflow-x-clip py-24 sm:py-32 lg:py-40"
       aria-labelledby="demo-title"
       style={{ backgroundColor: 'var(--color-surface)' }}
     >
@@ -290,8 +290,8 @@ export function Demo() {
                     step="0.1"
                     value={config.denseWeight}
                     onChange={(e) => setConfig({ ...config, denseWeight: parseFloat(e.target.value) })}
-                    className="w-full h-2 rounded-lg appearance-none"
-                    style={{ backgroundColor: 'var(--color-surface-soft)', accentColor: 'var(--color-primary)' }}
+                    className="w-full rounded-lg"
+                    style={{ color: 'var(--color-primary)' }}
                   />
                 </div>
 
@@ -307,8 +307,8 @@ export function Demo() {
                     step="0.1"
                     value={config.sparseWeight}
                     onChange={(e) => setConfig({ ...config, sparseWeight: parseFloat(e.target.value) })}
-                    className="w-full h-2 rounded-lg appearance-none"
-                    style={{ backgroundColor: 'var(--color-surface-soft)', accentColor: 'var(--color-accent)' }}
+                    className="w-full rounded-lg"
+                    style={{ color: 'var(--color-accent)' }}
                   />
                 </div>
 
@@ -351,7 +351,7 @@ export function Demo() {
                 <button
                   onClick={refreshDocuments}
                   aria-label="Refresh document list"
-                  className="p-1.5 rounded-md hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                  className="p-2.5 -m-1 rounded-md hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
                   style={{ color: 'var(--color-muted-foreground)' }}
                 >
                   <RefreshCw className="w-4 h-4" />
@@ -390,7 +390,7 @@ export function Demo() {
                     return (
                       <li
                         key={doc.source}
-                        className="flex items-center gap-1 px-1.5 py-1.5 rounded-lg border text-sm transition-colors"
+                        className="flex items-center gap-1 px-1.5 py-1 rounded-lg border text-sm transition-colors"
                         style={{
                           backgroundColor: isScoped
                             ? "color-mix(in srgb, var(--color-accent) 12%, transparent)"
@@ -405,7 +405,7 @@ export function Demo() {
                           aria-pressed={isScoped}
                           aria-label={`${isScoped ? "Stop focusing" : "Focus"} questions on ${name}`}
                           title={doc.source}
-                          className="flex-1 min-w-0 flex items-center justify-between gap-2 rounded-md px-1.5 py-1 text-left hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                          className="flex-1 min-w-0 flex items-center justify-between gap-2 rounded-md px-1.5 py-2.5 text-left hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
                         >
                           <span
                             className="min-w-0 truncate font-mono text-xs"
@@ -475,7 +475,7 @@ export function Demo() {
             className="space-y-6"
           >
             <form onSubmit={handleSubmit} className="bg-surface border border-border rounded-xl p-6" style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}>
-              <div className="flex gap-3">
+              <div className="flex flex-col gap-3 sm:flex-row">
                 <label htmlFor="query" className="visually-hidden">
                   Your question
                 </label>
@@ -485,7 +485,7 @@ export function Demo() {
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Ask a question about the documentation..."
-                  className="flex-1 px-4 py-3 rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 rounded-lg text-base sm:text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                   disabled={isLoading}
                   autoComplete="off"
                   style={{ backgroundColor: 'var(--color-surface-soft)', borderColor: 'var(--color-border-strong)', color: 'var(--color-foreground)' }}

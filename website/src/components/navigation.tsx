@@ -175,7 +175,7 @@ export function Navigation() {
                 <motion.a
                   key={link.href}
                   href={link.href}
-                  className="block text-base font-medium transition-colors"
+                  className="block py-2.5 text-base font-medium transition-colors"
                   onClick={() => setIsOpen(false)}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -200,7 +200,7 @@ export function Navigation() {
                   href="https://github.com/MaheshBoda-26/RAG-Pipeline-With-Hybrid-Search"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="transition-colors"
+                  className="p-2 -m-2 transition-colors"
                   whileHover={{ scale: 1.1 }}
                   aria-label="View on GitHub"
                   style={{ color: 'var(--color-text-2)' }}

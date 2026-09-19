@@ -313,3 +313,60 @@
     }
   }
 }
+
+/* ------------------------------------------------------------------ */
+/* Touch & mobile ergonomics                                           */
+/* ------------------------------------------------------------------ */
+
+/* Range sliders: `appearance-none` (set on the inputs in the demo) strips
+   the native thumb on WebKit — without these rules the drag handle is
+   invisible and ungrabbable on mobile Safari/Chrome. The input keeps a
+   28px hit area; the visible track is drawn by the pseudo-elements. */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 28px;
+  background: transparent;
+  cursor: pointer;
+}
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 8px;
+  border-radius: 9999px;
+  background: var(--color-surface-soft);
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  margin-top: -7px; /* center 22px thumb on the 8px track */
+  border-radius: 9999px;
+  background: currentColor; /* per-slider color set inline on the input */
+  border: 2px solid var(--color-canvas);
+  box-shadow: 0 1px 4px rgba(20, 20, 19, 0.25);
+}
+input[type="range"]::-moz-range-track {
+  height: 8px;
+  border-radius: 9999px;
+  background: var(--color-surface-soft);
+}
+input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 9999px;
+  background: currentColor;
+  border: 2px solid var(--color-canvas);
+}
+input[type="range"]:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 4px;
+}
+
+/* Citation hovercards are anchored centered on their badge; clamp them to
+   the viewport so they don't clip off-screen when a citation sits near a
+   phone-screen edge. */
+.citation-popover {
+  width: 18rem;
+  max-width: calc(100vw - 2.5rem);
+}
