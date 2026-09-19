@@ -1,12 +1,25 @@
 <div align="center">
 
-<video src="https://maheshboda-26.github.io/RAG-Pipeline-With-Hybrid-Search/brag-demo.mp4" controls muted playsinline width="100%"></video>
+<!--
+  OPTIONAL UPGRADE — true inline MP4 player:
+  GitHub strips <video> tags unless the src is a user-attachments URL, which can only be
+  minted by drag-and-drop in GitHub's own UI. To upgrade this animated demo to a real
+  player: edit this file on github.com, drag the demo mp4 (local copy:
+  brag-output/brag.mp4, or download it from the release link below) into the editor (or
+  into any issue's comment box) — GitHub uploads it and
+  prints a https://github.com/user-attachments/... URL — then replace the <img> below
+  with:  <video src="THAT_URL" controls muted playsinline width="100%"></video>
+-->
+
+<a href="https://github.com/MaheshBoda-26/RAG-Pipeline-With-Hybrid-Search/releases/download/demo-video/brag-demo.mp4">
+  <img src="docs/assets/brag-demo.gif" alt="20-second demo: ingest → hybrid retrieval → rerank → grounded, cited answer" width="100%">
+</a>
 
 **A retrieval-augmented generation pipeline that refuses to guess.**
 
 [Hybrid search](#architecture) · [Verified citations](#usage) · [Design decisions](#design-decisions-worth-knowing-about) · [Testing without a key](#testing-without-an-api-key) · [Extending](#extending-this-to-the-full-spec)
 
-<sub>Video not loading? [Download it here](https://github.com/MaheshBoda-26/RAG-Pipeline-With-Hybrid-Search/releases/download/demo-video/brag-demo.mp4) · Poster: [docs/assets/brag-poster.jpg](docs/assets/brag-poster.jpg)</sub>
+<sub>▶ <a href="https://github.com/MaheshBoda-26/RAG-Pipeline-With-Hybrid-Search/releases/download/demo-video/brag-demo.mp4"><b>Watch the full 20-second demo with sound (MP4)</b></a> · Poster: <a href="docs/assets/brag-poster.jpg">brag-poster.jpg</a></sub>
 
 </div>
 
