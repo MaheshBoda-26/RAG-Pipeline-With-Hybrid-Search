@@ -56,7 +56,10 @@ _CONTENT_STOPWORDS = frozenset(
     their them then there these they this to was we were what when where which who why will
     with would you your""".split()
 )
-_TOKEN_RE = re.compile(r"[a-z0-9_.\-]+")
+# Tokens are alphanumeric runs, optionally joined by . or - (so "bge-base",
+# "0.95" and "aegis_live" stay single tokens) but never ending in punctuation —
+# "minute." and "minute" must be the same token.
+_TOKEN_RE = re.compile(r"[a-z0-9_]+(?:[.\-][a-z0-9_]+)*")
 
 
 def content_tokens(text: str) -> set[str]:

@@ -2,6 +2,7 @@
 error codes -- the kind of tokens dense embeddings tend to blur together."""
 from __future__ import annotations
 
+import os
 import pickle
 import re
 from pathlib import Path
@@ -18,7 +19,11 @@ def tokenize(text: str) -> list[str]:
 class BM25Index:
     def __init__(self, user_id: str = "default"):
         self.user_id = user_id
-        self.index_dir = Path("./bm25_data")
+        # BM25_DIR exists so parallel eval/sweep runs (different chunking
+        # strategies, different corpora) cannot clobber each other's index —
+        # sharing one pickle file across configurations silently corrupts
+        # whichever run reads last.
+        self.index_dir = Path(os.getenv("BM25_DIR", "./bm25_data"))
         self.index_path = self.index_dir / f"{user_id}.pkl"
         self.bm25: BM25Okapi | None = None
         self.ids: list[str] = []

@@ -206,7 +206,10 @@ class Settings:
 
     # --- Contextual retrieval: situate each chunk before indexing it ---
     contextual_retrieval: bool = field(default_factory=lambda: os.getenv("CONTEXTUAL_RETRIEVAL", "false").lower() == "true")
-    contextual_model: str = field(default_factory=lambda: os.getenv("CONTEXTUAL_MODEL") or os.getenv("CHAT_MODEL", "meta/llama-3.1-70b-instruct"))
+    contextual_model: str = field(
+        default_factory=lambda: os.getenv("CONTEXTUAL_MODEL", "")
+        or os.getenv("CHAT_MODEL", "meta/llama-3.1-70b-instruct")
+    )
     contextual_max_chunks: int = field(default_factory=lambda: int(os.getenv("CONTEXTUAL_MAX_CHUNKS", "400")))
     context_cache_path: str = field(default_factory=lambda: os.getenv("CONTEXT_CACHE_PATH", "./.context_cache.json"))
 

@@ -19,7 +19,6 @@ class _JudgeClient:
     def __init__(self, content):
         self.calls = 0
         self._content = content
-        completions = self
 
         def create(**kwargs):
             self.calls += 1
