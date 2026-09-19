@@ -200,6 +200,28 @@ class TestFusionWeightOverrides:
         )
         assert response.status_code == 422
 
+    def test_scope_is_echoed_in_trace(self, viz_client, shared_pipeline):
+        """The trace must report which document retrieval was scoped to."""
+        response = viz_client.post(
+            "/v1/demo/pipeline",
+            json={"question": self.QUESTION, "source": "authentication.md"},
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["scope"] == "authentication.md"
+        # Every retrieved source must come from the scoped document.
+        if not data["refused"]:
+            assert data["sources"], "scoped retrieval must surface the doc"
+            for s in data["sources"]:
+                assert s["source"].endswith("authentication.md")
+
+    def test_unscoped_trace_has_null_scope(self, viz_client):
+        response = viz_client.post(
+            "/v1/demo/pipeline", json={"question": self.QUESTION}
+        )
+        assert response.status_code == 200
+        assert response.json()["scope"] is None
+
 
 class TestDemoDeleteDocumentEndpoint:
     """DELETE /v1/demo/documents?source=... — per-document removal.

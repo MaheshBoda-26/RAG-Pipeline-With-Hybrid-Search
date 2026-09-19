@@ -716,4 +716,7 @@ class RAGPipeline:
             "total_ms": round(sum(timings.values()), 2),
             "lanes": lanes,
             "trace": {"stages": list(timings.keys())},
+            # Echo the active document scope so the console can show that
+            # retrieval was restricted to one document.
+            "scope": source,
         }

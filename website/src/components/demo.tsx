@@ -57,6 +57,10 @@ export function Demo() {
   const [ingestMsg, setIngestMsg] = React.useState<string | null>(null);
   const [documents, setDocuments] = React.useState<DemoDocument[]>([]);
   const [deletingSource, setDeletingSource] = React.useState<string | null>(null);
+  // Search scope: "" searches the whole corpus; a source path restricts
+  // retrieval to that single document (DB-level filter, so an uploaded doc's
+  // chunks are never crowded out by the rest of the corpus).
+  const [searchScope, setSearchScope] = React.useState<string>("");
 
   const refreshDocuments = React.useCallback(async () => {
     try {
@@ -85,6 +89,8 @@ export function Demo() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Delete failed");
       setDocuments(prev => prev.filter(d => d.source !== source));
+      // Dropping the scoped document must also drop the scope filter.
+      setSearchScope(prev => (prev === source ? "" : prev));
       window.dispatchEvent(new Event("rag:documents-changed"));
     } catch (err) {
       setIngestState("failed");
@@ -110,7 +116,11 @@ export function Demo() {
       const res = await fetch("/api/demo/pipeline", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question: query.trim(), ...weights() }),
+        body: JSON.stringify({
+          question: query.trim(),
+          ...weights(),
+          ...(searchScope ? { source: searchScope } : {}),
+        }),
       });
 
       const data = await res.json();
@@ -240,7 +250,14 @@ export function Demo() {
             className="space-y-6"
           >
             {/* Document Uploader */}
-            <DocumentUploader />
+            <DocumentUploader
+              onUploaded={(filename) => {
+                // Auto-focus: a visitor who just uploaded a document almost
+                // certainly wants to ask about THAT document.
+                setSearchScope(filename);
+                refreshDocuments();
+              }}
+            />
 
             <div className="bg-surface border border-border rounded-xl p-6" style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}>
               <h3 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: 'var(--color-foreground)' }}>
@@ -323,9 +340,10 @@ export function Demo() {
             </div>
 
             {/* Corpus — live list of indexed documents with per-document delete.
-                Sample corpus files are protected; only user uploads are deletable. */}
+                Sample corpus files are protected; only user uploads are deletable.
+                Clicking a document scopes every question to that document. */}
             <div className="bg-surface border border-border rounded-xl p-6" style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}>
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between mb-2">
                 <h3 className="text-lg font-semibold flex items-center gap-2" style={{ color: 'var(--color-foreground)' }}>
                   <FileText className="w-5 h-5 text-primary" />
                   Corpus
@@ -339,6 +357,26 @@ export function Demo() {
                   <RefreshCw className="w-4 h-4" />
                 </button>
               </div>
+              <p className="text-xs mb-3" style={{ color: 'var(--color-muted-foreground)' }}>
+                Click a document to focus your questions on it.
+              </p>
+              {searchScope && (
+                <button
+                  onClick={() => setSearchScope("")}
+                  className="w-full mb-3 flex items-center justify-between gap-2 px-3 py-2 rounded-lg border text-xs transition-colors"
+                  style={{
+                    backgroundColor: 'color-mix(in srgb, var(--color-accent) 12%, transparent)',
+                    borderColor: 'color-mix(in srgb, var(--color-accent) 40%, transparent)',
+                    color: 'var(--color-foreground)',
+                  }}
+                  aria-label="Clear search scope — search all documents"
+                >
+                  <span className="min-w-0 truncate">
+                    Scope: {searchScope.split("/").pop()} · all questions target this doc
+                  </span>
+                  <span aria-hidden>✕</span>
+                </button>
+              )}
               {documents.length === 0 ? (
                 <p className="text-sm" style={{ color: 'var(--color-muted-foreground)' }}>
                   No documents indexed yet — upload files or ingest the sample corpus.
@@ -348,18 +386,41 @@ export function Demo() {
                   {documents.map(doc => {
                     const name = doc.source.split("/").pop() || doc.source;
                     const deletable = !isSampleDoc(doc.source);
+                    const isScoped = searchScope === doc.source;
                     return (
                       <li
                         key={doc.source}
-                        className="flex items-center gap-2 px-2.5 py-2 rounded-lg border text-sm"
-                        style={{ backgroundColor: 'var(--color-surface-soft)', borderColor: 'var(--color-border)' }}
+                        className="flex items-center gap-1 px-1.5 py-1.5 rounded-lg border text-sm transition-colors"
+                        style={{
+                          backgroundColor: isScoped
+                            ? "color-mix(in srgb, var(--color-accent) 12%, transparent)"
+                            : "var(--color-surface-soft)",
+                          borderColor: isScoped
+                            ? "color-mix(in srgb, var(--color-accent) 40%, transparent)"
+                            : "var(--color-border)",
+                        }}
                       >
-                        <span className="flex-1 min-w-0 truncate font-mono text-xs" style={{ color: 'var(--color-foreground)' }} title={doc.source}>
-                          {name}
-                        </span>
-                        <span className="flex-shrink-0 text-xs tabular-nums" style={{ color: 'var(--color-muted-foreground)' }}>
-                          {doc.chunk_count} ch
-                        </span>
+                        <button
+                          onClick={() => setSearchScope(isScoped ? "" : doc.source)}
+                          aria-pressed={isScoped}
+                          aria-label={`${isScoped ? "Stop focusing" : "Focus"} questions on ${name}`}
+                          title={doc.source}
+                          className="flex-1 min-w-0 flex items-center justify-between gap-2 rounded-md px-1.5 py-1 text-left hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                        >
+                          <span
+                            className="min-w-0 truncate font-mono text-xs"
+                            style={{ color: "var(--color-foreground)" }}
+                          >
+                            {isScoped ? "→ " : ""}
+                            {name}
+                          </span>
+                          <span
+                            className="flex-shrink-0 text-xs tabular-nums"
+                            style={{ color: "var(--color-muted-foreground)" }}
+                          >
+                            {doc.chunk_count} ch
+                          </span>
+                        </button>
                         {deletable && (
                           <button
                             onClick={() => handleDeleteDocument(doc.source)}

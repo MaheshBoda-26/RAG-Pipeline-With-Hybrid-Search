@@ -24,7 +24,7 @@ interface UploadedFile {
   error?: string;
 }
 
-export function DocumentUploader() {
+export function DocumentUploader({ onUploaded }: { onUploaded?: (filename: string) => void }) {
   const [files, setFiles] = React.useState<UploadedFile[]>([]);
   const [dragActive, setDragActive] = React.useState(false);
   const [isUploading, setIsUploading] = React.useState(false);
@@ -106,6 +106,11 @@ export function DocumentUploader() {
       setFiles(prev => prev.map(f => f.id === file.id ? { ...f, status: "success", progress: 100 } : f));
       // Let listeners (e.g. the Corpus panel) refresh their document list.
       window.dispatchEvent(new Event("rag:documents-changed"));
+      // Hand the stored source name back so the UI can scope questions to
+      // the freshly uploaded document.
+      if (onUploaded && (data.file || data.stored_as)) {
+        onUploaded(data.file || data.stored_as);
+      }
       return data;
     } catch (err) {
       setFiles(prev => prev.map(f => f.id === file.id ? { ...f, status: "error", error: (err as Error).message } : f));
