@@ -1,0 +1,21 @@
+# pre-commit guards — install once with:
+#   pip install pre-commit && pre-commit install
+#
+# Blocks committing secrets, personal uploads, tool caches, and large binaries.
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-added-large-files
+        args: ["--maxkb=2048"]
+      - id: detect-private-key
+      - id: check-merge-conflict
+      - id: check-case-conflict
+
+  - repo: local
+    hooks:
+      - id: guard-local-artifacts
+        name: guard against secrets and local artifacts
+        entry: python scripts/guard_local_artifacts.py
+        language: system
+        pass_filenames: true

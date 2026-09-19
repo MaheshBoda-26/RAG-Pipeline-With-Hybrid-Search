@@ -1,0 +1,3 @@
+# Machine Learning Fundamentals (Updated Version)
+
+Machine learning is a subset of artificial intelligence that focuses on building systems that learn from data. This document covers the basics of supervised and unsupervised learning, including classification, regression, and clustering algorithms.

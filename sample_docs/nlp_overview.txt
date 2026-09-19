@@ -1,0 +1,3 @@
+# Test Document 3: Natural Language Processing Overview
+
+Natural Language Processing (NLP) is a branch of AI that helps computers understand, interpret and manipulate human language. NLP draws from many disciplines including computer science and linguistics.

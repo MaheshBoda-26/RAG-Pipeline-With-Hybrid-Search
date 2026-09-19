@@ -1,36 +1,85 @@
-.vercel
-.env*
-
-# Ignore all markdown files except README.md
-*.md
-!README.md
-
-# Secrets
+# ============================================================
+# Secrets & credentials — NEVER commit
+# ============================================================
 .env
 .env.*
 !.env.example
+.jwt_secret
+user_registry.json
+cookies*.txt
+*.pem
+*.key
 
-# Local IDE / AI config
+# ============================================================
+# Virtual environments & package managers
+# ============================================================
+.venv/
+venv/
+env/
+node_modules/
+
+# ============================================================
+# Local runtime data (vector stores, caches, logs)
+# ============================================================
+qdrant_data/
+bm25_data/
+test_qdrant_data/
+test_bm25_data/
+*.log
+
+# ============================================================
+# Uploaded / personal documents — runtime data, not source
+# ============================================================
+sample_docs/**/uploads/
+uploads/
+
+# ============================================================
+# Local tooling (AI agents, editors, scrapers)
+# ============================================================
 .claude/
+.agents/
+.mcp.json
+.freebuff/
+.playwright-mcp/
+graphify-out/
+.firecrawl/
 
-# Python bytecode
+# ============================================================
+# Python
+# ============================================================
 __pycache__/
 *.py[cod]
 *.pyo
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.coverage
+htmlcov/
 
-# Local database / runtime data
-qdrant_data/
+# ============================================================
+# Website
+# ============================================================
+.vercel
+website/.next/
+website/out/
+website/node_modules/
 
-# macOS
+# ============================================================
+# Test artifacts
+# ============================================================
+tests/eval/results*.json
+
+# ============================================================
+# OS
+# ============================================================
 .DS_Store
 **/.DS_Store
 
-# Test artifacts
-tests/eval/results*.json
-.jwt_secret
-user_registry.json
-*.log
-cookies*.txt
-bm25_data/
-.freebuff/
-.playwright-mcp/
+# ============================================================
+# Markdown: keep README + intentional docs, ignore scratch notes
+# ============================================================
+*.md
+!README.md
+!docs/**/*.md
+!sample_docs/**/*.md

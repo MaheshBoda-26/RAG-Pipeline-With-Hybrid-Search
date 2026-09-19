@@ -1,0 +1,3 @@
+# Test Document: Reinforcement Learning Overview
+
+Reinforcement learning is a type of machine learning where an agent learns to make decisions by taking actions in an environment to maximize cumulative reward. The agent learns from trial and error, receiving rewards or penalties based on its actions.

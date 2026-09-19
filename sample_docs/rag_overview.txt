@@ -1,0 +1,21 @@
+# RAG Pipeline Overview
+
+The RAG (Retrieval-Augmented Generation) Pipeline is a production-grade system for querying internal documents using hybrid search.
+
+## Architecture
+
+The pipeline combines:
+1. **Dense Vector Search** - Using NVIDIA embeddings for semantic similarity
+2. **Sparse BM25 Retrieval** - Keyword-based search for exact matches
+3. **Reciprocal Rank Fusion (RRF)** - Combines dense and sparse results
+4. **LLM-as-Judge Reranking** - Re-ranks candidates using LLM evaluation
+5. **Grounded Generation** - Generates answers with verified inline citations
+
+## Features
+
+- Multi-tenant support with user isolation
+- Document upload and ingestion (PDF, DOCX, TXT, MD)
+- Real-time query dashboard with vector space visualization
+- Configurable chunking strategies (fixed, recursive, semantic)
+- Deduplication to avoid redundant chunks
+- Confidence-based fallback for low-retrieval scenarios
