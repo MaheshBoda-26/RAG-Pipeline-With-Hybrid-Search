@@ -100,9 +100,11 @@ class QdrantVectorStore:
                             )
                         )
                     },
-                    sparse_vectors_config={
-                        "bm25": qmodels.SparseVectorParams(modifier=qmodels.Modifier.IDF)
-                    },
+                    # No sparse_vectors_config: keyword search runs through the
+                    # in-process BM25 index (retrieval/sparse.py) and the two
+                    # legs are fused with RRF in retrieval/fusion.py. Declaring a
+                    # Qdrant sparse vector here would imply server-side hybrid
+                    # search that this pipeline does not use.
                 )
 
     def upsert(self, chunks: list[Chunk], embeddings: list[list[float]]) -> None:

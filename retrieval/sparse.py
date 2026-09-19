@@ -31,7 +31,13 @@ class BM25Index:
         never drifts out of sync with the vector store."""
         self.ids = [r["id"] for r in records]
         self.payloads = [r["payload"] for r in records]
-        corpus = [tokenize(r["payload"]["text"]) for r in records]
+        # Index the enriched text (situating context + passage) when contextual
+        # retrieval is on, so keyword search matches the same vocabulary the
+        # embedding sees. Falls back to the raw passage for older records.
+        corpus = [
+            tokenize(r["payload"].get("index_text") or r["payload"]["text"])
+            for r in records
+        ]
         self.bm25 = BM25Okapi(corpus) if corpus else None
         self.save()
 
