@@ -40,6 +40,9 @@ class Chunk:
     # vectors from different embedding models in one collection silently
     # destroys dense retrieval, so a mismatch must be loud, not silent.
     embedding_model: str | None = None
+    # Content hash of the source document this chunk came from. Lets a later
+    # ingest skip re-embedding documents whose text has not changed.
+    doc_hash: str | None = None
 
 
 def _make_chunk(text: str, source: str, index: int, strategy: str, heading: str | None) -> Chunk:

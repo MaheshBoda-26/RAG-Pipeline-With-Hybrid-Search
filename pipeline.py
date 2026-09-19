@@ -3,6 +3,7 @@ generation -> citation verification into two calls: ingest() and ask().
 """
 from __future__ import annotations
 
+import os
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
@@ -21,7 +22,9 @@ from generation.generate import generate_answer
 from generation.prompts import build_context_block
 from ingestion.chunking import Chunk, chunk_fixed, chunk_recursive, chunk_semantic
 from ingestion.dedup import DuplicateIndex
+from ingestion.incremental import document_hash, plan_incremental, stored_hashes
 from ingestion.loaders import RawDocument, load_directory, load_file
+from observability import StageTimer, log_event, new_trace_id
 from retrieval.embeddings import Embedder, create_openai_client
 from retrieval.reranker import rerank
 from retrieval.sparse import BM25Index
@@ -38,6 +41,8 @@ class AskResponse:
     confidence: dict                 # retrieval / coverage / completeness / composite
     refused: bool = False
     refusal_reason: str | None = None
+    # Per-stage wall-clock timings in milliseconds (see observability.StageTimer)
+    timings: dict | None = None
 
 
 class RAGPipeline:
@@ -139,9 +144,21 @@ class RAGPipeline:
             raise ValueError(f"Ingest path {path} is outside the allowed directory {self.settings.allowed_ingest_root}")
 
         docs = load_directory(requested_path)
+
+        # Incremental ingest: skip documents whose text is unchanged since the
+        # last run, so re-ingesting a corpus does not re-embed everything.
+        try:
+            known_hashes = stored_hashes(self.vector_store.all_chunks())
+        except Exception:
+            known_hashes = {}
+        changed_docs, unchanged_sources = plan_incremental(docs, known_hashes)
+
         all_chunks: list[Chunk] = []
-        for doc in docs:
-            all_chunks.extend(self._chunk_document(doc))
+        for doc in changed_docs:
+            chunks = self._chunk_document(doc)
+            for chunk in chunks:
+                chunk.doc_hash = document_hash(doc.text)
+            all_chunks.extend(chunks)
 
         if not all_chunks:
             # Invalidate query cache since documents may have changed
@@ -150,7 +167,13 @@ class RAGPipeline:
                     self.query_cache.clear_user(self.user_id)
                 except Exception:
                     pass
-            return {"documents": len(docs), "chunks_indexed": 0, "duplicates_skipped": 0}
+            return {
+                "documents": len(docs),
+                "documents_changed": len(changed_docs),
+                "documents_unchanged": len(unchanged_sources),
+                "chunks_indexed": 0,
+                "duplicates_skipped": 0,
+            }
 
         embeddings = self.embedder.embed([c.text for c in all_chunks])
 
@@ -178,6 +201,8 @@ class RAGPipeline:
 
         return {
             "documents": len(docs),
+            "documents_changed": len(changed_docs),
+            "documents_unchanged": len(unchanged_sources),
             "chunks_created": len(all_chunks),
             "chunks_indexed": len(kept_chunks),
             "duplicates_skipped": len(dup_idx),
@@ -211,6 +236,8 @@ class RAGPipeline:
             doc = RawDocument(source=original_filename, text=doc.text, doc_type=doc.doc_type, pages=doc.pages)
 
         chunks = self._chunk_document(doc)
+        for chunk in chunks:
+            chunk.doc_hash = document_hash(doc.text)
         if not chunks:
             # Invalidate query cache since documents may have changed
             if self.query_cache:
@@ -262,7 +289,11 @@ class RAGPipeline:
     # Retrieval + generation
     # ------------------------------------------------------------------
     def ask(self, question: str, source: str | None = None) -> AskResponse:
-        query_embedding = self.embedder.embed_one(question)
+        trace_id = new_trace_id()
+        timer = StageTimer(trace_id=trace_id, log=bool(os.getenv("LOG_PIPELINE_STAGES")))
+
+        with timer.stage("embed_query"):
+            query_embedding = self.embedder.embed_one(question)
 
         # Check query cache first
         if self.query_cache:
@@ -278,19 +309,21 @@ class RAGPipeline:
         # Use Qdrant's native hybrid search (dense + sparse + server-side RRF)
         # This replaces the previous pipeline of: dense query + Python BM25 + manual RRF
         # Qdrant handles sparse vector search, RRF fusion, and filtering server-side
-        candidate_pool = self.vector_store.hybrid_query(
-            query_embedding=query_embedding,
-            question=question,
-            top_k=self.settings.rerank_candidate_pool,
-            source_filter=source,
-            bm25=self.bm25,
-        )
+        with timer.stage("retrieve"):
+            candidate_pool = self.vector_store.hybrid_query(
+                query_embedding=query_embedding,
+                question=question,
+                top_k=self.settings.rerank_candidate_pool,
+                source_filter=source,
+                bm25=self.bm25,
+            )
 
-        ranked = rerank(
-            self.client, self.settings.chat_model, question, candidate_pool,
-            top_n=self.settings.final_top_k,
-            settings=self.settings,
-        )
+        with timer.stage("rerank"):
+            ranked = rerank(
+                self.client, self.settings.chat_model, question, candidate_pool,
+                top_n=self.settings.final_top_k,
+                settings=self.settings,
+            )
 
         retr_conf = retrieval_confidence(ranked)
         if not ranked or retr_conf < self.settings.min_retrieval_confidence:
@@ -324,23 +357,27 @@ class RAGPipeline:
                 },
                 refused=True,
                 refusal_reason="retrieval_confidence_below_threshold",
+                timings=timer.as_dict(),
             )
 
-        answer = generate_answer(self.client, self.settings.chat_model, question, ranked)
+        with timer.stage("generate"):
+            answer = generate_answer(self.client, self.settings.chat_model, question, ranked)
 
-        claims = extract_claims(answer)
-        context_str = "\n\n".join(build_context_block(i + 1, c["payload"]) for i, c in enumerate(ranked))
+        with timer.stage("extract_claims"):
+            claims = extract_claims(answer)
+            context_str = "\n\n".join(build_context_block(i + 1, c["payload"]) for i, c in enumerate(ranked))
 
         # Run citation verification and completeness scoring in parallel
-        claims, completeness = verify_citations_and_completeness_sync(
-            self.client,
-            self.settings.chat_model,
-            claims,
-            ranked,
-            question,
-            answer,
-            context_str,
-        )
+        with timer.stage("verify_and_score"):
+            claims, completeness = verify_citations_and_completeness_sync(
+                self.client,
+                self.settings.chat_model,
+                claims,
+                ranked,
+                question,
+                answer,
+                context_str,
+            )
         coverage = citation_coverage(claims)
 
         composite = composite_confidence(retr_conf, coverage, completeness)
@@ -366,6 +403,16 @@ class RAGPipeline:
                 "completeness": round(completeness, 3),
                 "composite": composite,
             },
+            timings=timer.as_dict(),
+        )
+
+        log_event(
+            "ask",
+            trace_id,
+            refused=False,
+            sources=len(response.sources),
+            composite=composite,
+            total_ms=timer.total_ms,
         )
 
         # Store in cache for future queries

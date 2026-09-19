@@ -6,9 +6,9 @@
   minted by drag-and-drop in GitHub's own UI. To upgrade this animated demo to a real
   player: edit this file on github.com, drag the demo mp4 (local copy:
   brag-output/brag.mp4, or download it from the release link below) into the editor (or
-  into any issue's comment box) — GitHub uploads it and
-  prints a https://github.com/user-attachments/... URL — then replace the <img> below
-  with:  <video src="THAT_URL" controls muted playsinline width="100%"></video>
+  into any issue's comment box) — GitHub uploads it and prints a
+  https://github.com/user-attachments/... URL — then replace the <img> below with:
+  <video src="THAT_URL" controls muted playsinline width="100%"></video>
 -->
 
 <a href="https://github.com/MaheshBoda-26/RAG-Pipeline-With-Hybrid-Search/releases/download/demo-video/brag-demo.mp4">
@@ -17,7 +17,12 @@
 
 **A retrieval-augmented generation pipeline that refuses to guess.**
 
-[Hybrid search](#architecture) · [Verified citations](#usage) · [Design decisions](#design-decisions-worth-knowing-about) · [Testing without a key](#testing-without-an-api-key) · [Extending](#extending-this-to-the-full-spec)
+[![CI](https://github.com/MaheshBoda-26/RAG-Pipeline-With-Hybrid-Search/actions/workflows/ci.yml/badge.svg)](https://github.com/MaheshBoda-26/RAG-Pipeline-With-Hybrid-Search/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/downloads/)
+[![Lint: ruff](https://img.shields.io/badge/lint-ruff-261230.svg)](https://github.com/astral-sh/ruff)
+
+[Benchmark](#benchmark) · [How it works](#how-it-works) · [Design decisions](#design-decisions-worth-knowing-about) · [Quickstart](#quickstart) · [Evaluation](#evaluation) · [What this is not](#what-this-is-not)
 
 <sub>▶ <a href="https://github.com/MaheshBoda-26/RAG-Pipeline-With-Hybrid-Search/releases/download/demo-video/brag-demo.mp4"><b>Watch the full 20-second demo with sound (MP4)</b></a> · Poster: <a href="docs/assets/brag-poster.jpg">brag-poster.jpg</a></sub>
 
@@ -26,166 +31,159 @@
 # RAG Pipeline with Hybrid Search Over Internal Docs
 
 A retrieval-augmented generation system that ingests internal documentation,
-indexes it with both dense vector and BM25 sparse search, fuses and reranks
+indexes it with both dense vector and BM25 sparse search, fuses and reranks the
 results, and generates grounded answers with verified inline citations and a
-composite confidence score.
+composite confidence score — refusing to answer when retrieval is weak.
 
-This covers Phases 1–3 of the full spec (ingestion/chunking, hybrid
-retrieval, grounded generation + citation verification) as a working,
-runnable system. Phases 4–6 (eval framework, dashboard, Docker packaging)
-are not built yet — see "Extending this" below for where they would plug in.
+Everything is measured. The numbers below are produced by the harness in
+`tests/eval/` over a 54-question golden set, and CI runs the same suite.
 
-## Architecture
+## Benchmark
 
+54 questions · `meta/llama-3.1-70b-instruct` judge · local `BAAI/bge-base-en-v1.5`
+embeddings · reproducible with `make eval`.
+
+| Metric | Value |
+| --- | --- |
+| Questions | 54 |
+| Answered | 54 |
+| Refused | 0 (0.0%) |
+| Correctness | 0.854 |
+| Faithfulness | 0.981 |
+| Citation accuracy | 0.963 |
+| Retrieval relevance (judge) | 0.691 |
+| **Recall@1** | **0.796** |
+| **Recall@3** | **0.944** |
+| **Recall@5** | **0.981** |
+| **MRR** | **0.873** |
+| **NDCG@5** | **0.952** |
+| Mean latency | 5.1 s |
+
+Retrieval metrics are **judge-free**: they check whether the chunk containing the
+golden passage was retrieved, and at what rank. That separates *retrieval*
+failures from *generation* failures — the distinction most RAG projects cannot
+measure. Full methodology and raw output: [`docs/benchmarks.md`](docs/benchmarks.md).
+
+The refusal path is not exercised by this golden set (every question is
+answerable), so it is covered by unit tests and the confidence-gate tests
+instead: `pytest tests/test_pipeline_smoke.py -k refusal`.
+
+## How it works
+
+```mermaid
+flowchart LR
+    A[docs: md/txt/html/pdf] --> B[loaders<br/>normalise + metadata]
+    B --> C[chunking<br/>fixed | recursive | semantic]
+    C --> D[cosine dedup<br/>0.95 threshold]
+    D --> E[dense: Qdrant HNSW<br/>+ sparse: BM25]
+    E --> F[RRF fusion<br/>server-side]
+    F --> G[rerank<br/>cross-encoder, LLM fallback]
+    G --> H{retrieval<br/>confidence}
+    H -- below threshold --> I[refuse + suggest<br/>documents to read]
+    H -- ok --> J[generate with<br/>context blocks]
+    J --> K[claim extraction +<br/>citation verification]
+    K --> L[completeness scoring]
+    L --> M[answer + citations +<br/>composite confidence]
 ```
-sample_docs/ (.md/.txt/.html/.pdf)
-        │
-        ▼
-  ingestion/loaders.py        multi-format → normalized plaintext + metadata
-        │
-        ▼
-  ingestion/chunking.py       fixed | recursive | semantic (switchable via config)
-        │
-        ▼
-  ingestion/dedup.py          skip near-duplicate chunks (cosine > 0.95)
-        │
-        ▼
-  retrieval/embeddings.py ──► retrieval/vector_store.py (Qdrant, dense)
-        │                     retrieval/sparse.py        (BM25, sparse)
-        │                             │
-        │                             ▼
-        │                     retrieval/fusion.py  (Reciprocal Rank Fusion)
-        │                             │
-        │                             ▼
-        │                     retrieval/reranker.py (LLM-as-judge, top-N)
-        │                             │
-        ▼                             ▼
-  generation/prompts.py ──────► generation/generate.py  (grounded answer)
-                                        │
-                                        ▼
-                              generation/citations.py
-                              (extract → verify → confidence score)
-```
 
-`pipeline.py` wires all of this into two calls: `ingest_directory(path)` and
-`ask(question)`. `cli.py` and `api.py` are two thin front ends over the same
-`RAGPipeline` class.
+| Stage | Implementation | Default |
+| --- | --- | --- |
+| Embeddings | FastEmbed (ONNX) `BAAI/bge-base-en-v1.5`, local, no GPU | 768 dims |
+| Dense store | Qdrant (embedded or server) with per-user collections | `./qdrant_data` |
+| Sparse | BM25 over the same chunk set | top-10 |
+| Fusion | Reciprocal Rank Fusion, k=60 | 0.7 dense / 0.3 sparse |
+| Rerank | Cross-encoder `ms-marco-MiniLM-L-6-v2`, LLM fallback | top-15 → top-5 |
+| Refusal | Composite confidence gate | min 0.35 |
+| Cache | Exact + semantic query cache (Redis, optional) | off |
 
-## Setup
+## Quickstart
 
 ```bash
-pip install -r requirements.txt
-cp .env.example .env   # then fill in OPENAI_API_KEY
+make install                 # runtime + dev dependencies
+cp .env.example .env         # add NVIDIA_API_KEY (chat only; embeddings are local)
+make demo                    # ingest ./sample_docs, then ask a question
+make api                     # FastAPI on :8000, docs at /docs
 ```
 
-Qdrant runs in **embedded mode** by default — a local on-disk folder
-(`./qdrant_data`), no separate server process needed. Set `QDRANT_URL` in
-`.env` to point at a real Qdrant server instead (needed for concurrent
-access — embedded mode locks its storage directory to one process at a
-time).
-
-## Usage
-
-```bash
-# Ingest the bundled sample docs (a small fictional API's documentation)
-python cli.py ingest ./sample_docs
-
-# Ask a question
-python cli.py ask "How do I authenticate with the API and what happens if I hit the rate limit?"
-
-# Or run as an API
-uvicorn api:app --reload
-curl -X POST localhost:8000/v1/ingest -H 'content-type: application/json' -d '{"path": "./sample_docs"}'
-curl -X POST localhost:8000/v1/ask -H 'content-type: application/json' -d '{"question": "How do I deploy on Kubernetes?"}'
-```
-
-A CLI `ask` call returns something like:
-
-```
-A: To authenticate with the API, use either an API key in the Authorization
-header [1] or OAuth2 [3]. Exceeding the rate limit returns 429 Too Many
-Requests with a Retry-After header [1].
-
-Sources:
-  [1] sample_docs/authentication.md (Rate Limits)
-  [2] sample_docs/error_codes.md (Common Error Codes)
-  [3] sample_docs/authentication.md (OAuth2)
-  ...
-
-Confidence:
-{
-  "retrieval_confidence": 0.87,
-  "citation_coverage": 1.0,
-  "completeness": 0.9,
-  "composite": 0.923
-}
-```
+No API key needed just to try retrieval — embeddings run locally, so
+`make demo` ingests and answers offline apart from the generation call.
 
 ## Design decisions worth knowing about
 
-- **Chunking is switchable, not fixed.** `CHUNK_STRATEGY` in `.env` picks
-  between `fixed` (baseline sliding window), `recursive` (splits on markdown
-  headings first, falls back to paragraph/character splitting only when a
-  section is too big), and `semantic` (splits on embedding-similarity drift
-  between consecutive sentences). Recursive is the default — it's the best
-  fit for structured docs (this project's actual use case) without the
-  extra embedding calls semantic chunking costs at ingest time.
-- **Custom splitters instead of LangChain's.** The spec's tech-stack table
-  lists LangChain text splitters; this build implements the three
-  strategies directly (~150 lines in `ingestion/chunking.py`) instead of
-  pulling in the dependency. Trade-off, not a correction: fewer moving
-  parts and the logic is fully inspectable, at the cost of not getting
-  LangChain's other splitters for free if you need more later.
-- **Dedup is corpus-aware, not just batch-aware.** `DuplicateIndex` is
-  seeded from every embedding already in Qdrant before checking a new
-  ingest batch, so re-ingesting the same directory (or a directory with
-  content that overlaps an earlier one) is fully caught — not just
-  duplicates that happen to land in the same `ingest_directory()` call.
-- **Reranking is one batched LLM call, not one call per candidate.** All 20
-  fused candidates are scored in a single prompt asking for a JSON array of
-  relevance scores. Cheaper and faster than N calls; the trade-off is a
-  single point of failure per query, handled by falling back to fusion
-  order if the model's JSON doesn't parse.
-- **Citation verification is also batched**, and only checks claims that
-  actually cite something — a sentence with no citation isn't a citation
-  accuracy failure, it's a prompt-compliance question (did the model
-  correctly say "not covered" instead of citing). Track that separately if
-  you build out the eval suite (Phase 4).
-- **The confidence score is a composite of three independent signals**:
-  retrieval confidence (avg. reranker score, not raw cosine similarity —
-  the reranker call is a much better proxy for "did we find the right
-  chunk"), citation coverage (fraction of citing claims verified as
-  actually supported), and completeness (LLM-judged, did the answer
-  address every part of the question given what was available). Below
-  `MIN_RETRIEVAL_CONFIDENCE`, the pipeline refuses rather than generating —
-  see `pipeline.py:ask()`.
+- **Confidence gating beats confident hallucination.** Retrieval confidence,
+  citation coverage and completeness combine into one score; below
+  `MIN_RETRIEVAL_CONFIDENCE` the pipeline returns a refusal that names the
+  documents worth reading instead of inventing an answer.
+- **Claims are verified, not assumed.** Every sentence's `[N]` citations are
+  re-checked against the cited passage by a separate model call, and the result
+  is published as citation accuracy (0.963 above).
+- **Retrieval is measured separately from generation.** Recall@k / MRR / NDCG@5
+  come from the golden passages, so a bad answer can always be attributed to
+  retrieval or to generation.
+- **The golden set ships with its corpus.** `scripts/build_demo_corpus.py`
+  generates `sample_docs/aegis/` from the golden contexts and a test asserts
+  complete coverage, so the benchmark cannot silently drift.
+- **Embedding drift is detected, not ignored.** Chunks record which model
+  embedded them; querying a collection built with a different model raises a
+  loud warning instead of returning meaningless similarity scores.
+- **Deduplication runs against the whole index**, so re-ingesting a corpus is
+  idempotent rather than doubling the store.
+- **Runs offline by default.** Local embeddings mean the vector space is
+  reproducible and free; the LLM is only needed for generation and judging.
 
-## Testing without an API key
-
-`tests/test_pipeline_smoke.py` runs the full ingest → retrieve → fuse →
-rerank → generate → verify pipeline with the OpenAI client mocked out
-deterministically (embeddings are keyword-biased pseudo-random vectors;
-chat completions are canned responses matched by system-prompt content).
-This exercises all the *logic* — fusion math, dedup, the low-confidence
-refusal path — without needing a real key or network access:
+## Evaluation
 
 ```bash
-python tests/test_pipeline_smoke.py
+make eval        # 54-question golden set → tests/eval/results.json
+make corpus      # regenerate the demo corpus from the golden set
+make check       # lint + types + tests (what CI runs)
 ```
 
-## Extending this to the full spec
+Metrics computed per run: correctness, faithfulness, citation accuracy and
+retrieval relevance (LLM-judged), plus judge-free Recall@1/3/5, MRR and NDCG@5.
+The judge-free metrics are unit-tested against known-good values
+(`tests/test_eval_metrics.py`) and wired end-to-end in CI by
+`tests/test_eval_runner_wiring.py`, which drives the real evaluation loop with
+stub clients — so metric regressions fail the build without spending a token.
 
-- ** Phase 4 (eval framework)**: the golden Q&A dataset would live in
-  `tests/eval/`, running `RAGPipeline.ask()` against each question and
-  scoring with the same `generation/citations.py` primitives
-  (`citation_coverage`, `score_completeness`) plus a new answer-correctness
-  judge. The chunking-strategy comparison report is just that eval suite
-  run three times with `CHUNK_STRATEGY` swapped.
-- ** Phase 5 (dashboard)**: `api.py` already exposes `/v1/ask`, `/v1/ingest`,
-  `/v1/documents` — a Streamlit or React frontend is a thin client over
-  those three endpoints. The "hybrid vs dense-only" toggle just means
-  calling `ask()` with `sparse_weight=0` for comparison.
-- ** Phase 6 (Docker)**: `Dockerfile` + `docker-compose.yml` bundling the API
-  service and a real Qdrant server (swap `QDRANT_PATH` for `QDRANT_URL` in
-  the compose env) — not included here since embedded mode was the chosen
-  setup for this pass.
+## Testing
+
+```bash
+make test              # self-contained unit suite (no server, no API key)
+make test-integration  # security suite against a live API on :8000
+```
+
+Tests that need a running server are marked `integration` and skipped unless
+`RUN_INTEGRATION_TESTS=1`. The unit suite covers loaders, chunking, reranking
+calibration, the refusal path, the API surface with mocked models, the
+evaluation metrics, and the corpus/benchmark contract.
+
+## Configuration
+
+All tunables live in [`config.py`](config.py) and are documented in
+[`.env.example`](.env.example): chunking strategy, RRF weights, candidate pool,
+confidence threshold, cache TTLs, multi-tenancy and upload limits.
+
+## What this is not
+
+- **Not a framework.** No LangChain/LlamaIndex; the pipeline is ~6k lines of
+  explicit Python you can read end to end.
+- **Not an agent.** There is no tool use or multi-step planning — retrieval,
+  reranking and verification only.
+- **Not tuned on your corpus.** Defaults are sensible, not optimal; `make eval`
+  exists so you can change them with evidence rather than vibes.
+- **Not production-hardened for hostile input.** Auth, rate limiting and upload
+  validation are real, but the multi-tenant registry is a local JSON file — see
+  [`SECURITY.md`](SECURITY.md) for the threat model.
+
+## Roadmap
+
+Shipped: ingestion/chunking/dedup · hybrid retrieval + reranking · grounded
+generation with verified citations · evaluation harness · dashboard ·
+Docker packaging · CI gates. Next: contextual retrieval, query transformation,
+incremental re-indexing and per-stage observability — tracked in
+[`docs/TOPTIER_ROADMAP.md`](docs/TOPTIER_ROADMAP.md).
+
+## License
+
+MIT — see [LICENSE](LICENSE).

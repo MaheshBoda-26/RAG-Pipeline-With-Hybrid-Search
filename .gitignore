@@ -22,6 +22,7 @@ node_modules/
 # Local runtime data (vector stores, caches, logs)
 # ============================================================
 qdrant_data/
+qdrant_data*/
 bm25_data/
 test_qdrant_data/
 test_bm25_data/

@@ -27,6 +27,12 @@ demo:  ## ingest the sample corpus and ask one question end to end
 	python cli.py ingest ./sample_docs
 	python cli.py ask "What does the hybrid retrieval pipeline combine?"
 
+eval:  ## run the 54-question golden-set benchmark against a fresh local store
+	USE_SUPABASE=false QDRANT_PATH=./qdrant_data_eval python tests/eval/run_eval.py --golden-set tests/eval/golden_set.json --output tests/eval/results.json
+
+corpus:  ## regenerate the Aegis demo corpus from the golden set
+	python scripts/build_demo_corpus.py
+
 site:  ## run the marketing site
 	cd website && npm run dev
 
