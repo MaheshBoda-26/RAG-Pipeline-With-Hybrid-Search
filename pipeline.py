@@ -15,6 +15,7 @@ from generation.citations import (
     citation_coverage,
     composite_confidence,
     extract_claims,
+    grounded_coverage,
     retrieval_confidence,
     verify_citations_and_completeness_sync,
 )
@@ -431,7 +432,14 @@ class RAGPipeline:
                 answer,
                 context_str,
             )
+        # Two coverage numbers, two jobs:
+        #   coverage  — claims supported by the block they cite (citation quality)
+        #   grounding — claims supported by any retrieved passage (did the answer
+        #               come from the corpus at all)
+        # The refusal gate uses grounding, so a wrong citation number cannot turn
+        # a correct answer into a refusal.
         coverage = citation_coverage(claims)
+        grounding = grounded_coverage(claims)
 
         composite = composite_confidence(retr_conf, coverage, completeness)
 
@@ -447,11 +455,12 @@ class RAGPipeline:
         # information, independently of how the answer was phrased.
         unanswerable = self.settings.require_answerable and answerable is False
 
-        if unanswerable or coverage <= self.settings.min_answer_coverage:
+        if unanswerable or grounding <= self.settings.min_answer_coverage:
             reason = "context_cannot_answer_question" if unanswerable else "no_supported_citations"
             log_event(
                 "ask", trace_id, refused=True, reason=reason,
-                coverage=coverage, composite=composite, total_ms=timer.total_ms,
+                coverage=coverage, grounding=grounding, composite=composite,
+                total_ms=timer.total_ms,
             )
             return AskResponse(
                 question=question,
@@ -460,6 +469,7 @@ class RAGPipeline:
                 confidence={
                     "retrieval_confidence": round(retr_conf, 3),
                     "citation_coverage": round(coverage, 3),
+                    "grounding_coverage": round(grounding, 3),
                     "completeness": round(completeness, 3),
                     "composite": composite,
                 },
@@ -475,6 +485,7 @@ class RAGPipeline:
             confidence={
                 "retrieval_confidence": round(retr_conf, 3),
                 "citation_coverage": round(coverage, 3),
+                "grounding_coverage": round(grounding, 3),
                 "completeness": round(completeness, 3),
                 "composite": composite,
             },

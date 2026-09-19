@@ -44,12 +44,51 @@ Respond with ONLY a JSON object: {"completeness": 0.8, "answerable": true}
 No prose, no markdown fences."""
 
 
+# A claim the judge called unsupported is rescued when it is almost verbatim
+# present in a retrieved passage: the judge is a small model and produces false
+# negatives, and a false negative here refuses a correct answer. The threshold
+# is deliberately high so the rescue cannot rescue a fabrication.
+LEXICAL_RESCUE_THRESHOLD = 0.6
+
+_CONTENT_STOPWORDS = frozenset(
+    """a an and are as at be been by can could do does for from had has have he her his
+    how i if in into is it its may might must no not of on or our should so than that the
+    their them then there these they this to was we were what when where which who why will
+    with would you your""".split()
+)
+_TOKEN_RE = re.compile(r"[a-z0-9_.\-]+")
+
+
+def content_tokens(text: str) -> set[str]:
+    """Lowercased content words: what a claim and a passage must share to be
+    talking about the same fact."""
+    return {
+        token for token in _TOKEN_RE.findall((text or "").lower())
+        if token not in _CONTENT_STOPWORDS and len(token) > 1
+    }
+
+
+def lexical_support(claim: str, passage: str) -> float:
+    """Fraction of the claim's content words present in the passage."""
+    want = content_tokens(claim)
+    if not want:
+        return 0.0
+    return len(want & content_tokens(passage)) / len(want)
+
+
 @dataclass
 class ClaimCitation:
     claim_index: int
     sentence: str
     cited_blocks: list[int]
     supported: bool | None = None  # filled in by verify_citations
+    # ``grounded`` is the wider question the refusal gate needs: does any
+    # retrieved passage support this claim? A model that cites [2] for a fact
+    # that lives in [1] has a citation defect (tracked by ``supported``) but is
+    # not hallucinating, and refusing a correct answer over a numbering slip is
+    # the wrong trade.
+    grounded: bool | None = None
+    grounded_block: int | None = None
 
 
 def extract_claims(answer_text: str) -> list[ClaimCitation]:
@@ -102,8 +141,22 @@ def verify_citations(
     except (json.JSONDecodeError, KeyError, TypeError, ValueError):
         verdict_by_index = {}
 
+    passages = [(i + 1, chunk["payload"]["text"]) for i, chunk in enumerate(ranked_chunks)]
     for c in citing_claims:
         c.supported = verdict_by_index.get(c.claim_index, False)
+        if c.supported:
+            c.grounded = True
+            c.grounded_block = c.cited_blocks[0]
+            continue
+        # Rescue rule: the judge says unsupported, but is the claim's content
+        # actually present in a retrieved passage? Highest overlap wins.
+        best_block, best_score = None, 0.0
+        for block, text in passages:
+            score = lexical_support(c.sentence, text)
+            if score > best_score:
+                best_block, best_score = block, score
+        c.grounded = best_score >= LEXICAL_RESCUE_THRESHOLD
+        c.grounded_block = best_block if c.grounded else None
     return claims
 
 
@@ -171,6 +224,19 @@ def citation_coverage(claims: list[ClaimCitation]) -> float:
     # Uncited claims (cited_blocks is empty) are treated as unsupported
     # since they have no source evidence to verify against.
     return supported / total
+
+
+def grounded_coverage(claims: list[ClaimCitation]) -> float:
+    """Fraction of claims supported by *some* retrieved passage.
+
+    This is the refusal gate's signal: it distinguishes "the model invented
+    this" from "the model cited the wrong passage number", which is the
+    difference between an ungrounded answer and a formatting slip.
+    """
+    if not claims:
+        return 1.0
+    grounded = sum(1 for c in claims if c.grounded)
+    return grounded / len(claims)
 
 
 def retrieval_confidence(ranked_chunks: list[dict]) -> float:
