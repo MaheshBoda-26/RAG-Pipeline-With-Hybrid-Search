@@ -403,18 +403,7 @@ class RAGPipeline:
                     if candidate_pool else
                     "I couldn't find any relevant information in the indexed documentation."
                 ),
-                sources=[
-                    {
-                        "block": i + 1,
-                        "source": c["payload"]["source"],
-                        "section_heading": c["payload"].get("section_heading"),
-                        "text": c["payload"].get("text", ""),
-                        "fused_score": c.get("fused_score"),
-                        "rerank_score": c.get("rerank_score"),
-                        "dense_score": c.get("dense_score"),
-                    }
-                    for i, c in enumerate(ranked)
-                ],
+                sources=self._source_blocks(ranked),
                 confidence={
                     "retrieval_confidence": retr_conf, "citation_coverage": None,
                     "completeness": None, "composite": retr_conf,
@@ -433,7 +422,7 @@ class RAGPipeline:
 
         # Run citation verification and completeness scoring in parallel
         with timer.stage("verify_and_score"):
-            claims, completeness = verify_citations_and_completeness_sync(
+            claims, completeness, answerable = verify_citations_and_completeness_sync(
                 self.client,
                 self.settings.chat_model,
                 claims,
@@ -446,21 +435,43 @@ class RAGPipeline:
 
         composite = composite_confidence(retr_conf, coverage, completeness)
 
+        # Grounding gate. Retrieval score says "these passages are about the
+        # right subject"; coverage says "this answer is supported by them". Only
+        # the second detects a near-miss question, and a declining model ("the
+        # context does not contain...") scores coverage 0 by definition. An
+        # answer with no supported claim is a refusal, not an answer — reporting
+        # it as an answer with sources attached is worse than refusing, because
+        # callers that check only `refused` would trust it.
+        # An answer grounded in a passage that does not answer the question is
+        # still a non-answer: the judge reports whether the context contained the
+        # information, independently of how the answer was phrased.
+        unanswerable = self.settings.require_answerable and answerable is False
+
+        if unanswerable or coverage <= self.settings.min_answer_coverage:
+            reason = "context_cannot_answer_question" if unanswerable else "no_supported_citations"
+            log_event(
+                "ask", trace_id, refused=True, reason=reason,
+                coverage=coverage, composite=composite, total_ms=timer.total_ms,
+            )
+            return AskResponse(
+                question=question,
+                answer=answer,
+                sources=self._source_blocks(ranked),
+                confidence={
+                    "retrieval_confidence": round(retr_conf, 3),
+                    "citation_coverage": round(coverage, 3),
+                    "completeness": round(completeness, 3),
+                    "composite": composite,
+                },
+                refused=True,
+                refusal_reason=reason,
+                timings=timer.as_dict(),
+            )
+
         response = AskResponse(
             question=question,
             answer=answer,
-            sources=[
-                {
-                    "block": i + 1,
-                    "source": c["payload"]["source"],
-                    "section_heading": c["payload"].get("section_heading"),
-                    "text": c["payload"].get("text", ""),
-                    "fused_score": c.get("fused_score"),
-                    "rerank_score": c.get("rerank_score"),
-                    "dense_score": c.get("dense_score"),
-                }
-                for i, c in enumerate(ranked)
-            ],
+            sources=self._source_blocks(ranked),
             confidence={
                 "retrieval_confidence": round(retr_conf, 3),
                 "citation_coverage": round(coverage, 3),
@@ -494,6 +505,28 @@ class RAGPipeline:
                 pass
 
         return response
+
+    @staticmethod
+    def _source_blocks(ranked: list[dict]) -> list[dict]:
+        """The retrieved passages as the API/UI sees them.
+
+        ``text`` is always the verbatim passage (what a citation quotes); the
+        situating context used for indexing is not shown, so a quoted source can
+        never contain text the document does not contain.
+        """
+        return [
+            {
+                "block": i + 1,
+                "source": c["payload"]["source"],
+                "section_heading": c["payload"].get("section_heading"),
+                "text": c["payload"].get("text", ""),
+                "fused_score": c.get("fused_score"),
+                "rerank_score": c.get("rerank_score"),
+                "dense_score": c.get("dense_score"),
+                "variants": c.get("variants"),
+            }
+            for i, c in enumerate(ranked)
+        ]
 
     def delete_document(self, source: str) -> int:
         """Delete all chunks for a given source document. Returns count deleted."""

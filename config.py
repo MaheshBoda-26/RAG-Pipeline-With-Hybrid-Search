@@ -212,6 +212,23 @@ class Settings:
 
     # --- Confidence / fallback ---
     min_retrieval_confidence: float = float(os.getenv("MIN_RETRIEVAL_CONFIDENCE", "0.35"))
+    # Grounding gate. Retrieval score alone cannot detect a near-miss question:
+    # the cross-encoder happily scores topically adjacent passages, so an
+    # out-of-corpus question can retrieve "well" and still have no answer in the
+    # context. Measured on the 10-question unanswerable set, retrieval score
+    # refuted a mean composite of 0.48 while every answer was ungrounded — what
+    # actually separates the two cases is citation coverage. With the default
+    # 0.0 an answer is only returned as an answer when at least one claim is
+    # verified against a retrieved passage; otherwise it is a refusal.
+    min_answer_coverage: float = float(os.getenv("MIN_ANSWER_COVERAGE", "0.0"))
+    # Second half of the same gate: the grading judge also reports whether the
+    # retrieved context could answer the question at all. A grounded but
+    # unanswerable response ("the context only says Aegis Cloud exists; it has
+    # no SLA information") passes the coverage gate, so this is what turns it
+    # into an explicit refusal.
+    require_answerable: bool = field(
+        default_factory=lambda: os.getenv("REQUIRE_ANSWERABLE", "true").lower() == "true"
+    )
 
     # --- Cross-encoder reranker ---
     cross_encoder_model: str = os.getenv("CROSS_ENCODER_MODEL", "cross-encoder/ms-marco-MiniLM-L-6-v2")

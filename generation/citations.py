@@ -26,14 +26,21 @@ Respond with ONLY a JSON array:
 [{"claim_index": 1, "supported": true}, {"claim_index": 2, "supported": false}, ...]
 No prose, no markdown fences."""
 
-COMPLETENESS_SYSTEM_PROMPT = """You are grading whether an answer fully \
-addresses a question, given the source context it was allowed to use. Score \
-completeness from 0.0 to 1.0: 1.0 means every part of the question is \
-addressed as well as the context allows (including correctly saying "not \
-covered" for parts the context doesn't address); lower scores mean parts of \
-the question were ignored or glossed over.
+COMPLETENESS_SYSTEM_PROMPT = """You are grading an answer to a question, given the source \
+context it was allowed to use. Report two independent judgments.
 
-Respond with ONLY a JSON object: {"completeness": 0.8}
+1. completeness: 0.0-1.0, whether the answer addresses every part of the \
+question as well as the context allows. Correctly saying "not covered" for a \
+part the context does not address still counts as addressing it; ignoring or \
+glossing over a part does not.
+
+2. answerable: whether the CONTEXT contains the information needed to answer \
+the QUESTION (or the material parts of it). This is a statement about the \
+context, not about the answer: if the context lacks the information, \
+answerable is false no matter how clearly the answer says so. Judge only the \
+context — what you may know from elsewhere is irrelevant.
+
+Respond with ONLY a JSON object: {"completeness": 0.8, "answerable": true}
 No prose, no markdown fences."""
 
 
@@ -100,7 +107,39 @@ def verify_citations(
     return claims
 
 
+def parse_completeness(raw: str) -> tuple[float, bool | None]:
+    """Parse the completeness/answerability judge, tolerating partial output.
+
+    Returns ``(completeness, answerable)``; ``answerable`` is ``None`` when the
+    judge did not say, which callers must treat as "unknown", not as "no".
+    """
+    cleaned = (raw or "").removeprefix("```json").removeprefix("```").removesuffix("```").strip()
+    try:
+        data = json.loads(cleaned)
+    except (json.JSONDecodeError, TypeError, ValueError):
+        return 0.5, None  # neutral fallback rather than crashing the request
+    try:
+        completeness = float(data["completeness"])
+    except (KeyError, TypeError, ValueError):
+        completeness = 0.5
+    answerable = data.get("answerable")
+    return completeness, answerable if isinstance(answerable, bool) else None
+
+
 def score_completeness(client: OpenAI, model: str, question: str, answer: str, context: str) -> float:
+    """Completeness only. Prefer ``score_completeness_and_answerability``."""
+    return score_completeness_and_answerability(client, model, question, answer, context)[0]
+
+
+def score_completeness_and_answerability(
+    client: OpenAI, model: str, question: str, answer: str, context: str
+) -> tuple[float, bool | None]:
+    """Grade the answer and, in the same call, whether the context could answer.
+
+    Answerability is what detects a near-miss question: an answer that politely
+    declines still scores high completeness, so completeness alone cannot tell a
+    grounded answer from an honest "I couldn't find it".
+    """
     user_prompt = f"Question: {question}\n\nContext available:\n{context}\n\nAnswer given:\n{answer}"
     resp = client.chat.completions.create(
         model=model,
@@ -110,12 +149,7 @@ def score_completeness(client: OpenAI, model: str, question: str, answer: str, c
         ],
         temperature=0,
     )
-    raw = resp.choices[0].message.content.strip()
-    raw = raw.removeprefix("```json").removeprefix("```").removesuffix("```").strip()
-    try:
-        return float(json.loads(raw)["completeness"])
-    except (json.JSONDecodeError, KeyError, TypeError, ValueError):
-        return 0.5  # neutral fallback rather than crashing the request
+    return parse_completeness(resp.choices[0].message.content)
 
 
 def citation_coverage(claims: list[ClaimCitation]) -> float:
@@ -185,7 +219,7 @@ async def verify_citations_and_completeness_parallel(
     question: str,
     answer: str,
     context: str,
-) -> tuple[list[ClaimCitation], float]:
+) -> tuple[list[ClaimCitation], float, bool | None]:
     """Run verify_citations and score_completeness in parallel using asyncio.
 
     This reduces latency by ~50% compared to sequential execution since both
@@ -201,7 +235,7 @@ async def verify_citations_and_completeness_parallel(
         context: Context string for completeness scoring
 
     Returns:
-        Tuple of (verified_claims, completeness_score)
+        Tuple of (verified_claims, completeness_score, answerable)
     """
     loop = asyncio.get_event_loop()
     executor = ThreadPoolExecutor(max_workers=2)
@@ -209,17 +243,17 @@ async def verify_citations_and_completeness_parallel(
     def run_verify():
         return verify_citations(client, model, claims, ranked_chunks)
 
-    def run_completeness():
-        return score_completeness(client, model, question, answer, context)
+    def run_grade():
+        return score_completeness_and_answerability(client, model, question, answer, context)
 
     # Run both in parallel
     verify_task = loop.run_in_executor(executor, run_verify)
-    completeness_task = loop.run_in_executor(executor, run_completeness)
+    grade_task = loop.run_in_executor(executor, run_grade)
 
-    verified_claims, completeness = await asyncio.gather(verify_task, completeness_task)
+    verified_claims, (completeness, answerable) = await asyncio.gather(verify_task, grade_task)
     executor.shutdown(wait=False)
 
-    return verified_claims, completeness
+    return verified_claims, completeness, answerable
 
 
 def verify_citations_and_completeness_sync(
@@ -230,16 +264,19 @@ def verify_citations_and_completeness_sync(
     question: str,
     answer: str,
     context: str,
-) -> tuple[list[ClaimCitation], float]:
-    """Synchronous wrapper for parallel verification and completeness scoring.
+) -> tuple[list[ClaimCitation], float, bool | None]:
+    """Synchronous wrapper for parallel verification and grading.
 
-    Uses ThreadPoolExecutor to run both LLM calls concurrently.
+    Uses ThreadPoolExecutor to run both LLM calls concurrently. Returns
+    ``(claims, completeness, answerable)``.
     """
     with ThreadPoolExecutor(max_workers=2) as executor:
         verify_future = executor.submit(verify_citations, client, model, claims, ranked_chunks)
-        completeness_future = executor.submit(score_completeness, client, model, question, answer, context)
+        grade_future = executor.submit(
+            score_completeness_and_answerability, client, model, question, answer, context
+        )
 
         verified_claims = verify_future.result()
-        completeness = completeness_future.result()
+        completeness, answerable = grade_future.result()
 
-    return verified_claims, completeness
+    return verified_claims, completeness, answerable

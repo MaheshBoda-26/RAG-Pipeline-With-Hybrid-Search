@@ -1,0 +1,52 @@
+[
+  {
+    "question": "What is the Aegis API's pricing per million requests?",
+    "why_unanswerable": "The corpus documents auth, rate limits, errors, deployment and general behavior — no pricing is stated anywhere.",
+    "trap": "Pricing is a plausible-sounding API question, so a system that answers from priors instead of the corpus will invent a number."
+  },
+  {
+    "question": "Which AWS region does Aegis Cloud store customer data in by default?",
+    "why_unanswerable": "No data-residency or region statement exists in the corpus.",
+    "trap": "Aegis Cloud is real in the corpus, so retrieval will surface deployment text; only the region claim is absent."
+  },
+  {
+    "question": "How do I configure the Aegis Terraform provider?",
+    "why_unanswerable": "No Terraform provider is mentioned; only Kubernetes, Docker Compose and Aegis Cloud.",
+    "trap": "It is adjacent to the deployment doc, which is exactly the kind of near-miss a weak refusal gate approves."
+  },
+  {
+    "question": "What is the maximum number of custom roles per Aegis organization?",
+    "why_unanswerable": "Role limits are not documented; the corpus has authentication methods but no RBAC quotas.",
+    "trap": "Asks for a specific number in a domain the corpus covers, which invites a fabricated figure."
+  },
+  {
+    "question": "Does Aegis support WebSocket subscriptions for event streaming?",
+    "why_unanswerable": "No streaming, WebSocket or event-transport capability is documented.",
+    "trap": "A yes/no capability question: a refusal gate must survive questions that look like a simple feature check."
+  },
+  {
+    "question": "What was the Aegis API's deprecated v1 rate limit before the current version?",
+    "why_unanswerable": "The corpus documents the current rate limits only; no historical v1 values exist.",
+    "trap": "Pairs a real concept (rate limits) with an absent one (a previous version), so partial retrieval looks sufficient."
+  },
+  {
+    "question": "How do I file a GDPR data-deletion request with Aegis?",
+    "why_unanswerable": "The corpus contains no compliance, privacy or data-deletion process.",
+    "trap": "Compliance is a serious-sounding topic where guessing produces confident, high-stakes nonsense."
+  },
+  {
+    "question": "What SLA does Aegis Cloud offer for enterprise customers?",
+    "why_unanswerable": "No SLA, uptime target or support-tier commitment appears in the corpus.",
+    "trap": "The word 'enterprise' invites a plausible generic answer (99.9% uptime) that is not in any source."
+  },
+  {
+    "question": "Which programming language is the Aegis CLI written in?",
+    "why_unanswerable": "The corpus never mentions a CLI, let alone its implementation language.",
+    "trap": "A factual question about an artifact that does not exist in the corpus at all."
+  },
+  {
+    "question": "What is the Aegis support email address for urgent production incidents?",
+    "why_unanswerable": "Support is referenced only generically (include request_id when contacting support); no channel is given.",
+    "trap": "Asks for a literal string (an email address) that a hallucination would happily produce in the right format."
+  }
+]
