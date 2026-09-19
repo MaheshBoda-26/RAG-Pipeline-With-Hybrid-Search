@@ -10,8 +10,6 @@ Requires:
 
 from __future__ import annotations
 
-import json
-import uuid
 from typing import Optional, List
 
 from supabase import create_client, Client
@@ -58,7 +56,7 @@ class SupabaseVectorStore:
 
         # Prepare data for batch insert
         data = []
-        for chunk, embedding in zip(chunks, embeddings):
+        for chunk, embedding in zip(chunks, embeddings, strict=False):
             # Convert embedding to string format for pgvector
             vec_str = "[" + ",".join(str(x) for x in embedding) + "]"
             payload = {

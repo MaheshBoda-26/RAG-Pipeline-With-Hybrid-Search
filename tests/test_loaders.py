@@ -1,5 +1,4 @@
 """Unit tests for document loaders."""
-import pytest
 import tempfile
 import os
 from pathlib import Path

@@ -11,29 +11,22 @@ DELETE /v1/documents/{source}  delete a document
 POST /v1/auth/register    register new user
 POST /v1/auth/login       login user (returns JWT cookies)
 """
-import asyncio
 import os
 from pathlib import Path
-from typing import Optional, AsyncGenerator
-from datetime import timedelta
 import json
 
 from fastapi import (
-    FastAPI, HTTPException, Security, Depends, UploadFile, File, Form,
-    Response, Request, Cookie, Body
+    FastAPI, HTTPException, Security, Depends, UploadFile, File, Response, Request, Cookie, Body
 )
 from fastapi.responses import StreamingResponse, JSONResponse
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.responses import Response as StarletteResponse
 from pydantic import BaseModel
 import time
-from openai import AsyncOpenAI
 
 from config import (
-    settings, get_user_by_api_key, create_user, load_user_registry, save_user_registry,
-    verify_user_password, get_user_by_email, create_access_token, create_refresh_token,
+    settings, get_user_by_api_key, create_user, load_user_registry, verify_user_password, get_user_by_email, create_access_token, create_refresh_token,
     get_user_id_from_token
 )
 from pipeline import RAGPipeline
@@ -502,12 +495,12 @@ async def _process_file_upload(file: UploadFile, user_id: str) -> dict:
         if "AuthenticationError" in error_msg or "401" in error_msg:
             raise HTTPException(
                 status_code=503,
-                detail=f"Embedding API authentication failed. Check NVIDIA_API_KEY in .env"
+                detail="Embedding API authentication failed. Check NVIDIA_API_KEY in .env"
             )
         if "404" in error_msg and "model" in error_msg.lower():
             raise HTTPException(
                 status_code=503,
-                detail=f"Embedding model not found. Check EMBEDDING_MODEL in .env"
+                detail="Embedding model not found. Check EMBEDDING_MODEL in .env"
             )
         raise HTTPException(status_code=502, detail=f"Indexing service unavailable: {error_msg}")
     except ValueError as e:
@@ -560,7 +553,7 @@ async def delete_document(source: str, user_id: str = Depends(verify_auth)):
     if file_path.exists():
         file_path.unlink()
 
-    return {"message": f"Document deleted", "chunks_removed": deleted, "source": source}
+    return {"message": "Document deleted", "chunks_removed": deleted, "source": source}
 
 
 # Admin endpoint to create users (requires authenticated admin user)

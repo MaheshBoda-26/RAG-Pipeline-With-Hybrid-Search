@@ -1,11 +1,8 @@
 """Unit tests for chunking strategies."""
-import pytest
-from pathlib import Path
 from ingestion.chunking import (
     Chunk,
     chunk_fixed,
     chunk_recursive,
-    chunk_semantic,
 )
 from ingestion.loaders import RawDocument
 
@@ -96,7 +93,6 @@ class TestChunkSemantic:
 
     def test_basic_semantic_chunking(self):
         # This will use the mocked embeddings in tests
-        text = "First sentence. Second sentence. Third sentence."
         # Note: This requires embedder - tested in integration tests
         pass
 

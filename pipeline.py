@@ -5,9 +5,7 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass
 from pathlib import Path
-import os
 
-from openai import OpenAI
 
 from config import Settings
 from generation.citations import (
@@ -15,8 +13,6 @@ from generation.citations import (
     composite_confidence,
     extract_claims,
     retrieval_confidence,
-    score_completeness,
-    verify_citations,
     verify_citations_and_completeness_sync,
 )
 from generation.generate import generate_answer
@@ -25,11 +21,10 @@ from ingestion.chunking import Chunk, chunk_fixed, chunk_recursive, chunk_semant
 from ingestion.dedup import DuplicateIndex
 from ingestion.loaders import RawDocument, load_directory, load_file
 from retrieval.embeddings import Embedder, create_openai_client
-from retrieval.fusion import reciprocal_rank_fusion
 from retrieval.reranker import rerank
 from retrieval.sparse import BM25Index
 from retrieval.vector_store import QdrantVectorStore
-from retrieval.supabase_store import SupabaseVectorStore, create_supabase_store
+from retrieval.supabase_store import create_supabase_store
 from retrieval.query_cache import QueryCache
 
 
@@ -189,7 +184,6 @@ class RAGPipeline:
 
     def ingest_file(self, file_path: str, original_filename: str | None = None, user_id: str | None = None) -> dict:
         """Ingest a single uploaded file. Returns stats dict."""
-        from ingestion.loaders import load_file
         from pathlib import Path
 
         # Validate path

@@ -1,7 +1,6 @@
 """Embedding wrapper with support for OpenAI/NVIDIA APIs and FastEmbed/local fallback."""
 from __future__ import annotations
 
-import os
 from functools import lru_cache
 from openai import OpenAI
 

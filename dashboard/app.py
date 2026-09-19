@@ -4,11 +4,8 @@ Run with: streamlit run dashboard/app.py
 """
 import streamlit as st
 import requests
-import json
 import time
 from typing import Dict, Any, List, Optional
-from pathlib import Path
-import pandas as pd
 
 
 # Page config
@@ -372,7 +369,7 @@ def render_upload_tab():
     
     col_ref, _ = st.columns([1, 5])
     with col_ref:
-        refresh_clicked = st.button("🔄 Refresh List")
+        st.button("🔄 Refresh List")
 
     doc_data = get_documents_api()
     if "error" in doc_data:
@@ -455,7 +452,7 @@ def render_chat_tab():
         if selected_source != "📚 All Documents":
             st.markdown(f'<div style="margin-top: 28px;"><span class="source-tag">🎯 Scoped to: {selected_source}</span></div>', unsafe_allow_html=True)
         else:
-            st.markdown(f'<div style="margin-top: 28px;"><span class="source-tag">🌐 Synthesizing Across Entire Notebook</span></div>', unsafe_allow_html=True)
+            st.markdown('<div style="margin-top: 28px;"><span class="source-tag">🌐 Synthesizing Across Entire Notebook</span></div>', unsafe_allow_html=True)
 
     # NotebookLM Starter Question Chips
     st.markdown("##### 💡 Suggested Questions")

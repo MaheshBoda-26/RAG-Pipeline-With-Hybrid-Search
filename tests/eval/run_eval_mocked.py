@@ -9,7 +9,6 @@ import os
 import sys
 from dataclasses import dataclass, asdict
 from pathlib import Path
-from typing import Any
 from unittest import mock
 
 import numpy as np
@@ -43,7 +42,6 @@ def fake_embedding(text: str) -> list[float]:
 
 class FakeEmbeddingsAPI:
     def create(self, model, input):
-        import hashlib
         data = [mock.Mock(embedding=fake_embedding(t)) for t in input]
         return mock.Mock(data=data)
 
@@ -180,7 +178,6 @@ def run_evaluation(
     settings,
     dense_only: bool = False,
 ) -> tuple[list[EvalResult], EvalSummary]:
-    from openai import OpenAI
     client = FakeOpenAI()  # Use mocked client
     model = settings.chat_model
     results = []
@@ -338,13 +335,13 @@ def export_results(
 
 def print_summary(summary: EvalSummary) -> None:
     print(f"\n{'='*50}")
-    print(f"EVALUATION SUMMARY")
+    print("EVALUATION SUMMARY")
     print(f"{'='*50}")
     print(f"Total questions:  {summary.total_questions}")
     print(f"Answered:         {summary.answered}")
     print(f"Refused:          {summary.refused} ({summary.refusal_rate:.1%})")
     print(f"Avg latency:      {summary.avg_latency_ms:.0f}ms")
-    print(f"")
+    print("")
     print(f"Correctness:      {summary.avg_correctness:.3f}" if summary.avg_correctness else "Correctness:      N/A")
     print(f"Faithfulness:     {summary.avg_faithfulness:.3f}" if summary.avg_faithfulness else "Faithfulness:     N/A")
     print(f"Citation accuracy: {summary.avg_citation_accuracy:.3f}" if summary.avg_citation_accuracy else "Citation accuracy: N/A")

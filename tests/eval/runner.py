@@ -14,12 +14,12 @@ import time
 import statistics
 from dataclasses import dataclass, asdict
 from pathlib import Path
-from typing import Any
 
 from openai import OpenAI
 
 from config import Settings
 from pipeline import RAGPipeline
+from tests.eval.metrics import aggregate, first_relevant_rank, relevance_flags
 
 
 @dataclass
@@ -36,6 +36,9 @@ class EvalResult:
     faithfulness: float | None = None
     citation_accuracy: float | None = None
     retrieval_relevance: float | None = None
+    # Retrieval metrics: computed from the golden context passage, no judge call
+    retrieved_flags: list[bool] | None = None
+    relevant_rank: int | None = None
 
 
 @dataclass
@@ -51,6 +54,12 @@ class EvalSummary:
     refusal_rate: float
     # Per-strategy breakdown (for chunking comparison)
     by_strategy: dict[str, dict] | None = None
+    # Retrieval metrics (mean across queries, judge-free)
+    recall_at_1: float | None = None
+    recall_at_3: float | None = None
+    recall_at_5: float | None = None
+    mrr: float | None = None
+    ndcg_at_5: float | None = None
 
 
 CORRECTNESS_PROMPT = """You are evaluating the correctness of an answer to a question.
@@ -153,6 +162,12 @@ def run_evaluation(
                 latency_ms=latency_ms,
             )
 
+            # Retrieval quality: did we retrieve the passage holding the answer?
+            result.retrieved_flags = relevance_flags(
+                response.sources, item.get("context", "")
+            )
+            result.relevant_rank = first_relevant_rank(result.retrieved_flags)
+
             if not response.refused:
                 # Correctness
                 correctness_prompt = f"Question: {question}\n\nExpected: {expected}\n\nActual: {response.answer}"
@@ -190,6 +205,13 @@ def run_evaluation(
         valid = [v for v in values if v is not None]
         return statistics.mean(valid) if valid else None
 
+    def as_float(value: float | int | None) -> float | None:
+        return None if value is None else float(value)
+
+    retrieval = aggregate(
+        [r.retrieved_flags for r in results if r.retrieved_flags is not None]
+    )
+
     summary = EvalSummary(
         total_questions=len(results),
         answered=len(answered),
@@ -200,6 +222,11 @@ def run_evaluation(
         avg_retrieval_relevance=avg([r.retrieval_relevance for r in answered]),
         avg_latency_ms=statistics.mean([r.latency_ms for r in results]) if results else 0,
         refusal_rate=len(refused) / len(results) if results else 0,
+        recall_at_1=as_float(retrieval["recall_at_1"]),
+        recall_at_3=as_float(retrieval["recall_at_3"]),
+        recall_at_5=as_float(retrieval["recall_at_5"]),
+        mrr=as_float(retrieval["mrr"]),
+        ndcg_at_5=as_float(retrieval["ndcg_at_5"]),
     )
 
     return results, summary
@@ -252,15 +279,25 @@ def export_results(
 
 def print_summary(summary: EvalSummary) -> None:
     print(f"\n{'='*50}")
-    print(f"EVALUATION SUMMARY")
+    print("EVALUATION SUMMARY")
     print(f"{'='*50}")
     print(f"Total questions:  {summary.total_questions}")
     print(f"Answered:         {summary.answered}")
     print(f"Refused:          {summary.refused} ({summary.refusal_rate:.1%})")
     print(f"Avg latency:      {summary.avg_latency_ms:.0f}ms")
-    print(f"")
+    print("")
     print(f"Correctness:      {summary.avg_correctness:.3f}" if summary.avg_correctness else "Correctness:      N/A")
     print(f"Faithfulness:     {summary.avg_faithfulness:.3f}" if summary.avg_faithfulness else "Faithfulness:     N/A")
     print(f"Citation accuracy: {summary.avg_citation_accuracy:.3f}" if summary.avg_citation_accuracy else "Citation accuracy: N/A")
     print(f"Retrieval relevance: {summary.avg_retrieval_relevance:.3f}" if summary.avg_retrieval_relevance else "Retrieval relevance: N/A")
+    print("")
+    if summary.recall_at_1 is None:
+        print("Retrieval quality: N/A")
+    else:
+        print("Retrieval quality:")
+        print(f"  Recall@1:       {summary.recall_at_1:.3f}")
+        print(f"  Recall@3:       {summary.recall_at_3:.3f}")
+        print(f"  Recall@5:       {summary.recall_at_5:.3f}")
+        print(f"  MRR:            {summary.mrr:.3f}")
+        print(f"  NDCG@5:         {summary.ndcg_at_5:.3f}")
     print(f"{'='*50}")

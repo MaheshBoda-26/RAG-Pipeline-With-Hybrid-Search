@@ -1,6 +1,5 @@
 """Pytest configuration and fixtures for RAG Pipeline tests."""
 import os
-import tempfile
 from pathlib import Path
 from unittest import mock
 
@@ -127,7 +126,6 @@ def test_client(mock_openai_client):
     with mock.patch("retrieval.embeddings.create_openai_client", return_value=mock_openai_client):
         with mock.patch("pipeline.create_openai_client", return_value=mock_openai_client):
             from api import app
-            from pipeline import RAGPipeline
             from config import settings
             
             # Override settings for testing
@@ -204,3 +202,20 @@ def integration_auth_client(integration_client):
         # Cookies are automatically handled by httpx
         pass
     return integration_client
+
+
+def pytest_collection_modifyitems(config, items):
+    """Skip tests marked ``integration`` unless RUN_INTEGRATION_TESTS is set.
+
+    Integration tests talk to a live API on localhost:8000. The default unit
+    run must stay self-contained (and green) without any running server.
+    """
+    if os.environ.get("RUN_INTEGRATION_TESTS"):
+        return
+
+    skip = pytest.mark.skip(
+        reason="integration test: start the API and set RUN_INTEGRATION_TESTS=1"
+    )
+    for item in items:
+        if "integration" in item.keywords:
+            item.add_marker(skip)

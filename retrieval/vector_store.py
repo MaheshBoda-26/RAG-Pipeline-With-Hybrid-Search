@@ -122,7 +122,7 @@ class QdrantVectorStore:
                     "embedding_model": chunk.embedding_model,
                 },
             )
-            for chunk, embedding in zip(chunks, embeddings)
+            for chunk, embedding in zip(chunks, embeddings, strict=False)
         ]
         self.client.upsert(collection_name=self.collection_name, points=points)
 

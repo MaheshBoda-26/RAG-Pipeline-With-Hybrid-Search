@@ -2,6 +2,8 @@
 import pytest
 import httpx
 
+pytestmark = pytest.mark.integration
+
 BASE_URL = "http://localhost:8000"
 
 def test_cookies_httponly():

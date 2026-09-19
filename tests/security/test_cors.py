@@ -2,6 +2,8 @@
 import pytest
 import httpx
 
+pytestmark = pytest.mark.integration
+
 BASE_URL = "http://localhost:8000"
 
 def test_cors_allows_localhost():
@@ -37,7 +39,7 @@ def test_cors_no_wildcard():
 def test_cors_exposes_retry_after():
     """Retry-After header should be exposed for rate limiting on actual responses."""
     # Test on an actual response that might have Retry-After (rate limited endpoint)
-    for i in range(12):
+    for _i in range(12):
         resp = httpx.post(
             f"{BASE_URL}/v1/demo/ask",
             json={"question": "test"},

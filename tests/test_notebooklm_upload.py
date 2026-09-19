@@ -1,5 +1,4 @@
 """Tests for file upload feature, source-scoped search, and dashboard integration."""
-import pytest
 from unittest.mock import MagicMock, patch
 from api import AskRequest, app
 from fastapi.testclient import TestClient
@@ -29,7 +28,6 @@ def test_pipeline_ask_signature_supports_source():
 def test_dashboard_helpers_mocked():
     """Verify dashboard API helper functions format and process requests cleanly."""
     import sys
-    from unittest.mock import MagicMock
     if "streamlit" not in sys.modules:
         sys.modules["streamlit"] = MagicMock()
 

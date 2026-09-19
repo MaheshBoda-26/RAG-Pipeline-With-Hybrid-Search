@@ -60,3 +60,27 @@ package = false
 
 [tool.vercel]
 entrypoint = "api:app"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+markers = [
+    "integration: requires a live API server on localhost:8000 (set RUN_INTEGRATION_TESTS=1)",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+exclude = [".venv", "venv", "node_modules", "website", "brag-output", "sample_docs"]
+
+[tool.ruff.lint]
+# Bug-level rules only: these must never fail. Broader style rules are a
+# follow-up once the codebase is reformatted.
+select = ["E4", "E7", "E9", "F", "B"]
+
+[tool.mypy]
+python_version = "3.11"
+ignore_missing_imports = true
+warn_redundant_casts = true
+no_implicit_optional = true
+files = ["config.py", "retrieval/fusion.py", "ingestion/dedup.py"]

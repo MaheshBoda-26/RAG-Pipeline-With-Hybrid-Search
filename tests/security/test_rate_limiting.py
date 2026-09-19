@@ -2,12 +2,14 @@
 import pytest
 import httpx
 
+pytestmark = pytest.mark.integration
+
 BASE_URL = "http://localhost:8000"
 
 def test_demo_ask_rate_limit():
     """Demo ask endpoint should rate limit at 10/minute."""
     allowed = 0
-    for i in range(12):
+    for _i in range(12):
         resp = httpx.post(
             f"{BASE_URL}/v1/demo/ask",
             json={"question": "test"},
@@ -65,7 +67,7 @@ def test_ingest_rate_limit():
 
 def test_login_rate_limit():
     """Login endpoint should rate limit at 5/minute."""
-    for i in range(6):
+    for _i in range(6):
         resp = httpx.post(
             f"{BASE_URL}/v1/auth/login",
             json={"email": "test@test.com", "password": "wrong"},
@@ -91,7 +93,7 @@ def test_register_rate_limit():
 def test_retry_after_header_on_429():
     """429 responses should include Retry-After header."""
     # Make enough requests to trigger rate limit
-    for i in range(12):
+    for _i in range(12):
         resp = httpx.post(
             f"{BASE_URL}/v1/demo/ask",
             json={"question": "test"},

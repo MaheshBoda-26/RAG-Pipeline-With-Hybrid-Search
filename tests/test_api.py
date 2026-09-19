@@ -107,7 +107,7 @@ def temp_qdrant():
 def shared_pipeline(mock_openai, temp_qdrant):
     """Create a single shared pipeline for all tests."""
     import api
-    from config import Settings, create_user, load_user_registry, save_user_registry
+    from config import Settings, load_user_registry, save_user_registry
     from pipeline import RAGPipeline
 
     # Set up test environment for multi-tenant mode
@@ -220,9 +220,6 @@ class TestAskEndpoint:
 
     def test_refusal_path(self, test_client, shared_pipeline):
         """Test low-confidence refusal."""
-        import api
-        from config import Settings
-        from pipeline import RAGPipeline
 
         # Use the shared pipeline but temporarily change the threshold
         original_threshold = shared_pipeline.settings.min_retrieval_confidence
@@ -312,7 +309,7 @@ class TestMultiUserIsolation:
     def test_users_see_only_own_documents(self, temp_qdrant):
         """Test that user A cannot see user B's documents."""
         import api
-        from config import settings, Settings, create_user, load_user_registry, save_user_registry
+        from config import settings, Settings, load_user_registry, save_user_registry
         from pipeline import RAGPipeline
         import tempfile
         import shutil
@@ -537,7 +534,6 @@ class TestMultiUserIsolation:
         """Test that separate Qdrant collections are created per user."""
         from config import Settings
         from pipeline import RAGPipeline
-        from retrieval.vector_store import QdrantVectorStore
         import tempfile
         import shutil
 
