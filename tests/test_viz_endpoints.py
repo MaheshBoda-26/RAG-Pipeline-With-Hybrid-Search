@@ -144,10 +144,12 @@ class TestDemoIngestEndpoint:
         response = viz_client.post("/v1/demo/ingest")
         assert response.status_code == 200
         data = response.json()
+        # `chunks_created` is only present when something was newly embedded;
+        # a no-op re-ingest returns the early-exit shape without it. The keys
+        # below are present in both response shapes.
         for key in (
             "documents",
             "documents_unchanged",
-            "chunks_created",
             "chunks_indexed",
             "duplicates_skipped",
         ):

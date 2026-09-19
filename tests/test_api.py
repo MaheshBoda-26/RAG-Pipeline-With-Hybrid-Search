@@ -265,13 +265,16 @@ class TestIngestEndpoint:
 
             response = test_client.post(
                 "/v1/ingest",
-                json={"path": settings.allowed_ingest_root},
+                # Ingest the tracked aegis subcorpus (5 docs) rather than the
+                # whole sample_docs root: runtime upload debris in
+                # sample_docs/default/uploads makes the root's doc count
+                # environment-dependent, so a whole-root assertion flakes.
+                json={"path": "./sample_docs/aegis"},
                 headers={"Authorization": "Bearer dev-secret-key"}
             )
             assert response.status_code == 200
             data = response.json()
-            # sample_docs has at least 17 documents (varies by test run)
-            assert data["documents"] >= 17
+            assert data["documents"] >= 5
             # chunks may be 0 due to mock embedding dedup behavior; endpoint success is the key test
         finally:
             shutil.rmtree(tmpdir, ignore_errors=True)
