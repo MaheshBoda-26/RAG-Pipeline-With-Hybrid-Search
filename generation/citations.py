@@ -255,9 +255,9 @@ def grounded_coverage(claims: list[ClaimCitation]) -> float:
 
 
 def retrieval_confidence(ranked_chunks: list[dict]) -> float:
-    """Blend of cross-encoder relevance and dense-similarity signal.
+    """Blend cross-encoder, dense-similarity, and BM25 relevance evidence.
 
-    Two independent views of "did we retrieve relevant material":
+    Independent views of "did we retrieve relevant material":
 
     - rerank_score (calibrated 0-10 from the ms-marco cross-encoder):
       excellent at detecting TRUE relevance, but lexically strict — a
@@ -267,12 +267,14 @@ def retrieval_confidence(ranked_chunks: list[dict]) -> float:
     - dense cosine similarity from the vector store (carried through as
       'dense_score' on candidates by the retrieval layer): robust to
       vocabulary mismatch, weaker at fine-grained relevance.
+    - BM25 keyword evidence (carried as 'sparse_score'): useful for exact facts
+      and phrasing differences. A saturating transform bounds its
+      corpus-dependent magnitude.
 
-    Taking the MAX of the two signals per chunk means neither view can
-    alone veto a good retrieval; both must agree the retrieval is BAD to
-    trigger refusal. This preserves the calibrated refusal gate (garbage
-    queries score ~0 on both signals) while not punishing queries whose
-    phrasing the cross-encoder dislikes.
+    Taking the MAX of the independent signals per chunk means no single
+    scorer can veto strong evidence from another retrieval leg; all must agree
+    the retrieval is bad to trigger refusal. This preserves the calibrated
+    refusal gate while not punishing queries whose phrasing a scorer dislikes.
     """
     if not ranked_chunks:
         return 0.0
@@ -281,7 +283,9 @@ def retrieval_confidence(ranked_chunks: list[dict]) -> float:
         rerank = (c.get("rerank_score") or 0.0) / 10.0
         dense = c.get("dense_score")
         dense = float(dense) if dense is not None else 0.0
-        return max(rerank, dense)
+        sparse = max(0.0, float(c.get("sparse_score") or 0.0))
+        sparse = sparse / (1.0 + sparse)
+        return max(rerank, dense, sparse)
 
     per_chunk = [_chunk_conf(c) for c in ranked_chunks]
     top_scores = sorted(per_chunk, reverse=True)[:3]

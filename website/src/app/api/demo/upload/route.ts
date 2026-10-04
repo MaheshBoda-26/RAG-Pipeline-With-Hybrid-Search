@@ -67,6 +67,28 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Upload metadata can report the browser filename even when legacy
+    // ingestion stored the chunks under a generated name. Resolve the exact
+    // source from the index before telling the UI which document to scope to.
+    const documentsResponse = await fetch(`${BACKEND_URL}/v1/demo/documents`, {
+      method: "GET",
+      headers: cookieHeader ? { Cookie: cookieHeader } : {},
+      cache: "no-store",
+    });
+    if (documentsResponse.ok) {
+      const corpus = await documentsResponse.json();
+      const documents = Array.isArray(corpus.documents) ? corpus.documents : [];
+      const requestedNames = [data.source, data.file, data.stored_as].filter(
+        (name): name is string => typeof name === "string" && name.length > 0
+      );
+      const match = documents.find((doc: { source?: string }) =>
+        requestedNames.some((name) =>
+          doc.source === name || doc.source?.split("/").pop() === name
+        )
+      );
+      if (match?.source) data.source = match.source;
+    }
+
     return NextResponse.json(data);
   } catch (err) {
     if (err instanceof Error && err.name === "AbortError") {

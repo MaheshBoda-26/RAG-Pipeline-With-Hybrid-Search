@@ -56,6 +56,7 @@ export function Demo() {
   const [ingestState, setIngestState] = React.useState<"idle" | "ingesting" | "done" | "failed">("idle");
   const [ingestMsg, setIngestMsg] = React.useState<string | null>(null);
   const [documents, setDocuments] = React.useState<DemoDocument[]>([]);
+  const documentsRef = React.useRef<DemoDocument[]>([]);
   const [deletingSource, setDeletingSource] = React.useState<string | null>(null);
   // Search scope: "" searches the whole corpus; a source path restricts
   // retrieval to that single document (DB-level filter, so an uploaded doc's
@@ -67,7 +68,18 @@ export function Demo() {
       const res = await fetch("/api/demo/documents", { cache: "no-store" });
       if (res.ok) {
         const data = await res.json();
-        setDocuments(data.documents || []);
+        const nextDocuments: DemoDocument[] = data.documents || [];
+        documentsRef.current = nextDocuments;
+        setDocuments(nextDocuments);
+        // Keep a scope that was selected by upload or before a refresh bound
+        // to the actual indexed source, never an unresolvable display name.
+        setSearchScope((current) => {
+          if (!current) return current;
+          const match = (data.documents || []).find((doc: DemoDocument) =>
+            doc.source === current || doc.source.split("/").pop() === current
+          );
+          return match?.source || current;
+        });
       }
     } catch {
       /* panel is secondary; leave the list as-is on failure */
@@ -251,10 +263,14 @@ export function Demo() {
           >
             {/* Document Uploader */}
             <DocumentUploader
-              onUploaded={(filename) => {
+              onUploaded={async (filename) => {
                 // Auto-focus: a visitor who just uploaded a document almost
                 // certainly wants to ask about THAT document.
-                setSearchScope(filename);
+                await refreshDocuments();
+                const indexed = documentsRef.current.find((doc) =>
+                  doc.source === filename || doc.source.split("/").pop() === filename
+                );
+                setSearchScope(indexed?.source || filename);
                 refreshDocuments();
               }}
             />
@@ -612,7 +628,9 @@ export function Demo() {
                 >
                   <div className="text-center">
                     <AlertTriangle className="w-8 h-8 mx-auto mb-3 text-warning" />
-                    <h3 className="text-lg font-semibold text-warning mb-2">Could not find enough information</h3>
+                    <h3 className="text-lg font-semibold text-warning mb-2">
+                      {searchScope ? "Not found in this document" : "Could not find enough information"}
+                    </h3>
                     <p className="text-muted-foreground">{response.answer}</p>
                     {response.refusal_reason && (
                       <p className="text-sm text-muted-foreground mt-2 font-mono">{response.refusal_reason}</p>

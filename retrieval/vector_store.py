@@ -185,9 +185,9 @@ class QdrantVectorStore:
 
         active_bm25 = bm25 if bm25 is not None else getattr(self, "bm25", None)
         if active_bm25 is not None:
-            bm25_results = active_bm25.query(question, top_k * 2)
-            if source_filter:
-                bm25_results = [r for r in bm25_results if r["payload"].get("source") == source_filter]
+            bm25_results = active_bm25.query(
+                question, top_k * 2, source_filter=source_filter
+            )
         else:
             # Fallback: rebuild BM25 from stored chunks and query
             records = self.all_chunks(with_vectors=False)

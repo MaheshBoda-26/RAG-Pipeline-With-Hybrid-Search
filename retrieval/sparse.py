@@ -46,11 +46,17 @@ class BM25Index:
         self.bm25 = BM25Okapi(corpus) if corpus else None
         self.save()
 
-    def query(self, query_text: str, top_k: int) -> list[dict]:
+    def query(self, query_text: str, top_k: int, source_filter: str | None = None) -> list[dict]:
         if self.bm25 is None:
             return []
         scores = self.bm25.get_scores(tokenize(query_text))
-        ranked = sorted(range(len(scores)), key=lambda i: scores[i], reverse=True)[:top_k]
+        ranked = sorted(range(len(scores)), key=lambda i: scores[i], reverse=True)
+        if source_filter:
+            ranked = [
+                i for i in ranked
+                if self.payloads[i].get("source") == source_filter
+            ]
+        ranked = ranked[:top_k]
         return [
             {"id": self.ids[i], "score": float(scores[i]), "payload": self.payloads[i]}
             for i in ranked

@@ -175,7 +175,9 @@ class SupabaseVectorStore:
 
         # Sparse search via BM25
         if bm25 is not None:
-            bm25_results = bm25.query(question, top_k * 2)
+            bm25_results = bm25.query(
+                question, top_k * 2, source_filter=source_filter
+            )
         else:
             from retrieval.sparse import tokenize as stokenize
             from rank_bm25 import BM25Okapi

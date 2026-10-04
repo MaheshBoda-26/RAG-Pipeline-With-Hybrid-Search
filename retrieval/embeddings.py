@@ -26,6 +26,20 @@ class Embedder:
         # first failure decides the backend for the process lifetime.
         self._use_local_only = False
         self._warned_local_only = False
+        self._embedding_identity: str | None = None
+        self._prefer_local = model.lower().startswith(("baai/", "sentence-transformers/"))
+
+    @property
+    def embedding_identity(self) -> str:
+        """Return the implementation that actually produced the vectors."""
+        return self._embedding_identity or f"unresolved:{self.model}"
+
+    def _pin_to_local(self, reason: str) -> None:
+        self._use_local_only = True
+        # A cached remote query vector must not survive switching to a local
+        # backend; it would be compared with vectors from a different space.
+        self._cached_embed_one.cache_clear()
+        self._warn_local_only(reason)
 
     def _get_local_model(self):
         """Lazy-load local sentence-transformers model."""
@@ -47,20 +61,12 @@ class Embedder:
                 self._fastembed_model = False  # Mark as unavailable
         return self._fastembed_model
 
-    @staticmethod
-    def _is_config_error(e: Exception) -> bool:
-        """Config errors (bad key / nonexistent model) mean every future API
-        call will fail too, so we must stick to one backend instead of
-        flapping between the API and a local model."""
-        msg = str(e)
-        return any(code in msg for code in ("401", "403", "404", "AuthenticationError", "PermissionDenied", "NotFound"))
-
     def _warn_local_only(self, reason: str) -> None:
         if not self._warned_local_only:
             self._warned_local_only = True
             import logging
             logging.getLogger(__name__).warning(
-                "Embedding API misconfigured (%s). Pinning ALL embeddings for "
+                "Embedding API unavailable (%s). Pinning ALL embeddings for "
                 "this process to the LOCAL model to keep the vector space "
                 "consistent. Fix EMBEDDING_MODEL / the provider API key and "
                 "RE-INGEST all documents if you switch back — embeddings from "
@@ -71,7 +77,7 @@ class Embedder:
         if not texts:
             return []
 
-        if not self._use_local_only:
+        if not self._use_local_only and not self._prefer_local:
             try:
                 out: list[list[float]] = []
                 for i in range(0, len(texts), BATCH_SIZE):
@@ -80,17 +86,13 @@ class Embedder:
                     if self.is_nvidia_asymmetric:
                         kwargs["extra_body"] = {"input_type": "passage"}
                     resp = self.client.embeddings.create(**kwargs)
+                    self._embedding_identity = f"api:{self.client.base_url}:{self.model}"
                     out.extend([d.embedding for d in resp.data])
                 return out
             except Exception as e:
-                if self._is_config_error(e):
-                    # Misconfiguration will recur on every call: stick to the
-                    # local model so query and document embeddings always come
-                    # from the SAME model (mixed spaces break retrieval).
-                    self._use_local_only = True
-                    self._warn_local_only(str(e))
-                else:
-                    print(f"API embedding failed (transient), using local model: {e}")
+                # Pin on every failure, including transient errors, so separate
+                # batches and later queries cannot silently use different spaces.
+                self._pin_to_local(str(e))
         return self._embed_local(texts)
 
     def _embed_local(self, texts: list[str]) -> list[list[float]]:
@@ -107,12 +109,14 @@ class Embedder:
                         f"This will cause Qdrant vector dimension mismatch. "
                         f"Ensure embedding model dimensions match Qdrant collection config."
                     )
+                self._embedding_identity = "fastembed:BAAI/bge-base-en-v1.5"
                 return embeddings
             except Exception as e:
                 print(f"FastEmbed failed, falling back to sentence-transformers: {e}")
 
         # Fallback to sentence-transformers
         model = self._get_local_model()
+        self._embedding_identity = "sentence-transformers/all-mpnet-base-v2"
         embeddings = model.encode(texts, batch_size=32, show_progress_bar=False, convert_to_numpy=True)
         if self.expected_dim and embeddings.size > 0 and len(embeddings[0]) != self.expected_dim:
             raise ValueError(
@@ -128,19 +132,16 @@ class Embedder:
     def _cached_embed_one(self, text: str) -> tuple[float, ...]:
         """Cached single query embedding - returns tuple for hashability."""
         # Respect the sticky backend so queries use the SAME model as documents.
-        if not self._use_local_only:
+        if not self._use_local_only and not self._prefer_local:
             try:
                 kwargs = {"model": self.model, "input": [text]}
                 if self.is_nvidia_asymmetric:
                     kwargs["extra_body"] = {"input_type": "query"}
                 resp = self.client.embeddings.create(**kwargs)
+                self._embedding_identity = f"api:{self.client.base_url}:{self.model}"
                 return tuple(resp.data[0].embedding)
             except Exception as e:
-                if self._is_config_error(e):
-                    self._use_local_only = True
-                    self._warn_local_only(str(e))
-                else:
-                    print(f"API query embedding failed (transient), using local model: {e}")
+                self._pin_to_local(str(e))
         local_emb = self._embed_local([text])[0]
         if self.expected_dim and len(local_emb) != self.expected_dim:
             print(f"WARNING: Local model dim {len(local_emb)} != expected {self.expected_dim}. Queries may fail.")

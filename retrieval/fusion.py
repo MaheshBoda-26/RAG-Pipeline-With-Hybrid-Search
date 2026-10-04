@@ -38,6 +38,8 @@ def reciprocal_rank_fusion(
         )
         entry["fused_score"] += sparse_weight * (1.0 / (k + rank + 1))
         entry["sparse_rank"] = rank + 1
+        if item.get("score") is not None:
+            entry["sparse_score"] = float(item["score"])
 
     return sorted(fused.values(), key=lambda e: e["fused_score"], reverse=True)
 

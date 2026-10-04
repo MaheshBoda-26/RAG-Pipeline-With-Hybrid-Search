@@ -106,10 +106,11 @@ export function DocumentUploader({ onUploaded }: { onUploaded?: (filename: strin
       setFiles(prev => prev.map(f => f.id === file.id ? { ...f, status: "success", progress: 100 } : f));
       // Let listeners (e.g. the Corpus panel) refresh their document list.
       window.dispatchEvent(new Event("rag:documents-changed"));
-      // Hand the stored source name back so the UI can scope questions to
-      // the freshly uploaded document.
-      if (onUploaded && (data.file || data.stored_as)) {
-        onUploaded(data.file || data.stored_as);
+      // The indexed source may differ from the browser's filename (legacy
+      // uploads can include a generated prefix). Prefer the source returned
+      // by ingestion; the parent will resolve the canonical corpus entry.
+      if (onUploaded && (data.source || data.file || data.stored_as)) {
+        onUploaded(data.source || data.file || data.stored_as);
       }
       return data;
     } catch (err) {

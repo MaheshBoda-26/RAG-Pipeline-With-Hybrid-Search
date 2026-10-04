@@ -4,6 +4,7 @@ generation -> citation verification into two calls: ingest() and ask().
 from __future__ import annotations
 
 import os
+import threading
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
@@ -85,7 +86,8 @@ class RAGPipeline:
             )
         self.bm25 = BM25Index(user_id=self.user_id)
         self._rebuild_sparse_index()  # picks up anything already in vector store from a prior run
-        self._check_embedding_drift()
+        self._embedding_space_checked = False
+        self._embedding_space_lock = threading.Lock()
 
         # Query cache (Redis semantic cache)
         self.query_cache = None
@@ -116,12 +118,69 @@ class RAGPipeline:
             chunks = chunk_semantic(doc, self.embedder.embed, self.settings.semantic_similarity_threshold)
         else:
             raise ValueError(f"Unknown chunking strategy: {strategy}")
-        # Stamp the embedding model on every chunk so the vector-store payload
-        # records WHICH model produced the vectors — enables query-time drift
-        # detection (mixing embedding spaces silently destroys dense search).
-        for c in chunks:
-            c.embedding_model = self.settings.embedding_model
         return chunks
+
+    def _ensure_embedding_space(self) -> None:
+        """Repair vectors created by a different embedding backend.
+
+        Older records stored only the configured model name. When that API
+        failed, ingestion silently fell back to another same-dimension model,
+        so a later process could query a different vector space while metadata
+        falsely reported a match. Actual backend identity is now persisted;
+        migrate stale records once before retrieval can use them.
+        """
+        if self._embedding_space_checked:
+            return
+        with self._embedding_space_lock:
+            if self._embedding_space_checked:
+                return
+
+            identity = self.embedder.embedding_identity
+            records = self.vector_store.all_chunks(with_vectors=False)
+            stale = [
+                record for record in records
+                if (record.get("payload") or {}).get("embedding_model") != identity
+            ]
+            if stale:
+                import logging
+
+                logger = logging.getLogger(__name__)
+                logger.warning(
+                    "Re-embedding %d chunks in collection '%s' from mixed/legacy "
+                    "embedding space into %s",
+                    len(stale), self.settings.get_collection_name(self.user_id), identity,
+                )
+                chunks = []
+                for record in stale:
+                    payload = record.get("payload") or {}
+                    chunks.append(Chunk(
+                        id=str(record["id"]),
+                        text=payload.get("text", ""),
+                        source=payload.get("source", "unknown"),
+                        chunk_index=int(payload.get("chunk_index", 0)),
+                        strategy=payload.get("strategy", "recursive"),
+                        char_count=int(payload.get("char_count", len(payload.get("text", "")))),
+                        section_heading=payload.get("section_heading"),
+                        embedding_model=identity,
+                        doc_hash=payload.get("doc_hash"),
+                        context=payload.get("context"),
+                    ))
+                try:
+                    vectors = self.embedder.embed([chunk.embedding_text for chunk in chunks])
+                    # A backend fallback during migration may change the
+                    # identity. Stamp the identity that actually made these.
+                    resolved_identity = self.embedder.embedding_identity
+                    for chunk in chunks:
+                        chunk.embedding_model = resolved_identity
+                    self.vector_store.upsert(chunks, vectors)
+                except Exception as exc:
+                    raise RuntimeError(
+                        f"Could not repair vectors for embedding backend "
+                        f"{identity}: {type(exc).__name__}: {exc}"
+                    ) from exc
+                self._rebuild_sparse_index()
+
+            self._embedding_space_checked = True
 
     def _apply_contextual_context(self, doc: RawDocument, chunks: list[Chunk]) -> int:
         """Situate chunks inside their document before indexing (opt-in).
@@ -211,6 +270,8 @@ class RAGPipeline:
         # embedding_text = situating context + passage when contextual retrieval
         # is on, and the plain passage otherwise.
         embeddings = self.embedder.embed([c.embedding_text for c in all_chunks])
+        for chunk in all_chunks:
+            chunk.embedding_model = self.embedder.embedding_identity
 
         dedup = DuplicateIndex(self.settings.dedup_similarity_threshold)
         # Seed with everything already indexed so re-ingesting the same
@@ -285,6 +346,8 @@ class RAGPipeline:
 
         try:
             embeddings = self.embedder.embed([c.embedding_text for c in chunks])
+            for chunk in chunks:
+                chunk.embedding_model = self.embedder.embedding_identity
         except Exception as e:
             # Surface upstream embedding errors with context for API layer
             raise RuntimeError(f"Embedding API call failed ({type(e).__name__}): {e}") from e
@@ -353,6 +416,8 @@ class RAGPipeline:
                 self.embedder.embed(queries[1:]) if len(queries) > 1 else []
             )
 
+        self._ensure_embedding_space()
+
         # Check query cache first
         if self.query_cache:
             cached = self.query_cache.lookup(
@@ -410,14 +475,17 @@ class RAGPipeline:
             return AskResponse(
                 question=question,
                 answer=(
-                    (
+                    "I don't have that information from the document."
+                    if source else (
+                        (
                         "I couldn't find enough relevant information in the indexed "
                         "documentation to answer this confidently. You may want to "
                         "check the following documents manually: "
                         + ", ".join(sorted({c["payload"]["source"] for c in candidate_pool[:3]}))
+                        )
+                        if candidate_pool else
+                        "I couldn't find any relevant information in the indexed documentation."
                     )
-                    if candidate_pool else
-                    "I couldn't find any relevant information in the indexed documentation."
                 ),
                 sources=self._source_blocks(ranked),
                 confidence={
@@ -479,7 +547,10 @@ class RAGPipeline:
             )
             return AskResponse(
                 question=question,
-                answer=answer,
+                answer=(
+                    "I don't have that information from the document."
+                    if source else answer
+                ),
                 sources=self._source_blocks(ranked),
                 confidence={
                     "retrieval_confidence": round(retr_conf, 3),
@@ -549,6 +620,7 @@ class RAGPipeline:
                 "fused_score": c.get("fused_score"),
                 "rerank_score": c.get("rerank_score"),
                 "dense_score": c.get("dense_score"),
+                "sparse_score": c.get("sparse_score"),
                 "variants": c.get("variants"),
             }
             for i, c in enumerate(ranked)
@@ -699,10 +771,9 @@ class RAGPipeline:
             ],
         }
         # Fill sparse rank from the candidate pool ordering where available.
-        sparse_ids = [s["block"] for s in response.sources if s.get("fused_score") is not None and s.get("dense_score") is None]
         lanes["sparse"] = [
             {"id": s["block"], "source": s["source"], "sparse_rank": i + 1}
-            for i, s in enumerate(response.sources) if s["block"] in sparse_ids
+            for i, s in enumerate(response.sources) if s.get("sparse_score") is not None
         ]
 
         return {
