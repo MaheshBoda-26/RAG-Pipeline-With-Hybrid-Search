@@ -33,7 +33,7 @@ const nextConfig = {
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: https:",
               "font-src 'self' data:",
-              "connect-src 'self' http://localhost:8000 ws://localhost:8000",
+              "connect-src 'self' http://localhost:8000 ws://localhost:8000 https://*.onrender.com wss://*.onrender.com",
             ].join('; '),
           },
         ],
