@@ -32,12 +32,12 @@ def _get_embedded_client(path: str) -> QdrantClient:
 
 
 class QdrantVectorStore:
-    def __init__(self, path: str, url: str, collection_name: str, embedding_dim: int, user_id: str | None = None):
+    def __init__(self, path: str, url: str, collection_name: str, embedding_dim: int, user_id: str | None = None, api_key: str | None = None):
         self.collection_name = collection_name
         self.embedding_dim = embedding_dim
         self.user_id = user_id
         if url:
-            self.client = QdrantClient(url=url)
+            self.client = QdrantClient(url=url, api_key=api_key or None)
         else:
             self.client = _get_embedded_client(path)
         self._ensure_collection()

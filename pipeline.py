@@ -83,6 +83,7 @@ class RAGPipeline:
                 collection_name=collection_name,
                 embedding_dim=self.settings.embedding_dim,
                 user_id=self.user_id,
+                api_key=self.settings.qdrant_api_key,
             )
         self.bm25 = BM25Index(user_id=self.user_id)
         self._rebuild_sparse_index()  # picks up anything already in vector store from a prior run
