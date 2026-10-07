@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { readUpstream } from "@/lib/upstream";
+
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
@@ -42,13 +44,13 @@ export async function POST(req: NextRequest) {
 
     clearTimeout(timeoutId);
 
-    const data = await upstream.json();
+    const { ok, status, data, error } = await readUpstream(
+      upstream,
+      "Upstream pipeline error"
+    );
 
-    if (!upstream.ok) {
-      return NextResponse.json(
-        { error: "Upstream pipeline error" },
-        { status: upstream.status }
-      );
+    if (!ok) {
+      return NextResponse.json({ error }, { status });
     }
 
     return NextResponse.json(data);

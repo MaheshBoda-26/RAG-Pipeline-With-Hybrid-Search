@@ -35,6 +35,7 @@ interface AskResponse {
     source: string;
     text: string;
     score: number;
+    rawScore: number;
   }>;
   retrieval: {
     dense: number;
@@ -143,16 +144,24 @@ export function Demo() {
 
       setTrace(data);
 
-      // Transform API response to match expected format
+      // Transform API response to match expected format.
+      // `rerank_score` is a raw cross-encoder logit (roughly -12..+12), not a
+      // 0..1 probability. It is kept verbatim and rendered as "r 9.82" rather
+      // than dressed up as a percentage, which would read "982%".
+      const rawSources = data.sources || [];
       setResponse({
         answer: data.answer,
         confidence: data.confidence?.composite ?? 0,
-        sources: (data.sources || []).map((s: any, i: number) => ({
-          id: s.block ? `block-${s.block}` : `source-${i}`,
-          source: s.source,
-          text: s.text || s.payload?.text || "",
-          score: s.rerank_score || s.fused_score || 0,
-        })),
+        sources: rawSources.map((s: any, i: number) => {
+          const raw = s.rerank_score ?? s.fused_score ?? 0;
+          return {
+            id: s.block ? `block-${s.block}` : `source-${i}`,
+            source: s.source,
+            text: s.text || s.payload?.text || "",
+            score: Math.max(0, Math.min(1, raw / 10)),
+            rawScore: raw,
+          };
+        }),
         retrieval: {
           dense: 0,
           sparse: 0,
@@ -253,13 +262,16 @@ export function Demo() {
           </p>
         </motion.div>
 
-        <div className="grid lg:grid-cols-[320px_1fr] gap-8 lg:gap-12">
+        {/* minmax(0,1fr) + min-w-0 on both children: grid/flex items default to
+            min-width:auto, so long unbreakable source paths inside the answer
+            card would otherwise stretch the track past the viewport. */}
+        <div className="grid lg:grid-cols-[320px_minmax(0,1fr)] gap-8 lg:gap-12">
           <motion.aside
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, amount: 0.2 }}
             transition={{ delay: 0.2, duration: 0.5 }}
-            className="space-y-6"
+            className="space-y-6 min-w-0"
           >
             {/* Document Uploader */}
             <DocumentUploader
@@ -282,18 +294,6 @@ export function Demo() {
               </h3>
 
               <div className="space-y-4">
-                <div>
-                  <span className="block text-sm font-medium text-muted-foreground mb-1" style={{ color: 'var(--color-muted-foreground)' }}>
-                    API Endpoint
-                  </span>
-                  <p
-                    className="w-full px-3 py-2 rounded-md text-sm font-mono"
-                    style={{ backgroundColor: 'var(--color-surface-soft)', borderColor: 'var(--color-border)', border: '1px solid var(--color-border)', color: 'var(--color-muted-foreground)' }}
-                  >
-                    /api/demo/* — same-origin proxy
-                  </p>
-                </div>
-
                 <div>
                   <label htmlFor="dense-weight" className="block text-sm font-medium text-muted-foreground mb-1" style={{ color: 'var(--color-muted-foreground)' }}>
                     Dense Weight: {config.denseWeight.toFixed(1)}
@@ -488,7 +488,7 @@ export function Demo() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, amount: 0.2 }}
             transition={{ delay: 0.3, duration: 0.5 }}
-            className="space-y-6"
+            className="space-y-6 min-w-0"
           >
             <form onSubmit={handleSubmit} className="bg-surface border border-border rounded-xl p-6" style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}>
               <div className="flex flex-col gap-3 sm:flex-row">
@@ -501,7 +501,7 @@ export function Demo() {
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Ask a question about the documentation..."
-                  className="w-full px-4 py-3 rounded-lg text-base sm:text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                  className="w-full min-w-0 px-4 py-3 rounded-lg text-base sm:text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                   disabled={isLoading}
                   autoComplete="off"
                   style={{ backgroundColor: 'var(--color-surface-soft)', borderColor: 'var(--color-border-strong)', color: 'var(--color-foreground)' }}
@@ -603,9 +603,9 @@ export function Demo() {
                                 {i + 1}
                               </span>
                               <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 text-sm">
-                                  <code className="font-mono px-1.5 py-0.5 rounded" style={{ backgroundColor: 'var(--color-surface-soft)', color: 'var(--color-foreground)' }}>{source.source}</code>
-                                  <span className="text-muted-foreground" style={{ color: 'var(--color-muted-foreground)' }}>Score: {Math.round(source.score * 100)}%</span>
+                                <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm min-w-0">
+                                  <code className="font-mono text-xs sm:text-sm px-1.5 py-0.5 rounded min-w-0 break-all" style={{ backgroundColor: 'var(--color-surface-soft)', color: 'var(--color-foreground)' }}>{source.source}</code>
+                                  <span className="text-muted-foreground flex-shrink-0 tabular-nums whitespace-nowrap" style={{ color: 'var(--color-muted-foreground)' }} title="Reranker score for this passage">r&nbsp;{source.rawScore.toFixed(2)}</span>
                                 </div>
                                 <p className="text-sm text-muted-foreground mt-1 line-clamp-2 font-mono" style={{ color: 'var(--color-muted-foreground)' }}>
                                   {source.text}

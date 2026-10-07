@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { readUpstream } from "@/lib/upstream";
+
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
@@ -28,13 +30,13 @@ export async function DELETE(
       cache: "no-store",
     });
 
-    const data = await upstream.json();
+    const { ok, status, data, error } = await readUpstream(
+      upstream,
+      "Upstream pipeline error"
+    );
 
-    if (!upstream.ok) {
-      return NextResponse.json(
-        { error: data.detail || data.error || "Upstream pipeline error" },
-        { status: upstream.status }
-      );
+    if (!ok) {
+      return NextResponse.json({ error }, { status });
     }
 
     return NextResponse.json(data);

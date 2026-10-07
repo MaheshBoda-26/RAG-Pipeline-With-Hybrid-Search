@@ -25,8 +25,8 @@ const PREVIEW_COLORS: Record<string, string> = {
 
 export function Hero() {
   return (
-    <section className="relative bg-canvas pt-24 pb-24 sm:pt-28 sm:pb-28 overflow-hidden" aria-labelledby="hero-title">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <section className="relative bg-canvas pt-28 pb-16 sm:pt-32 sm:pb-20 overflow-hidden min-h-screen flex items-center" aria-labelledby="hero-title">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
